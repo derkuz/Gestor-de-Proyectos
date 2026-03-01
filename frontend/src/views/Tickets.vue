@@ -32,8 +32,9 @@
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 012-2h10a2 2 0 012 2v14l-2-2-2 2-2-2-2 2-2-2-2 2V5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div>
-            <h3 class="text-lg font-bold">{{ ticket.asunto }}</h3>
-            <p class="text-slate-400 text-sm mt-1">{{ ticket.descripcion }}</p>
+            <h3 class="text-lg font-bold">{{ ticket.titulo }}</h3>
+            <p class="text-slate-400 text-sm mt-1">{{ ticket.mensaje }}</p>
+            <p class="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">Creado por: {{ ticket.usuario?.nombre || 'Sistemas' }}</p>
           </div>
         </div>
 
@@ -59,12 +60,12 @@
         <h3 class="text-2xl font-black mb-6">Nuevo Ticket de Soporte</h3>
         <form @submit.prevent="handleCreate" class="space-y-6">
           <div>
-            <label class="block text-sm font-bold text-slate-400 mb-2">Asunto</label>
-            <input v-model="newTicket.asunto" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:ring-2 focus:ring-blue-500/50 outline-none" placeholder="¿En qué podemos ayudarte?">
+            <label class="block text-sm font-bold text-slate-400 mb-2">Asunto (Título)</label>
+            <input v-model="newTicket.titulo" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:ring-2 focus:ring-blue-500/50 outline-none" placeholder="¿En qué podemos ayudarte?">
           </div>
           <div>
-            <label class="block text-sm font-bold text-slate-400 mb-2">Descripción detallada</label>
-            <textarea v-model="newTicket.descripcion" rows="3" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:ring-2 focus:ring-blue-500/50 outline-none"></textarea>
+            <label class="block text-sm font-bold text-slate-400 mb-2">Descripción detallada (Mensaje)</label>
+            <textarea v-model="newTicket.mensaje" rows="3" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:ring-2 focus:ring-blue-500/50 outline-none"></textarea>
           </div>
           <div class="flex space-x-4 pt-4">
             <button type="button" @click="showCreateModal = false" class="flex-1 py-3 font-bold text-slate-400 hover:text-white transition-colors">Cancelar</button>
@@ -82,7 +83,7 @@ import { useTicketStore } from '../store/tickets'
 
 const ticketStore = useTicketStore()
 const showCreateModal = ref(false)
-const newTicket = ref({ asunto: '', descripcion: '' })
+const newTicket = ref({ titulo: '', mensaje: '' })
 
 onMounted(() => {
   ticketStore.fetchTickets()
@@ -92,7 +93,7 @@ const handleCreate = async () => {
   const success = await ticketStore.createTicket(newTicket.value)
   if (success) {
     showCreateModal.value = false
-    newTicket.value = { asunto: '', descripcion: '' }
+    newTicket.value = { titulo: '', mensaje: '' }
   }
 }
 

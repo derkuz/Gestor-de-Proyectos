@@ -40,10 +40,13 @@
           <div class="flex -space-x-2">
             <div class="w-8 h-8 rounded-full border-2 border-slate-900 bg-purple-500 flex items-center justify-center text-[10px] font-bold">JD</div>
           </div>
-          <button class="text-sm font-bold text-slate-300 hover:text-white transition-colors flex items-center space-x-2">
+          <router-link 
+            :to="{ name: 'ProjectDetails', params: { id: project.id } }"
+            class="text-sm font-bold text-slate-300 hover:text-white transition-colors flex items-center space-x-2"
+          >
             <span>Ver detalles</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+          </router-link>
         </div>
       </div>
     </div>
