@@ -62,13 +62,17 @@ El sistema operará bajo un esquema de control de acceso basado en roles:
 
 * **RF-10: Tablero Kanban:** Visualización dinámica de tareas por columnas de estado con capacidad de *Drag & Drop*.
 * **RF-11: Diagrama de Gantt:** Visualización cronológica de las tareas principales para identificar dependencias y tiempos de entrega.
+* **RF-12: Documentación de Proyecto:** Cada proyecto debe tener un módulo de documentación enriquecida.
+    * **Markdown:** Editor con previsualización en tiempo real.
+    * **Diagramas:** Soporte para **Mermaid.js** (Diagramas de secuencia, flujo, etc.).
+    * **Exportación:** Opción para descargar la documentación en formato **PDF**.
 
 ---
 
 ## 4. Requerimientos No Funcionales (RNF)
 
 * **RNF-01: Arquitectura:** Separación física de capas. Backend en `/backend` (**NestJS sobre Deno**) y Frontend en `/frontend` (**Vue 3**).
-* **RNF-02: Escalabilidad:** El backend debe utilizar un ORM (TypeORM) para facilitar la migración o crecimiento de la base de datos.
+* **RNF-02: Escalabilidad:** El backend debe utilizar un ORM (TypeORM) con **PostgreSQL** para garantizar la integridad referencial y facilitar el crecimiento.
 * **RNF-03: Interfaz de Usuario:** El diseño debe ser responsivo (Mobile First) utilizando **Tailwind CSS** para un estilizado moderno y eficiente.
 
 ---
@@ -125,6 +129,12 @@ El sistema operará bajo un esquema de control de acceso basado en roles:
 - `password`: String (Hash)
 - `nombre`: String
 - `rol`: Enum (`ADMIN`, `PROJECT_MANAGER`, `COLABORADOR`, `EXTERNO`)
+
+### 6.5 Documentación (`Documentation`)
+- `id`: UUID (PK)
+- `proyectoId`: UUID (FK, 1:1)
+- `contenido`: Text (Markdown/Mermaid)
+- `ultimaActualizacion`: DateTime
 
 ---
 

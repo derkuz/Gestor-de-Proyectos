@@ -4,9 +4,9 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [4] 2026-03-01 01:29
-- **Ampliación del Modelo de Datos:**
-  - Diseño de la entidad **Usuarios (`User`)**.
-  - Inclusión de **Roles** mediante Enum (`ADMIN`, `PROJECT_MANAGER`, `COLABORADOR`, `EXTERNO`).
-  - Definición de relaciones entre Usuarios y Proyectos/Tareas/Tickets.
-- **Documentación:** Actualización de `README.MD` y `database_design.md`.
+## [5] 2026-03-01 01:31
+- **Definición de Base de Datos:** Elección de **PostgreSQL** como motor relacional.
+- **Nueva Funcionalidad:** Módulo de **Documentación por Proyecto**.
+  - Soporte para Markdown y diagramas Mermaid.
+  - Especificación para exportación a PDF.
+- **Modelo de Datos:** Inclusión de la entidad `Documentation` (Relación 1:1 con Project).
