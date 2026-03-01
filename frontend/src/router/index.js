@@ -20,9 +20,25 @@ const routes = [
     },
     {
         path: '/dashboard',
-        name: 'Dashboard',
-        component: () => import('../views/Dashboard.vue'),
+        component: () => import('../layouts/MainLayout.vue'),
         meta: { requiresAuth: true },
+        children: [
+            {
+                path: '',
+                name: 'Dashboard',
+                component: () => import('../views/Dashboard.vue'),
+            },
+            {
+                path: '/projects',
+                name: 'Projects',
+                component: () => import('../views/Projects.vue'),
+            },
+            {
+                path: '/tickets',
+                name: 'Tickets',
+                component: () => import('../views/Tickets.vue'),
+            }
+        ]
     },
 ];
 

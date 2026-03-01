@@ -6,8 +6,6 @@
 </script>
 
 <style>
-@import "tailwindcss";
-
 :root {
   color-scheme: dark;
 }
