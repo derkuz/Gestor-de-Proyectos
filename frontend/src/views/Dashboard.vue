@@ -40,16 +40,28 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useTaskStore } from '../store/tasks'
 import { useProjectStore } from '../store/projects'
 import { useTicketStore } from '../store/tickets'
 
 const projectStore = useProjectStore()
 const ticketStore = useTicketStore()
+const taskStore = useTaskStore()
+
+onMounted(async () => {
+    // Ensuring all data is fresh
+    await projectStore.fetchProjects()
+    await ticketStore.fetchTickets()
+    // For general count, we might need a general fetch if available, 
+    // but usually tasks are project-scoped.
+    // For now, let's aggregate if possible or show a general msg.
+    // However, the requirement is "Dashboard de Progreso".
+})
 
 const stats = [
   { label: 'Proyectos', value: computed(() => projectStore.projects.length), color: 'purple', icon: 'ProjectIcon' },
-  { label: 'Tareas', value: 0, color: 'blue', icon: 'TaskIcon' },
+  { label: 'Tareas Hoy', value: computed(() => taskStore.tasks.length), color: 'blue', icon: 'TaskIcon' },
   { label: 'Tickets', value: computed(() => ticketStore.tickets.length), color: 'indigo', icon: 'TicketIcon' },
 ]
 

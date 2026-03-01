@@ -36,10 +36,16 @@
         <button 
           @click="openTaskModal()"
           :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
-          class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+          class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           + Nueva Tarea
         </button>
+        <router-link 
+          :to="`/projects/${route.params.id}/kanban`"
+          class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/20 transition-all active:scale-95 text-center"
+        >
+          Ver Kanban
+        </router-link>
       </div>
     </header>
 
