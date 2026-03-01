@@ -19,6 +19,10 @@ const ticket_entity_1 = require("./entities/ticket.entity");
 const documentation_entity_1 = require("./entities/documentation.entity");
 const users_module_1 = require("./users/users.module");
 const auth_module_1 = require("./auth/auth.module");
+const projects_module_1 = require("./projects/projects.module");
+const tasks_module_1 = require("./tasks/tasks.module");
+const tickets_module_1 = require("./tickets/tickets.module");
+const documentation_module_1 = require("./documentation/documentation.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +48,10 @@ exports.AppModule = AppModule = __decorate([
             }),
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
+            projects_module_1.ProjectsModule,
+            tasks_module_1.TasksModule,
+            tickets_module_1.TicketsModule,
+            documentation_module_1.DocumentationModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

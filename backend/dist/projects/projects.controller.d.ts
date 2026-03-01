@@ -1,0 +1,11 @@
+import { ProjectsService } from './projects.service';
+import { Project } from '../entities/project.entity';
+export declare class ProjectsController {
+    private readonly projectsService;
+    constructor(projectsService: ProjectsService);
+    create(projectData: Partial<Project>): Promise<Project>;
+    findAll(): Promise<Project[]>;
+    findOne(id: string): Promise<Project>;
+    update(id: string, updateData: Partial<Project>): Promise<Project>;
+    remove(id: string): Promise<void>;
+}

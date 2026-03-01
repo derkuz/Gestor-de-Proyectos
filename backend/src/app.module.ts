@@ -10,6 +10,10 @@ import { Ticket } from './entities/ticket.entity';
 import { Documentation } from './entities/documentation.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { ProjectsModule } from './projects/projects.module';
+import { TasksModule } from './tasks/tasks.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { DocumentationModule } from './documentation/documentation.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    ProjectsModule,
+    TasksModule,
+    TicketsModule,
+    DocumentationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
