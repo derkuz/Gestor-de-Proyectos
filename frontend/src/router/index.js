@@ -39,11 +39,6 @@ const routes = [
                 component: () => import('../views/ProjectDetails.vue'),
             },
             {
-                path: '/projects/:id/kanban',
-                name: 'Kanban',
-                component: () => import('../views/Kanban.vue'),
-            },
-            {
                 path: '/tickets',
                 name: 'Tickets',
                 component: () => import('../views/Tickets.vue'),

@@ -36,16 +36,10 @@
         <button 
           @click="openTaskModal()"
           :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
-          class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
         >
           + Nueva Tarea
         </button>
-        <router-link 
-          :to="`/projects/${route.params.id}/kanban`"
-          class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/20 transition-all active:scale-95 text-center"
-        >
-          Ver Kanban
-        </router-link>
       </div>
     </header>
 
@@ -57,104 +51,41 @@
           <p class="text-slate-300 leading-relaxed">{{ projectStore.currentProject.descripcion || 'Sin descripción disponible.' }}</p>
         </section>
 
-        <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl min-h-[400px]">
-          <h3 class="text-xl font-black mb-6 flex items-center justify-between">
-            <span>Tareas y Subtareas</span>
-            <div class="flex items-center space-x-2">
-                <span class="px-2 py-0.5 rounded-lg bg-white/5 text-[10px] font-bold text-slate-400">{{ mainTasks.length }} principales</span>
+        <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl min-h-[500px] flex flex-col">
+          <h3 class="text-xl font-black mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <span>Gestión de Actividades</span>
+            
+            <!-- Tab Navigation -->
+            <div class="flex p-1 bg-white/5 rounded-2xl border border-white/5 self-start md:self-auto">
+               <button 
+                v-for="tab in ['kanban', 'list', 'gantt']" 
+                :key="tab"
+                @click="activeTab = tab"
+                class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                :class="activeTab === tab ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-slate-500 hover:text-slate-300'"
+               >
+                 {{ tab }}
+               </button>
             </div>
           </h3>
           
-          <div v-if="mainTasks.length > 0" class="space-y-4">
-             <div 
-              v-for="task in mainTasks" 
-              :key="task.id"
-              class="bg-white/3 rounded-2xl border border-white/5 overflow-hidden transition-all"
-              :class="expandedTasks.includes(task.id) ? 'ring-1 ring-purple-500/30' : ''"
-            >
-              <!-- Task Header -->
-              <div class="flex items-center justify-between p-5 hover:bg-white/5 cursor-pointer" @click="toggleExpand(task.id)">
-                <div class="flex items-center space-x-4">
-                  <button 
-                    @click.stop="toggleTaskStatus(task)"
-                    :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
-                    class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all"
-                    :class="task.estado === 'Finalizado' ? 'bg-green-500 border-green-500 text-slate-900 shadow-lg shadow-green-500/20' : 'border-slate-600 hover:border-purple-500'"
-                  >
-                    <svg v-if="task.estado === 'Finalizado'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
-                  </button>
-                  <div>
-                    <p class="font-bold text-slate-100" :class="task.estado === 'Finalizado' ? 'line-through text-slate-500' : ''">
-                      {{ task.nombre }}
-                    </p>
-                    <div class="flex items-center space-x-3 mt-1.5">
-                      <span :class="getPriorityClass(task.prioridad)" class="text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-md border">
-                          {{ task.prioridad }}
-                      </span>
-                      <span class="text-[10px] text-slate-600 font-bold uppercase">{{ task.estado }}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                   <div v-if="task.subtareas?.length > 0" class="flex items-center text-slate-500 space-x-1">
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2"/></svg>
-                      <span class="text-xs font-bold">{{ task.subtareas.length }}</span>
-                   </div>
-                   <svg :class="expandedTasks.includes(task.id) ? 'rotate-180' : ''" class="w-5 h-5 text-slate-500 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-              </div>
+          <div class="flex-1">
+            <KanbanBoard 
+              v-if="activeTab === 'kanban'" 
+              :project-status="projectStore.currentProject.estado" 
+            />
+            
+            <TaskListView 
+              v-else-if="activeTab === 'list'"
+              :project-status="projectStore.currentProject.estado"
+              @toggle-status="toggleTaskStatus"
+              @add-subtask="openTaskModal"
+              @delete-task="handleDeleteTask"
+            />
 
-              <!-- Task Content (Expanded) -->
-              <div v-if="expandedTasks.includes(task.id)" class="px-5 pb-5 border-t border-white/5 bg-slate-900/40 animate-slide-down">
-                <div class="py-4">
-                  <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Detalle</p>
-                  <p class="text-sm text-slate-300">{{ task.descripcion || 'Sin detalle adicional.' }}</p>
-                </div>
-
-                <!-- Subtasks List -->
-                <div class="mt-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <p class="text-xs font-black text-slate-500 uppercase tracking-widest">Subtareas</p>
-                        <button 
-                          @click.stop="openTaskModal(task.id)"
-                          class="text-[10px] font-black uppercase tracking-widest text-purple-400 hover:text-purple-300 px-2 py-1 rounded-lg bg-purple-500/5"
-                        >
-                          + Añadir Subtarea
-                        </button>
-                    </div>
-
-                    <div v-if="task.subtareas?.length > 0" class="space-y-3 pl-4 border-l border-white/5">
-                        <div 
-                          v-for="sub in task.subtareas" 
-                          :key="sub.id"
-                          class="flex items-center justify-between p-3 bg-white/1 rounded-xl group/sub"
-                        >
-                           <div class="flex items-center space-x-3">
-                              <button 
-                                @click.stop="toggleTaskStatus(sub)"
-                                class="w-4 h-4 rounded-md border-2 flex items-center justify-center transition-all"
-                                :class="sub.estado === 'Finalizado' ? 'bg-green-500 border-green-500 text-slate-900' : 'border-slate-700'"
-                              >
-                                <svg v-if="sub.estado === 'Finalizado'" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5"><path d="M5 13l4 4L19 7"/></svg>
-                              </button>
-                              <span class="text-sm font-medium" :class="sub.estado === 'Finalizado' ? 'line-through text-slate-500' : ''">{{ sub.nombre }}</span>
-                           </div>
-                           <button @click.stop="handleDeleteTask(sub.id)" class="text-slate-600 hover:text-red-400 opacity-0 group-hover/sub:opacity-100 transition-opacity">
-                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7" stroke-width="2"/></svg>
-                           </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-white/5 flex justify-end space-x-3">
-                   <button @click.stop="handleDeleteTask(task.id)" class="text-xs font-bold text-red-400/60 hover:text-red-400 transition-colors uppercase tracking-widest">Eliminar Tarea Principal</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-else class="flex flex-col items-center justify-center py-20 bg-white/1 rounded-3xl border border-dashed border-white/10">
-            <p class="text-slate-500 font-bold">Sin tareas asignadas.</p>
+            <GanttPlaceholder 
+              v-else
+            />
           </div>
         </section>
       </div>
@@ -196,6 +127,25 @@
              <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Detalles / Descripción</label>
              <textarea v-model="newTask.descripcion" rows="3" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-purple-500 outline-none transition-all" placeholder="Explica brevemente de qué trata esta actividad..."></textarea>
           </div>
+
+          <div>
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Asignar a Colaboradores</label>
+            <div class="flex flex-wrap gap-2 mb-4">
+               <div 
+                v-for="user in usersStore.users" 
+                :key="user.id"
+                @click="toggleUser(user.id)"
+                class="px-4 py-2 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center space-x-2"
+                :class="newTask.asignados.includes(user.id) 
+                  ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/20' 
+                  : 'bg-white/5 border-white/10 text-slate-500 hover:border-purple-500/50 hover:text-slate-300'"
+               >
+                 <span>{{ user.nombre }}</span>
+                 <svg v-if="newTask.asignados.includes(user.id)" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-width="4"/></svg>
+               </div>
+            </div>
+            <p class="text-[10px] text-slate-600 font-bold uppercase tracking-widest pl-1">Puedes seleccionar uno o varios usuarios</p>
+          </div>
           
           <div class="grid grid-cols-2 gap-6">
             <div>
@@ -207,7 +157,7 @@
                 <option value="CRITICA">Crítica</option>
               </select>
             </div>
-            <div class="flex items-end pb-1 pb-4">
+            <div class="flex items-end pb-4">
                <div class="w-full h-12 bg-white/3 border border-white/5 rounded-2xl flex items-center px-4">
                   <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Estado: Pendiente</span>
                </div>
@@ -231,16 +181,22 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProjectStore } from '../store/projects'
 import { useTaskStore } from '../store/tasks'
+import { useUsersStore } from '../store/users'
+import KanbanBoard from '../components/KanbanBoard.vue'
+import TaskListView from '../components/TaskListView.vue'
+import GanttPlaceholder from '../components/GanttPlaceholder.vue'
 
 const route = useRoute()
 const projectStore = useProjectStore()
 const taskStore = useTaskStore()
+const usersStore = useUsersStore()
 
 const showModal = ref(false)
 const isSubtask = ref(false)
 const parentTaskId = ref(null)
 const expandedTasks = ref([])
-const newTask = ref({ nombre: '', descripcion: '', prioridad: 'MEDIA' })
+const activeTab = ref('kanban')
+const newTask = ref({ nombre: '', descripcion: '', prioridad: 'MEDIA', asignados: [] })
 
 const mainTasks = computed(() => taskStore.tasks.filter(t => !t.esSubtarea))
 const parentTaskName = computed(() => {
@@ -251,7 +207,14 @@ const parentTaskName = computed(() => {
 onMounted(async () => {
   await projectStore.fetchProjectById(route.params.id)
   await taskStore.fetchTasksByProject(route.params.id)
+  await usersStore.fetchUsers()
 })
+
+const toggleUser = (userId) => {
+    const idx = newTask.value.asignados.indexOf(userId)
+    if (idx > -1) newTask.value.asignados.splice(idx, 1)
+    else newTask.value.asignados.push(userId)
+}
 
 const completionPercentage = computed(() => {
     const mainOnly = taskStore.tasks.filter(t => !t.esSubtarea)
@@ -263,7 +226,7 @@ const completionPercentage = computed(() => {
 const openTaskModal = (pid = null) => {
     isSubtask.value = !!pid
     parentTaskId.value = pid
-    newTask.value = { nombre: '', descripcion: '', prioridad: 'MEDIA' }
+    newTask.value = { nombre: '', descripcion: '', prioridad: 'MEDIA', asignados: [] }
     showModal.value = true
 }
 
