@@ -49,4 +49,30 @@ export class AuthService {
             },
         };
     }
+
+    async requestPasswordReset(email: string) {
+        const user = await this.usersService.findByEmail(email);
+        if (!user) return; // Do not leak existence
+
+        const token = Math.random().toString(36).substring(2, 12);
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1);
+
+        await this.usersService.updateResetToken(user.id, token, expires);
+
+        // TODO: Send real email. For now, we log it.
+        console.log(`[MOCK EMAIL] Reset Token para ${email}: ${token}`);
+        return { message: 'Si el correo existe, se ha enviado un código de recuperación.' };
+    }
+
+    async resetPassword(token: string, newPass: string) {
+        const user = await this.usersService.findByResetToken(token);
+        if (!user || user.resetTokenExpires! < new Date()) {
+            throw new UnauthorizedException('Token inválido o expirado');
+        }
+
+        const hashedPassword = await bcrypt.hash(newPass, 10);
+        await this.usersService.updatePassword(user.id, hashedPassword);
+        return { message: 'Contraseña actualizada correctamente' };
+    }
 }

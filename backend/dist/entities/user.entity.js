@@ -25,6 +25,8 @@ let User = class User {
     nombre;
     rol;
     fechaRegistro;
+    resetToken;
+    resetTokenExpires;
 };
 exports.User = User;
 __decorate([
@@ -55,6 +57,14 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], User.prototype, "fechaRegistro", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, select: false }),
+    __metadata("design:type", String)
+], User.prototype, "resetToken", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, select: false }),
+    __metadata("design:type", Date)
+], User.prototype, "resetTokenExpires", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

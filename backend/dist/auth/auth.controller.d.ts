@@ -21,4 +21,10 @@ export declare class AuthController {
             rol: any;
         };
     }>;
+    forgotPassword(email: string): Promise<{
+        message: string;
+    } | undefined>;
+    resetPassword(body: any): Promise<{
+        message: string;
+    }>;
 }

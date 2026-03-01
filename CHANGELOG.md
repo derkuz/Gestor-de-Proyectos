@@ -4,10 +4,9 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [8] 2026-03-01 02:00
-- **Sistema de Autenticación (JWT):**
-  - Implementación de `AuthModule` y `UsersModule`.
-  - Endpoints de **Registro** y **Login** con hashing de contraseñas (Bcrypt).
-  - Configuración de **Passport JWT Strategy** y `JwtAuthGuard`.
-  - Ruta protegida de prueba `/profile`.
-- **Seguridad:** Gestión de `JWT_SECRET` mediante variables de entorno.
+## [9] 2026-03-01 02:05
+- **Recuperación de Contraseña:**
+  - Implementación de lógica de tokens de recuperación (expiración de 1 hora).
+  - Nuevos endpoints: `POST /auth/forgot-password` y `POST /auth/reset-password`.
+- **Documentación:**
+  - Creación de una guía detallada sobre **NestJS y TypeScript** para facilitar la comprensión del proyecto.

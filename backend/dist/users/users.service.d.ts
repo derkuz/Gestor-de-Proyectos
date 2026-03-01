@@ -5,4 +5,7 @@ export declare class UsersService {
     constructor(usersRepository: Repository<User>);
     findByEmail(email: string): Promise<User | null>;
     create(userData: Partial<User>): Promise<User>;
+    updateResetToken(id: string, token: string, expires: Date): Promise<void>;
+    findByResetToken(token: string): Promise<User | null>;
+    updatePassword(id: string, passwordHash: string): Promise<void>;
 }

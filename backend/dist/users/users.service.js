@@ -32,6 +32,25 @@ let UsersService = class UsersService {
         const user = this.usersRepository.create(userData);
         return this.usersRepository.save(user);
     }
+    async updateResetToken(id, token, expires) {
+        await this.usersRepository.update(id, {
+            resetToken: token,
+            resetTokenExpires: expires
+        });
+    }
+    async findByResetToken(token) {
+        return this.usersRepository.findOne({
+            where: { resetToken: token },
+            select: ['id', 'resetTokenExpires']
+        });
+    }
+    async updatePassword(id, passwordHash) {
+        await this.usersRepository.update(id, {
+            password: passwordHash,
+            resetToken: null,
+            resetTokenExpires: null
+        });
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

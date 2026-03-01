@@ -30,4 +30,10 @@ export class User {
 
     @CreateDateColumn()
     fechaRegistro: Date;
+
+    @Column({ nullable: true, select: false })
+    resetToken: string;
+
+    @Column({ nullable: true, select: false })
+    resetTokenExpires: Date;
 }

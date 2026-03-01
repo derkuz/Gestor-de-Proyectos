@@ -24,4 +24,10 @@ export declare class AuthService {
             rol: any;
         };
     }>;
+    requestPasswordReset(email: string): Promise<{
+        message: string;
+    } | undefined>;
+    resetPassword(token: string, newPass: string): Promise<{
+        message: string;
+    }>;
 }

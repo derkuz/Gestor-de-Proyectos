@@ -11,4 +11,6 @@ export declare class User {
     nombre: string;
     rol: UserRole;
     fechaRegistro: Date;
+    resetToken: string;
+    resetTokenExpires: Date;
 }
