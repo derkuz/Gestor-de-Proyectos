@@ -25,11 +25,8 @@
       </div>
       
       <div class="flex space-x-3 w-full md:w-auto">
-         <button class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all">
-          Editar
-        </button>
         <button 
-          @click="showCreateTaskModal = true"
+          @click="openTaskModal()"
           :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
           class="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
         >
@@ -39,152 +36,175 @@
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left Column: Description & Tasks -->
+      <!-- Left Column -->
       <div class="lg:col-span-2 space-y-8">
-        <!-- Info Card -->
         <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl">
           <h3 class="text-xl font-black mb-4">Descripción del Proyecto</h3>
           <p class="text-slate-300 leading-relaxed">{{ projectStore.currentProject.descripcion || 'Sin descripción disponible.' }}</p>
         </section>
 
-        <!-- Tasks Section -->
         <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl min-h-[400px]">
           <h3 class="text-xl font-black mb-6 flex items-center justify-between">
-            <span>Tareas del Proyecto</span>
+            <span>Tareas y Subtareas</span>
             <div class="flex items-center space-x-2">
-                <span class="px-2 py-0.5 rounded-lg bg-white/5 text-[10px] font-bold text-slate-400">{{ taskStore.tasks.length }}</span>
+                <span class="px-2 py-0.5 rounded-lg bg-white/5 text-[10px] font-bold text-slate-400">{{ mainTasks.length }} principales</span>
             </div>
           </h3>
           
-          <div v-if="taskStore.tasks.length > 0" class="space-y-4">
+          <div v-if="mainTasks.length > 0" class="space-y-4">
              <div 
-              v-for="task in taskStore.tasks" 
+              v-for="task in mainTasks" 
               :key="task.id"
-              class="flex items-center justify-between p-5 bg-white/3 hover:bg-white/8 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group"
+              class="bg-white/3 rounded-2xl border border-white/5 overflow-hidden transition-all"
+              :class="expandedTasks.includes(task.id) ? 'ring-1 ring-purple-500/30' : ''"
             >
-              <div class="flex items-center space-x-4">
-                <button 
-                  @click="toggleTaskStatus(task)"
-                  :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
-                  class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all"
-                  :class="task.estado === 'Finalizado' ? 'bg-green-500 border-green-500 text-slate-900 shadow-lg shadow-green-500/20' : 'border-slate-600 hover:border-purple-500'"
-                >
-                  <svg v-if="task.estado === 'Finalizado'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
-                </button>
-                <div>
-                  <p class="font-bold text-slate-100 group-hover:text-white" :class="task.estado === 'Finalizado' ? 'line-through text-slate-500' : ''">
-                    {{ task.nombre }}
-                  </p>
-                  <div class="flex items-center space-x-3 mt-1.5">
-                    <span :class="getPriorityClass(task.prioridad)" class="text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-md border">
-                        {{ task.prioridad }}
-                    </span>
-                    <span class="text-[10px] text-slate-600 font-bold uppercase">{{ task.estado }}</span>
+              <!-- Task Header -->
+              <div class="flex items-center justify-between p-5 hover:bg-white/5 cursor-pointer" @click="toggleExpand(task.id)">
+                <div class="flex items-center space-x-4">
+                  <button 
+                    @click.stop="toggleTaskStatus(task)"
+                    :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
+                    class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all"
+                    :class="task.estado === 'Finalizado' ? 'bg-green-500 border-green-500 text-slate-900 shadow-lg shadow-green-500/20' : 'border-slate-600 hover:border-purple-500'"
+                  >
+                    <svg v-if="task.estado === 'Finalizado'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
+                  </button>
+                  <div>
+                    <p class="font-bold text-slate-100" :class="task.estado === 'Finalizado' ? 'line-through text-slate-500' : ''">
+                      {{ task.nombre }}
+                    </p>
+                    <div class="flex items-center space-x-3 mt-1.5">
+                      <span :class="getPriorityClass(task.prioridad)" class="text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-md border">
+                          {{ task.prioridad }}
+                      </span>
+                      <span class="text-[10px] text-slate-600 font-bold uppercase">{{ task.estado }}</span>
+                    </div>
                   </div>
                 </div>
+                
+                <div class="flex items-center space-x-4">
+                   <div v-if="task.subtareas?.length > 0" class="flex items-center text-slate-500 space-x-1">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2"/></svg>
+                      <span class="text-xs font-bold">{{ task.subtareas.length }}</span>
+                   </div>
+                   <svg :class="expandedTasks.includes(task.id) ? 'rotate-180' : ''" class="w-5 h-5 text-slate-500 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
               </div>
-              
-              <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button class="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-xl transition-all">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <button @click="handleDeleteTask(task.id)" class="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
+
+              <!-- Task Content (Expanded) -->
+              <div v-if="expandedTasks.includes(task.id)" class="px-5 pb-5 border-t border-white/5 bg-slate-900/40 animate-slide-down">
+                <div class="py-4">
+                  <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Detalle</p>
+                  <p class="text-sm text-slate-300">{{ task.descripcion || 'Sin detalle adicional.' }}</p>
+                </div>
+
+                <!-- Subtasks List -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-xs font-black text-slate-500 uppercase tracking-widest">Subtareas</p>
+                        <button 
+                          @click.stop="openTaskModal(task.id)"
+                          class="text-[10px] font-black uppercase tracking-widest text-purple-400 hover:text-purple-300 px-2 py-1 rounded-lg bg-purple-500/5"
+                        >
+                          + Añadir Subtarea
+                        </button>
+                    </div>
+
+                    <div v-if="task.subtareas?.length > 0" class="space-y-3 pl-4 border-l border-white/5">
+                        <div 
+                          v-for="sub in task.subtareas" 
+                          :key="sub.id"
+                          class="flex items-center justify-between p-3 bg-white/1 rounded-xl group/sub"
+                        >
+                           <div class="flex items-center space-x-3">
+                              <button 
+                                @click.stop="toggleTaskStatus(sub)"
+                                class="w-4 h-4 rounded-md border-2 flex items-center justify-center transition-all"
+                                :class="sub.estado === 'Finalizado' ? 'bg-green-500 border-green-500 text-slate-900' : 'border-slate-700'"
+                              >
+                                <svg v-if="sub.estado === 'Finalizado'" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5"><path d="M5 13l4 4L19 7"/></svg>
+                              </button>
+                              <span class="text-sm font-medium" :class="sub.estado === 'Finalizado' ? 'line-through text-slate-500' : ''">{{ sub.nombre }}</span>
+                           </div>
+                           <button @click.stop="handleDeleteTask(sub.id)" class="text-slate-600 hover:text-red-400 opacity-0 group-hover/sub:opacity-100 transition-opacity">
+                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7" stroke-width="2"/></svg>
+                           </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-white/5 flex justify-end space-x-3">
+                   <button @click.stop="handleDeleteTask(task.id)" class="text-xs font-bold text-red-400/60 hover:text-red-400 transition-colors uppercase tracking-widest">Eliminar Tarea Principal</button>
+                </div>
               </div>
             </div>
           </div>
           <div v-else class="flex flex-col items-center justify-center py-20 bg-white/1 rounded-3xl border border-dashed border-white/10">
-            <div class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mb-4 text-slate-600">
-               <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <p class="text-slate-500 font-bold">No hay tareas creadas.</p>
-            <button @click="showCreateTaskModal = true" class="text-purple-400 text-sm mt-2 font-black uppercase tracking-widest hover:text-purple-300">Crear la primera tarea</button>
+            <p class="text-slate-500 font-bold">Sin tareas asignadas.</p>
           </div>
         </section>
       </div>
 
-      <!-- Right Column: Docs & Stats -->
+      <!-- Right Column -->
       <div class="space-y-8">
-        <!-- Documentation -->
-        <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl">
-          <h3 class="text-xl font-black mb-6 flex items-center justify-between">
-            <span>Documentación</span>
-            <button class="text-purple-400 text-xs font-black uppercase tracking-widest p-2 hover:bg-purple-500/10 rounded-xl transition-all">Editar</button>
-          </h3>
-          <div v-if="projectStore.currentProject.documentacion" class="prose prose-invert prose-sm">
-            <div class="text-slate-300">{{ projectStore.currentProject.documentacion.contenido }}</div>
-          </div>
-          <div v-else class="flex flex-col items-center py-6 text-center">
-            <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-4 text-slate-500">
-               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <p class="text-slate-500 text-sm italic">No hay documentos aún.</p>
-          </div>
-        </section>
-
-        <!-- Stats Card -->
-        <section class="bg-gradient-to-br from-indigo-900/40 to-slate-900/40 border border-white/10 p-8 rounded-3xl overflow-hidden relative group">
-           <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/10 blur-3xl pointer-events-none group-hover:scale-150 transition-transform"></div>
-           <h3 class="text-xl font-black mb-6">Estado de Avance</h3>
+        <section class="bg-gradient-to-br from-indigo-900/40 to-slate-900/40 border border-white/10 p-8 rounded-3xl relative overflow-hidden group">
+           <h3 class="text-xl font-black mb-6">Progreso</h3>
            <div class="space-y-6">
               <div>
                 <div class="flex justify-between text-sm font-bold mb-2">
-                    <span class="text-slate-400 uppercase tracking-widest">Global</span>
+                    <span class="text-slate-400 uppercase tracking-widest">Proyecto</span>
                     <span class="text-purple-400">{{ completionPercentage }}%</span>
                 </div>
                 <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                     <div :style="{ width: completionPercentage + '%' }" class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-1000"></div>
                 </div>
               </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                  <div class="bg-white/3 p-4 rounded-2xl border border-white/5">
-                      <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Finalizadas</p>
-                      <p class="text-2xl font-black">{{ completedTasks }}</p>
-                  </div>
-                  <div class="bg-white/3 p-4 rounded-2xl border border-white/5">
-                      <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Pendientes</p>
-                      <p class="text-2xl font-black">{{ pendingTasks }}</p>
-                  </div>
-              </div>
+              <p class="text-xs text-slate-500 font-medium leading-relaxed">Considera todas las tareas y subtareas para el cálculo de avance.</p>
            </div>
         </section>
       </div>
     </div>
 
-    <!-- Create Task Modal -->
-    <div v-if="showCreateTaskModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md" @click="showCreateTaskModal = false"></div>
+    <!-- Enhanced Task/Subtask Modal -->
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md" @click="showModal = false"></div>
       <div class="bg-slate-900 border border-white/10 rounded-[2.5rem] p-10 w-full max-w-xl relative z-10 shadow-2xl animate-pop-in">
-        <h3 class="text-3xl font-black mb-2">Nueva Tarea</h3>
-        <p class="text-slate-400 mb-8 font-medium">Define los detalles de la actividad a realizar.</p>
+        <h3 class="text-3xl font-black mb-1">{{ isSubtask ? 'Nueva Subtarea' : 'Nueva Tarea Principal' }}</h3>
+        <p class="text-slate-400 mb-8 font-medium">{{ isSubtask ? 'Añadiendo a: ' + parentTaskName : 'Define una actividad principal para el proyecto.' }}</p>
         
-        <form @submit.prevent="handleCreateTask" class="space-y-6">
+        <form @submit.prevent="handleSubmit" class="space-y-6">
           <div>
-            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nombre de la tarea</label>
-            <input v-model="newTask.nombre" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500/50 outline-none transition-all placeholder:text-slate-700" placeholder="Ej: Implementar Login">
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Título de la {{ isSubtask ? 'subtarea' : 'tarea' }}</label>
+            <input v-model="newTask.nombre" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-purple-500 outline-none transition-all" :placeholder="isSubtask ? 'Nombre de la subtarea' : 'Nombre de la tarea principal'">
+          </div>
+
+          <div>
+             <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Detalles / Descripción</label>
+             <textarea v-model="newTask.descripcion" rows="3" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-purple-500 outline-none transition-all" placeholder="Explica brevemente de qué trata esta actividad..."></textarea>
           </div>
           
           <div class="grid grid-cols-2 gap-6">
             <div>
               <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Prioridad</label>
-              <select v-model="newTask.prioridad" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500/50 outline-none appearance-none cursor-pointer">
+              <select v-model="newTask.prioridad" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none cursor-pointer">
                 <option value="BAJA">Baja</option>
                 <option value="MEDIA">Media</option>
                 <option value="ALTA">Alta</option>
                 <option value="CRITICA">Crítica</option>
               </select>
             </div>
-            <div>
-               <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Estado inicial</label>
-               <input value="Pendiente" disabled class="w-full bg-white/3 border border-white/5 rounded-2xl px-6 py-4 text-slate-600 cursor-not-allowed">
+            <div class="flex items-end pb-1 pb-4">
+               <div class="w-full h-12 bg-white/3 border border-white/5 rounded-2xl flex items-center px-4">
+                  <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Estado: Pendiente</span>
+               </div>
             </div>
           </div>
 
           <div class="flex space-x-4 pt-6">
-            <button type="button" @click="showCreateTaskModal = false" class="flex-1 py-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-white transition-colors">Cancelar</button>
-            <button type="submit" class="flex-1 py-4 bg-purple-600 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/30">Crear Tarea</button>
+            <button type="button" @click="showModal = false" class="flex-1 py-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-white transition-colors">Cancelar</button>
+            <button type="submit" class="flex-1 py-4 bg-purple-600 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/30">
+               {{ isSubtask ? 'Crear Subtarea' : 'Crear Tarea' }}
+            </button>
           </div>
         </form>
       </div>
@@ -202,47 +222,70 @@ const route = useRoute()
 const projectStore = useProjectStore()
 const taskStore = useTaskStore()
 
-const showCreateTaskModal = ref(false)
-const newTask = ref({ nombre: '', prioridad: 'MEDIA' })
+const showModal = ref(false)
+const isSubtask = ref(false)
+const parentTaskId = ref(null)
+const expandedTasks = ref([])
+const newTask = ref({ nombre: '', descripcion: '', prioridad: 'MEDIA' })
+
+const mainTasks = computed(() => taskStore.tasks.filter(t => !t.esSubtarea))
+const parentTaskName = computed(() => {
+    if (!parentTaskId.value) return ''
+    return taskStore.tasks.find(t => t.id === parentTaskId.value)?.nombre
+})
 
 onMounted(async () => {
   await projectStore.fetchProjectById(route.params.id)
   await taskStore.fetchTasksByProject(route.params.id)
 })
 
-const completedTasks = computed(() => taskStore.tasks.filter(t => t.estado === 'Finalizado').length)
-const pendingTasks = computed(() => taskStore.tasks.length - completedTasks.value)
 const completionPercentage = computed(() => {
     if (taskStore.tasks.length === 0) return 0
-    return Math.round((completedTasks.value / taskStore.tasks.length) * 100)
+    const completed = taskStore.tasks.filter(t => t.estado === 'Finalizado').length
+    return Math.round((completed / taskStore.tasks.length) * 100)
 })
 
-const handleCreateTask = async () => {
-  const success = await taskStore.createTask(route.params.id, newTask.value)
-  if (success) {
-    showCreateTaskModal.value = false
-    newTask.value = { nombre: '', prioridad: 'MEDIA' }
-  }
+const openTaskModal = (pid = null) => {
+    isSubtask.value = !!pid
+    parentTaskId.value = pid
+    newTask.value = { nombre: '', descripcion: '', prioridad: 'MEDIA' }
+    showModal.value = true
+}
+
+const handleSubmit = async () => {
+    if (isSubtask.value) {
+        await taskStore.createSubtask(parentTaskId.value, newTask.value)
+    } else {
+        await taskStore.createTask(route.params.id, newTask.value)
+    }
+    showModal.value = false
+}
+
+const toggleExpand = (id) => {
+    const idx = expandedTasks.value.indexOf(id)
+    if (idx > -1) expandedTasks.value.splice(idx, 1)
+    else expandedTasks.value.push(id)
 }
 
 const toggleTaskStatus = async (task) => {
     const newStatus = task.estado === 'Finalizado' ? 'Pendiente' : 'Finalizado'
     await taskStore.updateTask(task.id, { estado: newStatus })
+    
+    // Refresh parent if it was a subtarea to ensure state consistency (optional depending on UX)
+    if (task.esSubtarea) {
+       await taskStore.fetchTasksByProject(route.params.id)
+    }
 }
 
 const handleDeleteTask = async (taskId) => {
-    if (confirm('¿Estás seguro de eliminar esta tarea?')) {
+    if (confirm('¿Estás seguro de eliminar esta actividad?')) {
         await taskStore.deleteTask(taskId)
     }
 }
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
+  return new Date(dateString).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 const getStatusClass = (status) => {
@@ -269,9 +312,12 @@ const getPriorityClass = (priority) => {
   0% { opacity: 0; transform: scale(0.95); }
   100% { opacity: 1; transform: scale(1); }
 }
-.animate-pop-in {
-  animation: pop-in 0.3s cubic-bezier(0, 0, 0.2, 1);
+@keyframes slide-down {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
+.animate-pop-in { animation: pop-in 0.3s cubic-bezier(0, 0, 0.2, 1); }
+.animate-slide-down { animation: slide-down 0.2s ease-out; }
 .bg-white\/3 { background-color: rgba(255, 255, 255, 0.03); }
-.bg-white\/8 { background-color: rgba(255, 255, 255, 0.08); }
+.bg-white\/1 { background-color: rgba(255, 255, 255, 0.01); }
 </style>

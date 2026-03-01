@@ -35,6 +35,25 @@ export const useTaskStore = defineStore('tasks', {
             }
         },
 
+        async createSubtask(padreId, taskData) {
+            this.loading = true;
+            try {
+                const response = await api.post(`/tasks/${padreId}/subtasks`, taskData);
+                // Update the parent task locally to include the new subtask
+                const parent = this.tasks.find(t => t.id === padreId);
+                if (parent) {
+                    if (!parent.subtareas) parent.subtareas = [];
+                    parent.subtareas.push(response.data);
+                }
+                return response.data;
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Error al crear subtarea';
+                return null;
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async updateTask(taskId, updateData) {
             this.loading = true;
             try {
