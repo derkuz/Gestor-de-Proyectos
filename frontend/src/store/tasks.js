@@ -37,17 +37,24 @@ export const useTaskStore = defineStore('tasks', {
 
         async createSubtask(padreId, taskData) {
             this.loading = true;
+            this.error = null;
             try {
                 const response = await api.post(`/tasks/${padreId}/subtasks`, taskData);
-                // Update the parent task locally to include the new subtask
+                // Add to flat list
+                this.tasks.push(response.data);
+                // Update parent relationship locally
                 const parent = this.tasks.find(t => t.id === padreId);
                 if (parent) {
                     if (!parent.subtareas) parent.subtareas = [];
-                    parent.subtareas.push(response.data);
+                    // Check if it's already there (defensive)
+                    if (!parent.subtareas.find(s => s.id === response.data.id)) {
+                        parent.subtareas.push(response.data);
+                    }
                 }
                 return response.data;
             } catch (error) {
                 this.error = error.response?.data?.message || 'Error al crear subtarea';
+                console.error('Error creating subtask:', error);
                 return null;
             } finally {
                 this.loading = false;

@@ -23,6 +23,14 @@
           <p class="text-slate-400 text-sm font-medium">Desde {{ formatDate(projectStore.currentProject.fechaCreacion) }}</p>
         </div>
       </div>
+
+      <!-- Error Toast (Static for now) -->
+      <div v-if="taskStore.error" class="fixed top-24 right-8 z-[60] animate-bounce">
+         <div class="bg-red-500/20 backdrop-blur-xl border border-red-500/30 px-6 py-3 rounded-2xl text-red-400 font-bold shadow-2xl flex items-center space-x-3">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-width="2"/></svg>
+            <span>{{ taskStore.error }}</span>
+         </div>
+      </div>
       
       <div class="flex space-x-3 w-full md:w-auto">
         <button 
@@ -159,7 +167,7 @@
                     <div :style="{ width: completionPercentage + '%' }" class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-1000"></div>
                 </div>
               </div>
-              <p class="text-xs text-slate-500 font-medium leading-relaxed">Considera todas las tareas y subtareas para el cálculo de avance.</p>
+              <p class="text-xs text-slate-500 font-medium leading-relaxed">El progreso se calcula basándose únicamente en las tareas principales finalizadas.</p>
            </div>
         </section>
       </div>
@@ -240,9 +248,10 @@ onMounted(async () => {
 })
 
 const completionPercentage = computed(() => {
-    if (taskStore.tasks.length === 0) return 0
-    const completed = taskStore.tasks.filter(t => t.estado === 'Finalizado').length
-    return Math.round((completed / taskStore.tasks.length) * 100)
+    const mainOnly = taskStore.tasks.filter(t => !t.esSubtarea)
+    if (mainOnly.length === 0) return 0
+    const completed = mainOnly.filter(t => t.estado === 'Finalizado').length
+    return Math.round((completed / mainOnly.length) * 100)
 })
 
 const openTaskModal = (pid = null) => {
@@ -253,12 +262,22 @@ const openTaskModal = (pid = null) => {
 }
 
 const handleSubmit = async () => {
+    let success = false
     if (isSubtask.value) {
-        await taskStore.createSubtask(parentTaskId.value, newTask.value)
+        const res = await taskStore.createSubtask(parentTaskId.value, newTask.value)
+        if (res) {
+            success = true
+            // Importante: Recargar para asegurar que las relaciones se vean bien
+            await taskStore.fetchTasksByProject(route.params.id)
+        }
     } else {
-        await taskStore.createTask(route.params.id, newTask.value)
+        const res = await taskStore.createTask(route.params.id, newTask.value)
+        if (res) success = true
     }
-    showModal.value = false
+    
+    if (success) {
+        showModal.value = false
+    }
 }
 
 const toggleExpand = (id) => {
