@@ -4,11 +4,8 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [6] 2026-03-01 01:36
-- **Migración de Backend:** Cambio de Deno a **Node.js** para mayor compatibilidad con NestJS.
-  - Inicialización de proyecto NestJS mediante CLI.
-  - Instalación de dependencias: `@nestjs/typeorm`, `typeorm`, `pg`, `@nestjs/config`.
-- **Implementación de Entidades (TypeORM):**
-  - `User`, `Project`, `Task`, `Ticket`, `Documentation`.
-  - Configuración de relaciones (1:N, 1:1, Recursivas).
-- **Configuración:** Conexión a PostgreSQL factorizada mediante variables de entorno (`.env`).
+## [7] 2026-03-01 01:47
+- **Infraestructura con Docker:**
+  - Creación de `docker-compose.yml` para el motor de **PostgreSQL 17**.
+  - Configuración de volúmenes persistentes y mapeo de puertos (5432).
+  - Actualización del `README.MD` con instrucciones de ejecución mediante Docker.

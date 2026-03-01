@@ -138,7 +138,25 @@ El sistema operará bajo un esquema de control de acceso basado en roles:
 
 ---
 
-## 7. Próximos Pasos Sugeridos
+## 7. Instalación y Ejecución (Docker)
+
+Para arrancar el motor de base de datos rápidamente, se ha configurado Docker Compose:
+
+1. **Asegúrate de tener Docker instalado.**
+2. **Arrancar DB:**
+   ```bash
+   docker-compose up -d
+   ```
+3. **Backend:**
+   ```bash
+   cd backend
+   npm install
+   npm run start:dev
+   ```
+
+---
+
+## 8. Próximos Pasos Sugeridos
 
 1. **Modelado de Datos:** Definir las entidades en TypeORM para Proyectos, Usuarios, Tareas y Tickets.
 2. **Maquetado (Wireframes):** Diseñar la vista del Dashboard y el Kanban en Vue.
