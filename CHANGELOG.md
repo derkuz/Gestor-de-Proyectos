@@ -4,9 +4,11 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [5] 2026-03-01 01:31
-- **Definición de Base de Datos:** Elección de **PostgreSQL** como motor relacional.
-- **Nueva Funcionalidad:** Módulo de **Documentación por Proyecto**.
-  - Soporte para Markdown y diagramas Mermaid.
-  - Especificación para exportación a PDF.
-- **Modelo de Datos:** Inclusión de la entidad `Documentation` (Relación 1:1 con Project).
+## [6] 2026-03-01 01:36
+- **Migración de Backend:** Cambio de Deno a **Node.js** para mayor compatibilidad con NestJS.
+  - Inicialización de proyecto NestJS mediante CLI.
+  - Instalación de dependencias: `@nestjs/typeorm`, `typeorm`, `pg`, `@nestjs/config`.
+- **Implementación de Entidades (TypeORM):**
+  - `User`, `Project`, `Task`, `Ticket`, `Documentation`.
+  - Configuración de relaciones (1:N, 1:1, Recursivas).
+- **Configuración:** Conexión a PostgreSQL factorizada mediante variables de entorno (`.env`).
