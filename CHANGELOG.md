@@ -4,8 +4,8 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [11] 2026-03-01 02:20
-- **Integración con Model Context Protocol (MCP):**
-  - Implementación de un servidor puente (`src/mcp-server.ts`) para IA.
-  - Exposición de herramientas: `listar_proyectos`, `crear_proyecto`.
-  - Configuración detallada para conexión con Claude Desktop.
+## [12] 2026-03-01 02:25
+- **Pruebas Unitarias:**
+  - Implementación de **12 suites de pruebas** con un total de **30 tests** pasando.
+  - Cobertura completa de la lógica de negocio en `Auth`, `Projects`, `Tasks`, `Tickets` y `Documentation`.
+  - Validación de restricciones de estado de proyectos y jerarquías de tareas.
