@@ -17,6 +17,8 @@ const project_entity_1 = require("./entities/project.entity");
 const task_entity_1 = require("./entities/task.entity");
 const ticket_entity_1 = require("./entities/ticket.entity");
 const documentation_entity_1 = require("./entities/documentation.entity");
+const users_module_1 = require("./users/users.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +42,8 @@ exports.AppModule = AppModule = __decorate([
                     synchronize: true,
                 }),
             }),
+            users_module_1.UsersModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -8,6 +8,8 @@ import { Project } from './entities/project.entity';
 import { Task } from './entities/task.entity';
 import { Ticket } from './entities/ticket.entity';
 import { Documentation } from './entities/documentation.entity';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { Documentation } from './entities/documentation.entity';
         synchronize: true,
       }),
     }),
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
