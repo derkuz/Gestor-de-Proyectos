@@ -4,11 +4,9 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [2] 2026-03-01 01:25
-- **Backend Scaffolding:** Inicialización de NestJS sobre Deno 2.0.
-  - Creación de `deno.json` con configuración de tareas (`dev`, `start`) e importaciones npm.
-  - Creación de `main.ts` con un controlador básico y habilitación de CORS.
-- **Frontend Scaffolding:** Inicialización de Vue 3 mediante Vite.
-  - Configuración manual de **Tailwind CSS** y **PostCSS**.
-  - Creación de `tailwind.config.js`, `postcss.config.js` y actualización de `src/style.css`.
-- **Estructura Documental:** Creación del `CHANGELOG.md` para seguimiento de cambios.
+## [4] 2026-03-01 01:29
+- **Ampliación del Modelo de Datos:**
+  - Diseño de la entidad **Usuarios (`User`)**.
+  - Inclusión de **Roles** mediante Enum (`ADMIN`, `PROJECT_MANAGER`, `COLABORADOR`, `EXTERNO`).
+  - Definición de relaciones entre Usuarios y Proyectos/Tareas/Tickets.
+- **Documentación:** Actualización de `README.MD` y `database_design.md`.

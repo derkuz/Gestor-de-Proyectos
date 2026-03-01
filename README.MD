@@ -110,3 +110,28 @@ El sistema operará bajo un esquema de control de acceso basado en roles:
 - `esSubtarea`: Boolean
 - `padreId`: UUID (FK, opcional)
 
+### 6.3 Tickets (`Ticket`)
+- `id`: UUID (PK)
+- `codigo`: String (ej: TKT-001)
+- `titulo`: String
+- `mensaje`: Text
+- `estado`: String
+- `tareaRelacionadaId`: UUID (FK, opcional)
+- `solicitanteId`: UUID (FK)
+
+### 6.4 Usuarios (`User`)
+- `id`: UUID (PK)
+- `email`: String (Unique)
+- `password`: String (Hash)
+- `nombre`: String
+- `rol`: Enum (`ADMIN`, `PROJECT_MANAGER`, `COLABORADOR`, `EXTERNO`)
+
+---
+
+## 7. Próximos Pasos Sugeridos
+
+1. **Modelado de Datos:** Definir las entidades en TypeORM para Proyectos, Usuarios, Tareas y Tickets.
+2. **Maquetado (Wireframes):** Diseñar la vista del Dashboard y el Kanban en Vue.
+3. **Core de Auth:** Implementar el módulo de autenticación con JWT en NestJS para diferenciar los roles.
+
+¿Te parece que este documento refleja bien lo que tienes en mente o te gustaría que profundice en algún punto de la lógica de los tickets?
