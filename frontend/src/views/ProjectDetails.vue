@@ -43,15 +43,80 @@
       </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left Column -->
-      <div class="lg:col-span-2 space-y-8">
-        <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl">
-          <h3 class="text-xl font-black mb-4">Descripción del Proyecto</h3>
-          <p class="text-slate-300 leading-relaxed">{{ projectStore.currentProject.descripcion || 'Sin descripción disponible.' }}</p>
+    <!-- Project Content -->
+    <main class="space-y-8 animate-fade-in">
+      <!-- Full Width Description -->
+      <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl">
+        <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Descripción del Proyecto</h3>
+        <p class="text-slate-200 text-lg leading-relaxed">{{ projectStore.currentProject.descripcion || 'Sin descripción disponible.' }}</p>
+      </section>
+
+      <!-- Progress & Documentation Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Progress Section (Left) -->
+        <section class="lg:col-span-5 bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl flex flex-col justify-center">
+          <div class="flex items-center justify-between mb-8">
+             <h3 class="text-xl font-black">Estado del Progreso</h3>
+             <span class="text-3xl font-black text-purple-400">{{ completionPercentage }}%</span>
+          </div>
+          
+          <div class="relative h-4 bg-white/5 rounded-full overflow-hidden border border-white/5 mb-4">
+            <div 
+              class="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-600 to-blue-500 transition-all duration-1000 ease-out"
+              :style="{ width: `${completionPercentage}%` }"
+            ></div>
+          </div>
+          <p class="text-xs text-slate-500 font-bold uppercase tracking-widest text-right">Basado en tareas principales finalizadas</p>
         </section>
 
-        <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl min-h-[500px] flex flex-col">
+        <!-- Documentation Section (Right) -->
+        <section class="lg:col-span-7 bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl flex flex-col min-h-[400px]">
+          <div class="flex items-center justify-between mb-6">
+             <h3 class="text-xl font-black flex items-center space-x-3">
+                <svg class="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2"/></svg>
+                <span>Documentación Técnica</span>
+             </h3>
+             <div class="flex space-x-3">
+                <button 
+                  v-if="!isEditMode" 
+                  @click="isEditMode = true"
+                  class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                >
+                  Editar
+                </button>
+                <button 
+                  v-else 
+                  @click="saveDocumentation"
+                  :disabled="docStore.loading"
+                  class="px-4 py-2 bg-purple-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/20 disabled:opacity-50"
+                >
+                  {{ docStore.loading ? 'Guardando...' : 'Guardar Cambios' }}
+                </button>
+                <button 
+                  v-if="isEditMode" 
+                  @click="isEditMode = false"
+                  class="px-4 py-2 bg-transparent text-slate-500 text-[10px] font-black uppercase tracking-widest hover:text-white"
+                >
+                  Cancelar
+                </button>
+             </div>
+          </div>
+
+          <!-- Documentation Content -->
+          <div class="flex-1 bg-black/20 rounded-2xl border border-white/5 p-6 overflow-y-auto">
+             <div v-if="!isEditMode" class="prose prose-invert prose-sm max-w-none" v-html="renderedMarkdown"></div>
+             <textarea 
+               v-else 
+               v-model="editableDoc"
+               class="w-full h-full min-h-[300px] bg-transparent text-slate-300 font-mono text-sm border-none focus:ring-0 resize-none outline-none"
+               placeholder="Escribe la documentación en formato Markdown..."
+             ></textarea>
+          </div>
+        </section>
+      </div>
+
+      <!-- Unified Tasks Section -->
+      <section class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl min-h-[500px] flex flex-col">
           <h3 class="text-xl font-black mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <span>Gestión de Actividades</span>
             
@@ -88,27 +153,7 @@
             />
           </div>
         </section>
-      </div>
-
-      <!-- Right Column -->
-      <div class="space-y-8">
-        <section class="bg-gradient-to-br from-indigo-900/40 to-slate-900/40 border border-white/10 p-8 rounded-3xl relative overflow-hidden group">
-           <h3 class="text-xl font-black mb-6">Progreso</h3>
-           <div class="space-y-6">
-              <div>
-                <div class="flex justify-between text-sm font-bold mb-2">
-                    <span class="text-slate-400 uppercase tracking-widest">Proyecto</span>
-                    <span class="text-purple-400">{{ completionPercentage }}%</span>
-                </div>
-                <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div :style="{ width: completionPercentage + '%' }" class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-1000"></div>
-                </div>
-              </div>
-              <p class="text-xs text-slate-500 font-medium leading-relaxed">El progreso se calcula basándose únicamente en las tareas principales finalizadas.</p>
-           </div>
-        </section>
-      </div>
-    </div>
+    </main>
 
     <!-- Enhanced Task/Subtask Modal -->
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -182,6 +227,8 @@ import { useRoute } from 'vue-router'
 import { useProjectStore } from '../store/projects'
 import { useTaskStore } from '../store/tasks'
 import { useUsersStore } from '../store/users'
+import { useDocumentationStore } from '../store/documentation'
+import { marked } from 'marked'
 import KanbanBoard from '../components/KanbanBoard.vue'
 import TaskListView from '../components/TaskListView.vue'
 import GanttPlaceholder from '../components/GanttPlaceholder.vue'
@@ -190,12 +237,15 @@ const route = useRoute()
 const projectStore = useProjectStore()
 const taskStore = useTaskStore()
 const usersStore = useUsersStore()
+const docStore = useDocumentationStore()
 
 const showModal = ref(false)
 const isSubtask = ref(false)
 const parentTaskId = ref(null)
 const expandedTasks = ref([])
 const activeTab = ref('kanban')
+const isEditMode = ref(false)
+const editableDoc = ref('')
 const newTask = ref({ nombre: '', descripcion: '', prioridad: 'MEDIA', asignados: [] })
 
 const mainTasks = computed(() => taskStore.tasks.filter(t => !t.esSubtarea))
@@ -204,11 +254,24 @@ const parentTaskName = computed(() => {
     return taskStore.tasks.find(t => t.id === parentTaskId.value)?.nombre
 })
 
+const renderedMarkdown = computed(() => {
+    return marked(docStore.documentation?.contenido || '*Sin documentación disponible todavía.*')
+})
+
 onMounted(async () => {
   await projectStore.fetchProjectById(route.params.id)
   await taskStore.fetchTasksByProject(route.params.id)
   await usersStore.fetchUsers()
+  await docStore.fetchDocumentation(route.params.id)
+  editableDoc.value = docStore.documentation?.contenido || ''
 })
+
+const saveDocumentation = async () => {
+    const success = await docStore.updateDocumentation(route.params.id, editableDoc.value)
+    if (success) {
+        isEditMode.value = false
+    }
+}
 
 const toggleUser = (userId) => {
     const idx = newTask.value.asignados.indexOf(userId)
