@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-env main.ts",
+    "dev": "deno run --allow-net --allow-read --allow-env --watch main.ts"
+  },
+  "imports": {
+    "@nestjs/common": "npm:@nestjs/common@^10.0.0",
+    "@nestjs/core": "npm:@nestjs/core@^10.0.0",
+    "@nestjs/platform-express": "npm:@nestjs/platform-express@^10.0.0",
+    "reflect-metadata": "npm:reflect-metadata@^0.1.13",
+    "rxjs": "npm:rxjs@^7.8.1"
+  }
+}

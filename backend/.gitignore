@@ -1,0 +1,5 @@
+# Backend gitignore (Deno/NestJS)
+.env
+.env.*
+deno.lock
+cov/
