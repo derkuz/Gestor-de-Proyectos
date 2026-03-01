@@ -70,47 +70,64 @@
         </section>
 
         <!-- Documentation Section (Right) -->
-        <section class="lg:col-span-7 bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl flex flex-col min-h-[400px]">
-          <div class="flex items-center justify-between mb-6">
+        <section class="lg:col-span-12 bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl flex flex-col min-h-[400px]">
+          <div class="flex items-center justify-between mb-8">
              <h3 class="text-xl font-black flex items-center space-x-3">
                 <svg class="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2"/></svg>
-                <span>Documentación Técnica</span>
+                <span>Documentos & Recursos</span>
              </h3>
-             <div class="flex space-x-3">
-                <button 
-                  v-if="!isEditMode" 
-                  @click="isEditMode = true"
-                  class="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
-                >
-                  Editar
-                </button>
-                <button 
-                  v-else 
-                  @click="saveDocumentation"
-                  :disabled="docStore.loading"
-                  class="px-4 py-2 bg-purple-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/20 disabled:opacity-50"
-                >
-                  {{ docStore.loading ? 'Guardando...' : 'Guardar Cambios' }}
-                </button>
-                <button 
-                  v-if="isEditMode" 
-                  @click="isEditMode = false"
-                  class="px-4 py-2 bg-transparent text-slate-500 text-[10px] font-black uppercase tracking-widest hover:text-white"
-                >
-                  Cancelar
-                </button>
-             </div>
+             <button 
+                @click="showAddDocModal = true"
+                class="px-6 py-3 bg-purple-600/10 text-purple-400 border border-purple-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-purple-600/20 transition-all flex items-center space-x-2"
+              >
+                <span>+ Agregar Documento</span>
+              </button>
           </div>
 
-          <!-- Documentation Content -->
-          <div class="flex-1 bg-black/20 rounded-2xl border border-white/5 p-6 overflow-y-auto">
-             <div v-if="!isEditMode" class="prose prose-invert prose-sm max-w-none" v-html="renderedMarkdown"></div>
-             <textarea 
-               v-else 
-               v-model="editableDoc"
-               class="w-full h-full min-h-[300px] bg-transparent text-slate-300 font-mono text-sm border-none focus:ring-0 resize-none outline-none"
-               placeholder="Escribe la documentación en formato Markdown..."
-             ></textarea>
+          <!-- Documents List -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+             <div 
+              v-for="doc in docStore.documents" 
+              :key="doc.id"
+              @click="handleDocumentAction(doc)"
+              class="group bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:bg-white/10 hover:border-purple-500/30 transition-all cursor-pointer relative overflow-hidden"
+             >
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                   <svg v-if="doc.tipo === 'MD'" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-width="2"/></svg>
+                   <svg v-else class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2"/></svg>
+                </div>
+
+                <div class="flex items-start space-x-4">
+                   <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                      <span v-if="doc.tipo === 'MD'" class="text-[10px] font-black">MD</span>
+                      <span v-else class="text-[10px] font-black">URL</span>
+                   </div>
+                   <div class="pr-8">
+                      <h4 class="font-bold text-slate-200 group-hover:text-white transition-colors line-clamp-1">{{ doc.titulo }}</h4>
+                      <p class="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">
+                        Actualizado {{ formatDate(doc.ultimaActualizacion) }}
+                      </p>
+                   </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-between">
+                   <span class="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-black/20 text-slate-400">
+                     {{ doc.tipo === 'MD' ? 'Editor Interno' : 'Link Externo' }}
+                   </span>
+                   <button 
+                    @click.stop="handleDeleteDoc(doc.id)"
+                    class="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                   >
+                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2"/></svg>
+                   </button>
+                </div>
+             </div>
+
+             <!-- Placeholder empty -->
+             <div v-if="docStore.documents.length === 0" class="col-span-full py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
+                <p class="text-slate-500 font-medium">No hay documentos todavía.</p>
+                <p class="text-xs text-slate-600 mt-1 uppercase font-black tracking-widest">Añade guías o recursos del proyecto</p>
+             </div>
           </div>
         </section>
       </div>
@@ -218,12 +235,61 @@
         </form>
       </div>
     </div>
+    <!-- Add Document Modal -->
+    <div v-if="showAddDocModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md" @click="showAddDocModal = false"></div>
+      <div class="bg-slate-900 border border-white/10 rounded-[2.5rem] p-10 w-full max-w-lg relative z-10 shadow-2xl animate-pop-in">
+        <h3 class="text-3xl font-black mb-1">Agregar Documento</h3>
+        <p class="text-slate-400 mb-8 font-medium">Añade guías MD o enlaces externos al proyecto.</p>
+        
+        <form @submit.prevent="handleAddDocument" class="space-y-6">
+          <div>
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Título del Documento</label>
+            <input v-model="newDoc.titulo" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-purple-500 outline-none transition-all" placeholder="Ej: Manual de Instalación">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Tipo de Recurso</label>
+            <div class="grid grid-cols-2 gap-4">
+               <button 
+                type="button"
+                @click="newDoc.tipo = 'MD'"
+                class="px-6 py-4 rounded-2xl border text-xs font-bold transition-all"
+                :class="newDoc.tipo === 'MD' ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/20' : 'bg-white/5 border-white/10 text-slate-500'"
+               >
+                 Markdown (.md)
+               </button>
+               <button 
+                type="button"
+                @click="newDoc.tipo = 'LINK'"
+                class="px-6 py-4 rounded-2xl border text-xs font-bold transition-all"
+                :class="newDoc.tipo === 'LINK' ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20' : 'bg-white/5 border-white/10 text-slate-500'"
+               >
+                 Enlace Externo
+               </button>
+            </div>
+          </div>
+
+          <div v-if="newDoc.tipo === 'LINK'">
+             <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">URL del Recurso</label>
+             <input v-model="newDoc.url" required class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-purple-500 outline-none transition-all" placeholder="https://google.com/docs/...">
+          </div>
+
+          <div class="flex space-x-4 pt-6">
+            <button type="button" @click="showAddDocModal = false" class="flex-1 py-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-white transition-colors">Cancelar</button>
+            <button type="submit" class="flex-1 py-4 bg-purple-600 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/30">
+               Crear Recurso
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useProjectStore } from '../store/projects'
 import { useTaskStore } from '../store/tasks'
 import { useUsersStore } from '../store/users'
@@ -244,8 +310,8 @@ const isSubtask = ref(false)
 const parentTaskId = ref(null)
 const expandedTasks = ref([])
 const activeTab = ref('kanban')
-const isEditMode = ref(false)
-const editableDoc = ref('')
+const showAddDocModal = ref(false)
+const newDoc = ref({ titulo: '', tipo: 'MD', url: '' })
 const newTask = ref({ nombre: '', descripcion: '', prioridad: 'MEDIA', asignados: [] })
 
 const mainTasks = computed(() => taskStore.tasks.filter(t => !t.esSubtarea))
@@ -254,22 +320,32 @@ const parentTaskName = computed(() => {
     return taskStore.tasks.find(t => t.id === parentTaskId.value)?.nombre
 })
 
-const renderedMarkdown = computed(() => {
-    return marked(docStore.documentation?.contenido || '*Sin documentación disponible todavía.*')
-})
-
 onMounted(async () => {
   await projectStore.fetchProjectById(route.params.id)
   await taskStore.fetchTasksByProject(route.params.id)
   await usersStore.fetchUsers()
-  await docStore.fetchDocumentation(route.params.id)
-  editableDoc.value = docStore.documentation?.contenido || ''
+  await docStore.fetchDocuments(route.params.id)
 })
 
-const saveDocumentation = async () => {
-    const success = await docStore.updateDocumentation(route.params.id, editableDoc.value)
+const handleAddDocument = async () => {
+    const success = await docStore.createDocument(route.params.id, newDoc.value)
     if (success) {
-        isEditMode.value = false
+        showAddDocModal.value = false
+        newDoc.value = { titulo: '', tipo: 'MD', url: '' }
+    }
+}
+
+const handleDocumentAction = (doc) => {
+    if (doc.tipo === 'MD') {
+        router.push(`/projects/${route.params.id}/documentation/${doc.id}`)
+    } else if (doc.url) {
+        window.open(doc.url, '_blank')
+    }
+}
+
+const handleDeleteDoc = async (docId) => {
+    if (confirm('¿Estás seguro de eliminar este documento?')) {
+        await docStore.deleteDocument(route.params.id, docId)
     }
 }
 
