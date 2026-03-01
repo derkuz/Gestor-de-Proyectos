@@ -84,39 +84,34 @@
               </button>
           </div>
 
-          <!-- Documents List -->
-          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <!-- Documents List (Compact) -->
+          <div class="space-y-3">
              <div 
               v-for="doc in docStore.documents" 
               :key="doc.id"
               @click="handleDocumentAction(doc)"
-              class="group bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:bg-white/10 hover:border-purple-500/30 transition-all cursor-pointer relative overflow-hidden"
+              class="group bg-white/3 backdrop-blur-md border border-white/5 p-4 rounded-2xl hover:bg-white/10 hover:border-purple-500/30 transition-all cursor-pointer flex items-center justify-between"
              >
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
-                   <svg v-if="doc.tipo === 'MD'" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-width="2"/></svg>
-                   <svg v-else class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2"/></svg>
-                </div>
-
-                <div class="flex items-start space-x-4">
-                   <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                      <span v-if="doc.tipo === 'MD'" class="text-[10px] font-black">MD</span>
-                      <span v-else class="text-[10px] font-black">URL</span>
+                <div class="flex items-center space-x-4">
+                   <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0 group-hover:bg-purple-500/20 transition-all">
+                      <svg v-if="doc.tipo === 'MD'" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-width="2"/></svg>
+                      <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2"/></svg>
                    </div>
-                   <div class="pr-8">
-                      <h4 class="font-bold text-slate-200 group-hover:text-white transition-colors line-clamp-1">{{ doc.titulo }}</h4>
-                      <p class="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">
-                        Actualizado {{ formatDate(doc.ultimaActualizacion) }}
+                   <div>
+                      <h4 class="font-bold text-slate-300 group-hover:text-white transition-colors">
+                        {{ doc.titulo }}{{ doc.tipo === 'MD' && !doc.titulo.toLowerCase().endsWith('.md') ? '.md' : '' }}
+                      </h4>
+                      <p class="text-[9px] text-slate-600 font-black uppercase tracking-[0.1em] mt-0.5">
+                        {{ doc.tipo === 'MD' ? 'Documento Interno' : 'Recurso Externo' }} • {{ formatDate(doc.ultimaActualizacion) }}
                       </p>
                    </div>
                 </div>
 
-                <div class="mt-6 flex items-center justify-between">
-                   <span class="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-black/20 text-slate-400">
-                     {{ doc.tipo === 'MD' ? 'Editor Interno' : 'Link Externo' }}
-                   </span>
+                <div class="flex items-center space-x-2">
+                   <span class="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-black uppercase text-purple-400 tracking-widest mr-4">Abrir</span>
                    <button 
                     @click.stop="handleDeleteDoc(doc.id)"
-                    class="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                    class="p-2 text-slate-700 hover:text-red-400 transition-colors"
                    >
                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2"/></svg>
                    </button>
@@ -124,7 +119,7 @@
              </div>
 
              <!-- Placeholder empty -->
-             <div v-if="docStore.documents.length === 0" class="col-span-full py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
+             <div v-if="docStore.documents.length === 0" class="py-12 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl">
                 <p class="text-slate-500 font-medium">No hay documentos todavía.</p>
                 <p class="text-xs text-slate-600 mt-1 uppercase font-black tracking-widest">Añade guías o recursos del proyecto</p>
              </div>
