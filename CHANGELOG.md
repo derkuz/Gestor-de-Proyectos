@@ -4,8 +4,9 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
-## [7] 2026-03-01 01:47
+## [7] 2026-03-01 01:53
 - **Infraestructura con Docker:**
-  - Creación de `docker-compose.yml` para el motor de **PostgreSQL 17**.
-  - Configuración de volúmenes persistentes y mapeo de puertos (5432).
-  - Actualización del `README.MD` con instrucciones de ejecución mediante Docker.
+  - Despliegue de **PostgreSQL 17** mediante Docker Compose.
+  - **Ajuste de Puerto:** Cambio de host port a **5433** para evitar conflicto con servicios locales.
+  - Verificación exitosa de conexión y sincronización de tablas desde el backend NestJS.
+- **Documentación:** Actualización de instrucciones en `README.MD`.
