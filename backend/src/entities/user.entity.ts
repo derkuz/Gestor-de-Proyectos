@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Ticket } from './ticket.entity';
 
 export enum UserRole {
     ADMIN = 'ADMIN',
@@ -36,4 +37,7 @@ export class User {
 
     @Column({ nullable: true, select: false })
     resetTokenExpires: Date;
+
+    @OneToMany(() => Ticket, (ticket) => ticket.usuario)
+    tickets: Ticket[];
 }

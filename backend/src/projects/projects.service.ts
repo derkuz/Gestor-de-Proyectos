@@ -16,13 +16,13 @@ export class ProjectsService {
     }
 
     async findAll(): Promise<Project[]> {
-        return this.projectsRepository.find({ relations: ['documentacion'] });
+        return this.projectsRepository.find({ relations: ['documentos'] });
     }
 
     async findOne(id: string): Promise<Project> {
         const project = await this.projectsRepository.findOne({
             where: { id },
-            relations: ['tareas', 'documentacion'],
+            relations: ['tareas', 'documentos'],
         });
         if (!project) throw new NotFoundException('Proyecto no encontrado');
         return project;

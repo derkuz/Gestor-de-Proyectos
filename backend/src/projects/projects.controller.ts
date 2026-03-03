@@ -2,13 +2,17 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { ProjectsService } from './projects.service';
 import { Project } from '../entities/project.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../entities/user.entity';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('projects')
 export class ProjectsController {
     constructor(private readonly projectsService: ProjectsService) { }
 
     @Post()
+    @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER)
     create(@Body() projectData: Partial<Project>) {
         return this.projectsService.create(projectData);
     }
@@ -24,11 +28,13 @@ export class ProjectsController {
     }
 
     @Patch(':id')
+    @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER)
     update(@Param('id') id: string, @Body() updateData: Partial<Project>) {
         return this.projectsService.update(id, updateData);
     }
 
     @Delete(':id')
+    @Roles(UserRole.ADMIN)
     remove(@Param('id') id: string) {
         return this.projectsService.remove(id);
     }

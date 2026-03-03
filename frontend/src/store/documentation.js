@@ -13,9 +13,14 @@ export const useDocumentationStore = defineStore('documentation', {
         async fetchDocuments(projectId) {
             this.loading = true;
             this.error = null;
+            // Limpiamos el estado actual para evitar "fantasmas" de otros proyectos o sesiones
+            this.documents = [];
             try {
                 const response = await api.get(`/projects/${projectId}/documentation`);
-                this.documents = response.data;
+                // Aseguramos que sea un array y filtramos posibles nulos o vacíos
+                const rawData = Array.isArray(response.data) ? response.data : (response.data ? [response.data] : []);
+                this.documents = rawData.filter(d => d && d.id);
+                console.log('Documentos cargados (vistos):', this.documents.length);
             } catch (error) {
                 this.error = 'Error al cargar documentos';
                 console.error(error);
@@ -73,14 +78,43 @@ export const useDocumentationStore = defineStore('documentation', {
         },
 
         async deleteDocument(projectId, docId) {
+            console.log('Solicitando eliminar documento:', docId, 'del proyecto:', projectId);
+            if (!docId) {
+                this.error = 'Error: ID de documento no válido';
+                console.error('ID de documento nulo o indefinido');
+                return false;
+            }
             this.loading = true;
             try {
                 await api.delete(`/projects/${projectId}/documentation/${docId}`);
                 this.documents = this.documents.filter(d => d.id !== docId);
+                console.log('Documento eliminado del estado local');
                 return true;
             } catch (error) {
                 this.error = 'Error al eliminar el documento';
                 return false;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async uploadDocument(projectId, file, titulo) {
+            console.log('Store: Subiendo archivo...', { projectId, fileName: file.name, titulo });
+            this.loading = true;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('titulo', titulo);
+            try {
+                const response = await api.post(`/projects/${projectId}/documentation/upload`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                console.log('Store: Respuesta subida:', response.data);
+                this.documents.unshift(response.data);
+                return response.data;
+            } catch (error) {
+                console.error('Store: Error subida:', error.response?.data || error.message);
+                this.error = 'Error al subir el archivo';
+                return null;
             } finally {
                 this.loading = false;
             }

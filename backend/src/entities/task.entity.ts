@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Project } from './project.entity';
+import { User } from './user.entity';
+import { Ticket } from './ticket.entity';
 
 export enum TaskPriority {
     BAJA = 'BAJA',
@@ -16,6 +18,9 @@ export class Task {
     @Column()
     nombre: string;
 
+    @Column({ type: 'text', nullable: true })
+    descripcion: string;
+
     @Column({
         type: 'enum',
         enum: TaskPriority,
@@ -29,8 +34,17 @@ export class Task {
     @Column({ default: false })
     esSubtarea: boolean;
 
+    @Column({ type: 'date', nullable: true })
+    fechaInicio: Date;
+
+    @Column({ type: 'date', nullable: true })
+    fechaFin: Date;
+
     @ManyToOne(() => Project, (project) => project.tareas)
     proyecto: Project;
+
+    @OneToOne(() => Ticket, ticket => ticket.tareaRelacionada, { nullable: true })
+    ticketLigado: Ticket;
 
     // Hierarchy
     @ManyToOne(() => Task, (task) => task.subtareas, { nullable: true })
@@ -39,4 +53,8 @@ export class Task {
 
     @OneToMany(() => Task, (task) => task.padre)
     subtareas: Task[];
+
+    @ManyToMany(() => User)
+    @JoinTable({ name: 'task_assignments' })
+    asignados: User[];
 }

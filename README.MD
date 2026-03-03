@@ -154,6 +154,13 @@ Para arrancar el motor de base de datos rápidamente, se ha configurado Docker C
    npm run start:dev
    ```
 
+4. **Frontend:**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
 ---
 
 ## 8. Próximos Pasos Sugeridos

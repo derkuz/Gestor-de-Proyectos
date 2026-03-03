@@ -43,4 +43,10 @@ export class UsersService {
             resetTokenExpires: null as any
         });
     }
+
+    async findAll(): Promise<User[]> {
+        return this.usersRepository.find({
+            select: ['id', 'nombre', 'email', 'rol']
+        });
+    }
 }

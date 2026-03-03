@@ -6,8 +6,8 @@ import {
     ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 // @ts-ignore
-import zodToJsonSchemaPkg from 'zod-to-json-schema';
-const zodToJsonSchema = (zodToJsonSchemaPkg.default || zodToJsonSchemaPkg) as any;
+import { zodToJsonSchema as zodToJsonSchemaFn } from 'zod-to-json-schema';
+const zodToJsonSchema = zodToJsonSchemaFn as any;
 import { z } from 'zod';
 import { AppModule } from './app.module';
 import { ProjectsService } from './projects/projects.service';

@@ -6,10 +6,6 @@
 </script>
 
 <style>
-:root {
-  color-scheme: dark;
-}
-
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;

@@ -49,6 +49,12 @@ const routes = [
                 path: '/tickets',
                 name: 'Tickets',
                 component: () => import('../views/Tickets.vue'),
+            },
+            {
+                path: '/tickets/categories',
+                name: 'CategoryManagement',
+                component: () => import('../views/CategoryManagement.vue'),
+                meta: { requiresAuth: true, adminOnly: true }
             }
         ]
     },
@@ -64,6 +70,9 @@ router.beforeEach((to, from, next) => {
 
     if (to.meta.requiresAuth && !auth.isAuthenticated) {
         next('/login');
+    } else if (to.meta.adminOnly && !auth.isAdmin) {
+        // Redirigir si intenta entrar a admin y no lo es
+        next('/dashboard');
     } else if (to.meta.guest && auth.isAuthenticated) {
         next('/dashboard');
     } else {

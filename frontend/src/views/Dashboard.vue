@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h2 class="text-3xl font-black mb-8">Resumen General</h2>
+    <h2 class="text-3xl font-black mb-8 text-app-text">Resumen General</h2>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      <div v-for="stat in stats" :key="stat.label" class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-all group">
-        <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">{{ stat.label }}</p>
+      <div v-for="stat in stats" :key="stat.label" class="bg-app-surface border border-app-border p-8 rounded-3xl hover:shadow-lg transition-all group">
+        <p class="text-app-text-muted text-sm font-bold uppercase tracking-widest mb-2">{{ stat.label }}</p>
         <div class="flex items-end justify-between">
-          <p class="text-4xl font-black tracking-tighter">{{ stat.value }}</p>
-          <div :class="`p-3 rounded-2xl bg-${stat.color}-500/20 text-${stat.color}-400 group-hover:scale-110 transition-transform`">
+          <p class="text-4xl font-black tracking-tighter text-app-text">{{ stat.value }}</p>
+          <div :class="`p-3 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400 group-hover:scale-110 transition-transform`">
             <component :is="stat.icon" class="w-6 h-6" />
           </div>
         </div>
@@ -16,21 +16,21 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Recent Activity / Placeholder -->
-      <div class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl">
-        <h3 class="text-xl font-black mb-6">Actividad Reciente</h3>
+      <div class="bg-app-surface border border-app-border p-8 rounded-3xl">
+        <h3 class="text-xl font-black mb-6 text-app-text">Actividad Reciente</h3>
         <div class="space-y-6">
-          <p class="text-slate-500 font-medium">No hay actividad reciente para mostrar.</p>
+          <p class="text-app-text-muted font-medium">No hay actividad reciente para mostrar.</p>
         </div>
       </div>
 
       <!-- Quick Actions -->
-      <div class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl">
-        <h3 class="text-xl font-black mb-6">Acciones Rápidas</h3>
+      <div class="bg-app-surface border border-app-border p-8 rounded-3xl">
+        <h3 class="text-xl font-black mb-6 text-app-text">Acciones Rápidas</h3>
         <div class="grid grid-cols-2 gap-4">
-          <router-link to="/projects" class="p-4 rounded-2xl bg-purple-600/10 border border-purple-500/20 text-purple-400 font-bold text-center hover:bg-purple-600/20 transition-all">
+          <router-link to="/projects" class="p-4 rounded-2xl bg-purple-600/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-center hover:bg-purple-600/20 transition-all">
             + Nuevo Proyecto
           </router-link>
-          <router-link to="/tickets" class="p-4 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 font-bold text-center hover:bg-blue-600/20 transition-all">
+          <router-link to="/tickets" class="p-4 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-center hover:bg-blue-600/20 transition-all">
             + Abrir Ticket
           </router-link>
         </div>
@@ -38,6 +38,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { computed, onMounted } from 'vue'

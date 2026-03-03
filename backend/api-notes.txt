@@ -1,0 +1,22 @@
+
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+async function checkApiDocs() {
+    const projectId = 'd65c4048-fd21-4f11-9311-50e561121d5a'; // I'll use the ID from the previous raw query
+    const apiBase = 'http://localhost:3000'; // Assuming Port 3000 for backend
+    
+    // I need a JWT token. I'll try to find any user to login or skip auth if possible (but guards are on).
+    // Actually, I'll just check if I can get standard response or check if the backend logs the fetch.
+    console.log(`Checking API for Project: ${projectId}`);
+    try {
+        // Without JWT this might fail, but let's see the logs.
+        // Instead, I'll just trust the RAW DB check which said TOTAL DOCS: 1.
+    } catch (e) {}
+}
+
+// Wait, I'll just do a raw count including ALL columns to see if there's any hidden data.
+console.log('Skipping API check, relying on RAW DB which is more reliable.');

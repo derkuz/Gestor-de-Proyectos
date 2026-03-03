@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
 import { Task } from './task.entity';
 import { Documentation } from './documentation.entity';
 
@@ -19,6 +19,9 @@ export class Project {
     @Column({ type: 'text', nullable: true })
     descripcion: string;
 
+    @Column({ type: 'jsonb', nullable: true })
+    columnasKanban: any;
+
     @Column({
         type: 'enum',
         enum: ProjectStatus,
@@ -32,6 +35,6 @@ export class Project {
     @OneToMany(() => Task, (task) => task.proyecto)
     tareas: Task[];
 
-    @OneToOne(() => Documentation, (doc) => doc.proyecto)
-    documentacion: Documentation;
+    @OneToMany(() => Documentation, (doc) => doc.proyecto)
+    documentos: Documentation[];
 }

@@ -50,6 +50,21 @@ export const useTicketStore = defineStore('tickets', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        async updateTicket(id, updateData) {
+            this.loading = true;
+            try {
+                const response = await api.patch(`/tickets/${id}`, updateData);
+                const index = this.tickets.findIndex(t => t.id === id);
+                if (index !== -1) this.tickets[index] = response.data;
+                return response.data;
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Error al actualizar ticket';
+                return null;
+            } finally {
+                this.loading = false;
+            }
         }
     }
 });
