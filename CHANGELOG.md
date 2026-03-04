@@ -4,6 +4,22 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
+## [26] 2026-03-03 21:30
+- **Dockerización Integral del Proyecto**:
+  - Creación de `Dockerfile` optimizados para **Backend** (NestJS) y **Frontend** (Nginx/Vite).
+  - Configuración de `docker-compose.yml` para orquestar Backend, Frontend y PostgreSQL 17.
+  - Implementación de **Volúmenes persistentes** para la base de datos y archivos subidos (`uploads`).
+  - Configuración de **Healthchecks** para asegurar que el backend espere a la DB antes de iniciar.
+- **Automatización Multiplataforma**:
+  - Nuevo script `start.ps1` para Windows (PowerShell) que automatiza el despliegue y muestra accesos.
+  - Nuevo script `start.sh` para Linux/macOS (Bash) con compatibilidad total.
+- **Configuración de Entorno**:
+  - Creación de archivos `.env.example` detallados para facilitar la configuración inicial.
+- **Documentación de Despliegue**:
+  - Actualización completa del `README.MD` con la nueva guía de instalación rápida mediante Docker.
+
+---
+
 ## [25] 2026-03-01 15:15
 - **Rediseño de Lista de Tickets**:
   - Migración de diseño de tarjetas a un formato de **Filas/Tabla profesional** con mejor densidad de datos.

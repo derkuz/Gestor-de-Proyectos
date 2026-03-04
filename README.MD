@@ -138,23 +138,51 @@ El sistema operará bajo un esquema de control de acceso basado en roles:
 
 ---
 
-## 7. Instalación y Ejecución (Docker)
+## 7. Instalación y Ejecución (Docker) 🐳
 
-Para arrancar el motor de base de datos rápidamente, se ha configurado Docker Compose:
+El proyecto está completamente dockerizado, lo que permite levantar el Backend, Frontend y Base de Datos con un solo comando.
 
-1. **Asegúrate de tener Docker instalado.**
-2. **Arrancar DB:**
-   ```bash
-   docker-compose up -d
-   ```
-3. **Backend:**
+### Requisitos Previos
+* Tener **Docker Desktop** instalado y en ejecución.
+
+### Inicio Rápido (Recomendado)
+
+#### En Windows (PowerShell):
+```powershell
+.\start.ps1
+```
+
+#### En Linux o macOS (Bash):
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+### URLs de Acceso
+* **Frontend:** [http://localhost:8080](http://localhost:8080)
+* **Backend (API):** [http://localhost:3000](http://localhost:3000)
+* **Base de Datos:** `localhost:5434` (Usuario: `postgres`, Pass: `password`)
+
+### Comandos Manuales de Docker
+* **Levantar todo:** `docker compose up -d --build`
+* **Ver Logs:** `docker compose logs -f`
+* **Detener todo:** `docker compose down`
+* **Limpiar todo (incluyendo datos):** `docker compose down -v`
+
+---
+
+### Desarrollo Local (Sin Docker)
+
+Si prefieres correrlo fuera de Docker, asegúrate de configurar los archivos `.env` (basados en los `.env.example` creados):
+
+1. **Backend:**
    ```bash
    cd backend
    npm install
    npm run start:dev
    ```
 
-4. **Frontend:**
+2. **Frontend:**
    ```bash
    cd frontend
    npm install
