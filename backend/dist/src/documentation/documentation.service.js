@@ -1,10 +1,43 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
@@ -18,6 +51,8 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const documentation_entity_1 = require("../entities/documentation.entity");
 const project_entity_1 = require("../entities/project.entity");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 let DocumentationService = class DocumentationService {
     docRepository;
     projectsRepository;
@@ -28,7 +63,8 @@ let DocumentationService = class DocumentationService {
     async findAllByProject(projectId) {
         return this.docRepository.find({
             where: { proyecto: { id: projectId } },
-            order: { ultimaActualizacion: 'DESC' }
+            order: { ultimaActualizacion: 'DESC' },
+            select: ['id', 'titulo', 'tipo', 'url', 'ultimaActualizacion']
         });
     }
     async findOne(id) {
@@ -38,28 +74,90 @@ let DocumentationService = class DocumentationService {
         });
         if (!doc)
             throw new common_1.NotFoundException('Documento no encontrado');
+        if (doc.tipo === documentation_entity_1.DocType.MD && doc.url) {
+            try {
+                const filePath = path.resolve('.' + doc.url);
+                if (fs.existsSync(filePath)) {
+                    doc.contenido = fs.readFileSync(filePath, 'utf8');
+                }
+            }
+            catch (error) {
+                console.error('Error leyendo archivo físico:', error);
+            }
+        }
         return doc;
     }
     async create(projectId, docData) {
         const project = await this.projectsRepository.findOne({ where: { id: projectId } });
         if (!project)
             throw new common_1.NotFoundException('Proyecto no encontrado');
+        const content = docData.contenido;
+        const { contenido, ...rest } = docData;
         const doc = this.docRepository.create({
-            ...docData,
+            ...rest,
             proyecto: project
         });
-        return this.docRepository.save(doc);
+        const savedDoc = (await this.docRepository.save(doc));
+        if (savedDoc.tipo === documentation_entity_1.DocType.MD && content) {
+            const currentYear = new Date().getFullYear().toString();
+            const relativeDir = `/uploads/proyectos/${currentYear}/${projectId}`;
+            const uploadDir = path.resolve('.' + relativeDir);
+            if (!fs.existsSync(uploadDir))
+                fs.mkdirSync(uploadDir, { recursive: true });
+            const safeTitle = savedDoc.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const fileName = `${safeTitle}.md`;
+            const filePath = path.join(uploadDir, fileName);
+            fs.writeFileSync(filePath, content);
+            savedDoc.url = `${relativeDir}/${fileName}`;
+            await this.docRepository.update(savedDoc.id, { url: savedDoc.url });
+            savedDoc.contenido = content;
+        }
+        return savedDoc;
     }
     async update(id, docData) {
         const doc = await this.findOne(id);
-        Object.assign(doc, docData);
-        return this.docRepository.save(doc);
+        const project = doc.proyecto;
+        const content = docData.contenido;
+        const { contenido, ...rest } = docData;
+        Object.assign(doc, rest);
+        const savedDoc = (await this.docRepository.save(doc));
+        if (savedDoc.tipo === documentation_entity_1.DocType.MD && content !== undefined) {
+            const currentYear = new Date().getFullYear().toString();
+            const relativeDir = `/uploads/proyectos/${currentYear}/${project.id}`;
+            const uploadDir = path.resolve('.' + relativeDir);
+            if (!fs.existsSync(uploadDir))
+                fs.mkdirSync(uploadDir, { recursive: true });
+            const safeTitle = savedDoc.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const fileName = `${safeTitle}.md`;
+            const filePath = path.join(uploadDir, fileName);
+            if (savedDoc.url && savedDoc.url !== `${relativeDir}/${fileName}`) {
+                const oldPath = path.resolve('.' + savedDoc.url);
+                if (fs.existsSync(oldPath))
+                    fs.unlinkSync(oldPath);
+            }
+            fs.writeFileSync(filePath, content);
+            savedDoc.url = `${relativeDir}/${fileName}`;
+            await this.docRepository.update(savedDoc.id, { url: savedDoc.url });
+            savedDoc.contenido = content;
+        }
+        return savedDoc;
     }
     async remove(id) {
-        const result = await this.docRepository.delete(id);
-        if (result.affected === 0) {
+        const doc = await this.docRepository.findOne({ where: { id } });
+        if (!doc)
             throw new common_1.NotFoundException('Documento no encontrado');
+        if (doc.tipo === documentation_entity_1.DocType.MD && doc.url) {
+            try {
+                const filePath = path.resolve('.' + doc.url);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            }
+            catch (error) {
+                console.error('Error eliminando archivo físico:', error);
+            }
         }
+        await this.docRepository.delete(id);
     }
 };
 exports.DocumentationService = DocumentationService;

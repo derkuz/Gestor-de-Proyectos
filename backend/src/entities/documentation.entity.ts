@@ -22,11 +22,8 @@ export class Documentation {
     })
     tipo: DocType;
 
-    @Column({ type: 'text', nullable: true })
-    contenido: string; // Used for MD
-
     @Column({ nullable: true })
-    url: string; // Used for LINK or FILE
+    url: string; // URL del archivo físico o link externo
 
     @UpdateDateColumn()
     ultimaActualizacion: Date;

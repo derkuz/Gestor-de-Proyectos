@@ -5,9 +5,9 @@ export declare class DocumentationService {
     private docRepository;
     private projectsRepository;
     constructor(docRepository: Repository<Documentation>, projectsRepository: Repository<Project>);
-    findAllByProject(projectId: string): Promise<Documentation[]>;
+    findAllByProject(projectId: number): Promise<Documentation[]>;
     findOne(id: string): Promise<Documentation>;
-    create(projectId: string, docData: Partial<Documentation>): Promise<Documentation>;
+    create(projectId: number, docData: Partial<Documentation>): Promise<Documentation>;
     update(id: string, docData: Partial<Documentation>): Promise<Documentation>;
     remove(id: string): Promise<void>;
 }

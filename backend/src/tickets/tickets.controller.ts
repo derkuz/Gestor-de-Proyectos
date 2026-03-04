@@ -15,28 +15,16 @@ export class TicketsController {
     constructor(private readonly ticketsService: TicketsService) { }
 
     @Post()
-    @UseInterceptors(FileInterceptor('image', {
-        storage: diskStorage({
-            destination: './uploads',
-            filename: (req, file, cb) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-                cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
-            },
-        }),
-    }))
-    create(@Body() ticketData: any, @Req() req: any, @UploadedFile() file: Express.Multer.File) {
-        const payload = { ...ticketData };
-        if (file) {
-            payload.imagenUrl = `/uploads/${file.filename}`;
-        }
-
+    @UseInterceptors(FileInterceptor('image'))
+    async create(@Body() ticketData: any, @Req() req: any, @UploadedFile() file: Express.Multer.File) {
         // Map categoriaRelacionadaId if present
+        const payload = { ...ticketData };
         if (ticketData.categoriaRelacionadaId) {
             payload.categoriaRelacionada = { id: ticketData.categoriaRelacionadaId };
             delete payload.categoriaRelacionadaId;
         }
 
-        return this.ticketsService.create(payload, req.user.userId);
+        return this.ticketsService.createWithAttachment(payload, req.user.userId, file);
     }
 
     @Get()

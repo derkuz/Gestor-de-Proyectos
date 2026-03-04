@@ -47,12 +47,15 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const users_service_1 = require("../users/users.service");
 const bcrypt = __importStar(require("bcrypt"));
+const activity_logs_service_1 = require("../activity-logs/activity-logs.service");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    constructor(usersService, jwtService) {
+    activityLogsService;
+    constructor(usersService, jwtService, activityLogsService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.activityLogsService = activityLogsService;
     }
     async register(userData) {
         if (!userData.email || !userData.password) {
@@ -66,17 +69,23 @@ let AuthService = class AuthService {
             ...userData,
             password: hashedPassword,
         });
+        await this.activityLogsService.log('REGISTER', `Nuevo usuario registrado: ${user.email}`, user.id);
         return this.login(user);
     }
     async validateUser(email, pass) {
         const user = await this.usersService.findByEmail(email);
-        if (user && user.password && await bcrypt.compare(pass, user.password)) {
-            const { password, ...result } = user;
-            return result;
+        if (!user) {
+            throw new common_1.UnauthorizedException('El correo electrónico no está registrado');
         }
-        return null;
+        const isPasswordMatching = await bcrypt.compare(pass, user.password);
+        if (!isPasswordMatching) {
+            throw new common_1.UnauthorizedException('La contraseña es incorrecta');
+        }
+        const { password, ...result } = user;
+        return result;
     }
     async login(user) {
+        await this.activityLogsService.log('LOGIN', `Inicio de sesión exitoso: ${user.email}`, user.id);
         const payload = { email: user.email, sub: user.id, rol: user.rol };
         return {
             access_token: this.jwtService.sign(payload),
@@ -113,6 +122,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        activity_logs_service_1.ActivityLogsService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

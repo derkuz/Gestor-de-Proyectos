@@ -51,9 +51,9 @@ const routes = [
                 component: () => import('../views/Tickets.vue'),
             },
             {
-                path: '/tickets/categories',
-                name: 'CategoryManagement',
-                component: () => import('../views/CategoryManagement.vue'),
+                path: '/admin',
+                name: 'AdminPanel',
+                component: () => import('../views/AdminPanel.vue'),
                 meta: { requiresAuth: true, adminOnly: true }
             }
         ]

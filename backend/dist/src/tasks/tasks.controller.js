@@ -25,13 +25,13 @@ let TasksController = class TasksController {
         this.tasksService = tasksService;
     }
     create(projectId, taskData) {
-        return this.tasksService.create(projectId, taskData);
+        return this.tasksService.create(+projectId, taskData);
     }
     createSubtask(taskId, taskData) {
         return this.tasksService.createSubtask(taskId, taskData);
     }
     findAll(projectId) {
-        return this.tasksService.findAllByProject(projectId);
+        return this.tasksService.findAllByProject(+projectId);
     }
     findOne(id) {
         return this.tasksService.findOne(id);

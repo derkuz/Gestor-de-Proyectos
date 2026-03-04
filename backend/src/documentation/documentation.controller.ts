@@ -16,7 +16,7 @@ export class DocumentationController {
 
     @Get()
     findAll(@Param('projectId') projectId: string) {
-        return this.documentationService.findAllByProject(projectId);
+        return this.documentationService.findAllByProject(+projectId);
     }
 
     @Post('upload')
@@ -39,7 +39,7 @@ export class DocumentationController {
         if (!file) {
             console.error('Backend: No se recibió ningún archivo');
         }
-        return this.documentationService.create(projectId, {
+        return this.documentationService.create(+projectId, {
             titulo: titulo || file?.originalname,
             tipo: DocType.FILE,
             url: `/uploads/${file?.filename}`,
@@ -54,7 +54,7 @@ export class DocumentationController {
     @Post()
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.COLABORADOR)
     create(@Param('projectId') projectId: string, @Body() docData: Partial<Documentation>) {
-        return this.documentationService.create(projectId, docData);
+        return this.documentationService.create(+projectId, docData);
     }
 
     @Patch(':id')

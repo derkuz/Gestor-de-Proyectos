@@ -20,7 +20,9 @@ const task_entity_1 = require("./entities/task.entity");
 const ticket_entity_1 = require("./entities/ticket.entity");
 const documentation_entity_1 = require("./entities/documentation.entity");
 const category_entity_1 = require("./entities/category.entity");
+const activity_log_entity_1 = require("./entities/activity-log.entity");
 const users_module_1 = require("./users/users.module");
+const activity_logs_module_1 = require("./activity-logs/activity-logs.module");
 const auth_module_1 = require("./auth/auth.module");
 const projects_module_1 = require("./projects/projects.module");
 const tasks_module_1 = require("./tasks/tasks.module");
@@ -37,7 +39,7 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: (0, path_1.join)(__dirname, '..', '..', 'uploads'),
+                rootPath: (0, path_1.join)(process.cwd(), 'uploads'),
                 serveRoot: '/uploads',
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
@@ -50,7 +52,7 @@ exports.AppModule = AppModule = __decorate([
                     username: configService.get('DB_USERNAME'),
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_NAME'),
-                    entities: [user_entity_1.User, project_entity_1.Project, task_entity_1.Task, ticket_entity_1.Ticket, documentation_entity_1.Documentation, category_entity_1.Category],
+                    entities: [user_entity_1.User, project_entity_1.Project, task_entity_1.Task, ticket_entity_1.Ticket, documentation_entity_1.Documentation, category_entity_1.Category, activity_log_entity_1.ActivityLog],
                     synchronize: true,
                 }),
             }),
@@ -61,6 +63,7 @@ exports.AppModule = AppModule = __decorate([
             tickets_module_1.TicketsModule,
             documentation_module_1.DocumentationModule,
             categories_module_1.CategoriesModule,
+            activity_logs_module_1.ActivityLogsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -6,9 +6,9 @@ export declare class TasksService {
     private projectsRepository;
     constructor(tasksRepository: Repository<Task>, projectsRepository: Repository<Project>);
     private checkProjectStatus;
-    create(projectId: string, taskData: any): Promise<Task>;
+    create(projectId: number, taskData: any): Promise<Task>;
     createSubtask(padreId: string, taskData: any): Promise<Task>;
-    findAllByProject(projectId: string): Promise<Task[]>;
+    findAllByProject(projectId: number): Promise<Task[]>;
     findOne(id: string): Promise<Task>;
     update(id: string, updateData: any): Promise<Task>;
     remove(id: string): Promise<void>;

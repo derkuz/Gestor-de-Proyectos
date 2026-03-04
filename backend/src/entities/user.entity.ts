@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToMany } from 'typeorm';
 import { Ticket } from './ticket.entity';
+import { Project } from './project.entity';
 
 export enum UserRole {
     ADMIN = 'ADMIN',
@@ -40,4 +41,7 @@ export class User {
 
     @OneToMany(() => Ticket, (ticket) => ticket.usuario)
     tickets: Ticket[];
+
+    @ManyToMany(() => Project, (project) => project.usuarios)
+    proyectos: Project[];
 }

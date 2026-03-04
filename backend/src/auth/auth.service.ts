@@ -3,12 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
+        private activityLogsService: ActivityLogsService,
     ) { }
 
     async register(userData: Partial<User>) {
@@ -25,19 +27,29 @@ export class AuthService {
             password: hashedPassword,
         });
 
+        await this.activityLogsService.log('REGISTER', `Nuevo usuario registrado: ${user.email}`, user.id);
+
         return this.login(user);
     }
 
     async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findByEmail(email);
-        if (user && user.password && await bcrypt.compare(pass, user.password)) {
-            const { password, ...result } = user;
-            return result;
+
+        if (!user) {
+            throw new UnauthorizedException('El correo electrónico no está registrado');
         }
-        return null;
+
+        const isPasswordMatching = await bcrypt.compare(pass, user.password);
+        if (!isPasswordMatching) {
+            throw new UnauthorizedException('La contraseña es incorrecta');
+        }
+
+        const { password, ...result } = user;
+        return result;
     }
 
     async login(user: any) {
+        await this.activityLogsService.log('LOGIN', `Inicio de sesión exitoso: ${user.email}`, user.id);
         const payload = { email: user.email, sub: user.id, rol: user.rol };
         return {
             access_token: this.jwtService.sign(payload),

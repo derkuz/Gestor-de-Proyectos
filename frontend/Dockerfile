@@ -15,8 +15,8 @@ FROM nginx:alpine
 # Copiar la construcción de Vite a la carpeta de Nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copiar configuración personalizada de Nginx si es necesario (opcional)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar configuración personalizada de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

@@ -11,7 +11,9 @@ import { Task } from './entities/task.entity';
 import { Ticket } from './entities/ticket.entity';
 import { Documentation } from './entities/documentation.entity';
 import { Category } from './entities/category.entity';
+import { ActivityLog } from './entities/activity-log.entity';
 import { UsersModule } from './users/users.module';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { AuthModule } from './auth/auth.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -38,7 +40,7 @@ import { CategoriesModule } from './categories/categories.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User, Project, Task, Ticket, Documentation, Category],
+        entities: [User, Project, Task, Ticket, Documentation, Category, ActivityLog],
         synchronize: true,
       }),
     }),
@@ -49,6 +51,7 @@ import { CategoriesModule } from './categories/categories.module';
     TicketsModule,
     DocumentationModule,
     CategoriesModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

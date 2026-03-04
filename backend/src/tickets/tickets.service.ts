@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ticket } from '../entities/ticket.entity';
 import { Category } from '../entities/category.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class TicketsService {
@@ -33,6 +35,28 @@ export class TicketsService {
             usuario: { id: userId } as any,
         }) as unknown as Ticket;
         return this.ticketsRepository.save(ticket);
+    }
+
+    async createWithAttachment(ticketData: any, userId: string, file?: Express.Multer.File): Promise<Ticket> {
+        const ticket = await this.create(ticketData, userId);
+
+        if (file) {
+            const currentYear = new Date().getFullYear().toString();
+            const relativeDir = `/uploads/Ticket_adjuntos/${currentYear}/${ticket.id}`;
+            const uploadDir = path.resolve('.' + relativeDir);
+
+            if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+            const fileName = `${Date.now()}${path.extname(file.originalname)}`;
+            const filePath = path.join(uploadDir, fileName);
+
+            fs.writeFileSync(filePath, file.buffer);
+
+            ticket.imagenUrl = `${relativeDir}/${fileName}`;
+            await this.ticketsRepository.update(ticket.id, { imagenUrl: ticket.imagenUrl });
+        }
+
+        return ticket;
     }
 
     async findAll(userId: string, role: string): Promise<Ticket[]> {

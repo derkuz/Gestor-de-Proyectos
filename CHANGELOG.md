@@ -4,6 +4,27 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
+## [27] 2026-03-03 23:45
+- **Panel de Administración Integral**:
+  - Transformación de la sección de Categorías en un **Centro de Control** centralizado.
+  - Implementación de **Gestión de Usuarios**: reseteo de contraseñas directo desde la UI por administradores.
+  - Implementación de **Asignación de Proyectos**: interfaz visual para gestionar colaboradores y accesos.
+  - Nuevo **Dashboard Administrativo** con métricas clave (Usuarios, Proyectos, Tickets, Tareas) y estado del servidor.
+- **Correcciones y DevOps**:
+  - **Nginx SPA Fix**: Implementada redirección `try_files` en el servidor web para evitar errores 404 al recargar rutas de Vue.
+- **Sistema de Auditoría y Logging**:
+  - Implementación de `ActivityLog` para rastrear acciones críticas (Login, Registro, Cambios en proyectos, Reseteo de claves).
+  - Nueva pestaña de **Actividad en Tiempo Real** para supervisión administrativa.
+- **Mejoras en Autenticación**:
+  - Implementación de **Eye Toggle** (ojo) en login para visualización de contraseña.
+  - Mensajes de error específicos para "Usuario no registrado" vs "Contraseña incorrecta".
+  - Refuerzo de seguridad con `RolesGuard` en todos los nuevos endpoints administrativos.
+- **Optimización de UI/UX**:
+  - Menú lateral actualizado con acceso directo a "Administración".
+  - Sistema de pestañas premium con micro-animaciones y diseño adaptativo.
+
+---
+
 ## [26] 2026-03-03 21:30
 - **Dockerización Integral del Proyecto**:
   - Creación de `Dockerfile` optimizados para **Backend** (NestJS) y **Frontend** (Nginx/Vite).

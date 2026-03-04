@@ -13,7 +13,7 @@ export class TasksService {
         private projectsRepository: Repository<Project>,
     ) { }
 
-    private async checkProjectStatus(projectId: string, allowedStatuses: ProjectStatus[] = [ProjectStatus.ACTIVO]) {
+    private async checkProjectStatus(projectId: number, allowedStatuses: ProjectStatus[] = [ProjectStatus.ACTIVO]) {
         const project = await this.projectsRepository.findOne({ where: { id: projectId } });
         if (!project) throw new NotFoundException('Proyecto no encontrado');
         if (!allowedStatuses.includes(project.estado)) {
@@ -22,7 +22,7 @@ export class TasksService {
         return project;
     }
 
-    async create(projectId: string, taskData: any): Promise<Task> {
+    async create(projectId: number, taskData: any): Promise<Task> {
         await this.checkProjectStatus(projectId);
         const { asignados, ...rest } = taskData;
         const task = this.tasksRepository.create({
@@ -48,7 +48,7 @@ export class TasksService {
         return this.tasksRepository.save(task);
     }
 
-    async findAllByProject(projectId: string): Promise<Task[]> {
+    async findAllByProject(projectId: number): Promise<Task[]> {
         return this.tasksRepository.find({
             where: { proyecto: { id: projectId } },
             relations: ['subtareas', 'padre', 'asignados', 'ticketLigado'],
