@@ -8,9 +8,54 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: sgpt_db
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sgpt_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sgpt_backend
+    restart: always
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=sgpt_db
+      - JWT_SECRET=algun_secreto_muy_seguro
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - db
+    networks:
+      - sgpt_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sgpt_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - sgpt_network
+
+networks:
+  sgpt_network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  uploads_data:
