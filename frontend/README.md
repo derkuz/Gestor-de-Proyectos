@@ -74,3 +74,6 @@ INSERT INTO "user" (email, password, nombre, rol)
 VALUES ('cliente@ejemplo.com', '$2b$10$EpJ6Tf.B.C6G7yP6U6G6Uu8v8z8z8z8z8z8z8z8z8z8z8z8z8z8z8', 'Cliente VIP', 'EXTERNO');
 
 password123
+
+
+docker exec -i sgpt_db_container psql -U postgres -d sgpt_db < init-users.sql
