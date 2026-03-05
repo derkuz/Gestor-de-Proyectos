@@ -25,7 +25,7 @@ export class DocumentationController {
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {
-                const projectId = req.params.projectId;
+                const projectId = req.params.projectId as string;
                 const basePath = process.env.PROJECTS_UPLOAD_PATH || 'uploads/projects';
                 const path = getDynamicUploadPath(basePath, projectId);
                 cb(null, path);
@@ -46,6 +46,11 @@ export class DocumentationController {
             console.error('Backend: No se recibió ningún archivo');
             return; // O lanzar error
         }
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = String(now.getFullYear());
+        const url = `/uploads/projects/${projectId}/${month}/${year}/${file.filename}`;
+
         return this.documentationService.create(+projectId, {
             titulo: titulo || file?.originalname,
             tipo: DocType.FILE,

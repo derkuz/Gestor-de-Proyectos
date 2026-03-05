@@ -38,6 +38,10 @@ let DocumentationController = class DocumentationController {
             console.error('Backend: No se recibió ningún archivo');
             return;
         }
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = String(now.getFullYear());
+        const url = `/uploads/projects/${projectId}/${month}/${year}/${file.filename}`;
         return this.documentationService.create(+projectId, {
             titulo: titulo || file?.originalname,
             tipo: documentation_entity_1.DocType.FILE,
