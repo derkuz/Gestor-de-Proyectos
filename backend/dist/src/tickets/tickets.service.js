@@ -102,12 +102,10 @@ let TicketsService = class TicketsService {
             .leftJoin('categoriaRelacionada.usuariosAutorizados', 'autorizado');
         if (role === 'ADMIN') {
         }
-        else if (role === 'COLABORADOR') {
-            query.where('usuario.id = :userId', { userId })
-                .orWhere('autorizado.id = :userId', { userId });
-        }
         else {
-            query.where('usuario.id = :userId', { userId });
+            query.where('usuario.id = :userId', { userId })
+                .orWhere('autorizado.id = :userId', { userId })
+                .orWhere('categoriaRelacionada.rolesAutorizados LIKE :role', { role: `%${role}%` });
         }
         return query.getMany();
     }
@@ -124,9 +122,10 @@ let TicketsService = class TicketsService {
         const ticket = await this.findOne(id);
         if (userId && role && role !== 'ADMIN') {
             const isOwner = ticket.usuario?.id === userId;
-            const isAuthorizedCollab = role === 'COLABORADOR' &&
-                ticket.categoriaRelacionada?.usuariosAutorizados?.some(u => u.id === userId);
-            if (!isOwner && !isAuthorizedCollab) {
+            const isExplicitAuthorized = ticket.categoriaRelacionada?.usuariosAutorizados?.some(u => u.id === userId);
+            const isRoleAuthorized = ticket.categoriaRelacionada?.rolesAutorizados?.includes(role);
+            if (!isOwner && !isExplicitAuthorized && !isRoleAuthorized) {
+                throw new common_1.ForbiddenException('No tienes permiso para modificar este ticket');
             }
         }
         Object.assign(ticket, updateData);

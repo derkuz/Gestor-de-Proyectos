@@ -29,6 +29,7 @@ let User = class User {
     fechaRegistro;
     resetToken;
     resetTokenExpires;
+    activo;
     tickets;
     proyectos;
 };
@@ -69,6 +70,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true, select: false }),
     __metadata("design:type", Date)
 ], User.prototype, "resetTokenExpires", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "activo", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => ticket_entity_1.Ticket, (ticket) => ticket.usuario),
     __metadata("design:type", Array)

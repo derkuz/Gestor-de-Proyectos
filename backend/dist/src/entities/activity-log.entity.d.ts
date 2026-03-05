@@ -7,4 +7,6 @@ export declare class ActivityLog {
     usuario: User;
     entidadTipo: string;
     entidadId: string;
+    duracionMs: number;
+    categoria: string;
 }

@@ -68,13 +68,13 @@ export class TicketsService {
 
         if (role === 'ADMIN') {
             // ADMIN ve todo
-        } else if (role === 'COLABORADOR') {
-            // COLABORADOR ve los suyos O los de categorías donde está autorizado
-            query.where('usuario.id = :userId', { userId })
-                .orWhere('autorizado.id = :userId', { userId });
         } else {
-            // Usuarios normales solo sus propios tickets
-            query.where('usuario.id = :userId', { userId });
+            // Ver si el usuario es el dueño, 
+            // O si está en la lista de usuarios autorizados,
+            // O si su ROL está en la lista de roles autorizados de la categoría.
+            query.where('usuario.id = :userId', { userId })
+                .orWhere('autorizado.id = :userId', { userId })
+                .orWhere('categoriaRelacionada.rolesAutorizados LIKE :role', { role: `%${role}%` });
         }
 
         return query.getMany();
@@ -94,14 +94,11 @@ export class TicketsService {
 
         if (userId && role && role !== 'ADMIN') {
             const isOwner = ticket.usuario?.id === userId;
-            const isAuthorizedCollab = role === 'COLABORADOR' &&
-                ticket.categoriaRelacionada?.usuariosAutorizados?.some(u => u.id === userId);
+            const isExplicitAuthorized = ticket.categoriaRelacionada?.usuariosAutorizados?.some(u => u.id === userId);
+            const isRoleAuthorized = ticket.categoriaRelacionada?.rolesAutorizados?.includes(role as any);
 
-            if (!isOwner && !isAuthorizedCollab) {
-                // Not owner and not an authorized specialist
-                // throw new ForbiddenException('No tienes permiso para modificar este ticket');
-                // For now, let's just log or ignore if we don't want to break things, 
-                // but user asked for "only assigned".
+            if (!isOwner && !isExplicitAuthorized && !isRoleAuthorized) {
+                throw new ForbiddenException('No tienes permiso para modificar este ticket');
             }
         }
 

@@ -15,6 +15,7 @@ export declare class User {
     fechaRegistro: Date;
     resetToken: string;
     resetTokenExpires: Date;
+    activo: boolean;
     tickets: Ticket[];
     proyectos: Project[];
 }

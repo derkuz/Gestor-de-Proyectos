@@ -9,6 +9,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
+import { ActivityLogsService } from './activity-logs.service';
 
 @Controller('admin/stats')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -18,16 +19,18 @@ export class StatsController {
         @InjectRepository(Project) private readonly projectRepo: Repository<Project>,
         @InjectRepository(Ticket) private readonly ticketRepo: Repository<Ticket>,
         @InjectRepository(Task) private readonly taskRepo: Repository<Task>,
+        private readonly activityLogsService: ActivityLogsService,
     ) { }
 
     @Get()
     @Roles(UserRole.ADMIN)
     async getStats() {
-        const [users, projects, tickets, tasks] = await Promise.all([
+        const [users, projects, tickets, tasks, technical] = await Promise.all([
             this.userRepo.count(),
             this.projectRepo.count(),
             this.ticketRepo.count(),
             this.taskRepo.count(),
+            this.activityLogsService.getTechnicalMetrics()
         ]);
 
         return {
@@ -35,6 +38,7 @@ export class StatsController {
             projects,
             tickets,
             tasks,
+            technical,
             lastUpdate: new Date()
         };
     }

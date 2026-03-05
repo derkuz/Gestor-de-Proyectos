@@ -5,6 +5,7 @@ export declare class ProjectsController {
     constructor(projectsService: ProjectsService);
     create(projectData: Partial<Project>): Promise<Project>;
     findAll(): Promise<Project[]>;
+    getStats(): Promise<any>;
     findOne(id: string): Promise<Project>;
     update(id: string, updateData: Partial<Project>): Promise<Project>;
     remove(id: string): Promise<void>;

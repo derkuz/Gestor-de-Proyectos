@@ -23,4 +23,10 @@ export class ActivityLog {
 
     @Column({ nullable: true })
     entidadId: string;
+
+    @Column({ type: 'int', nullable: true })
+    duracionMs: number;
+
+    @Column({ default: 'BUSINESS' })
+    categoria: string; // 'BUSINESS' o 'TECHNICAL'
 }

@@ -16,13 +16,32 @@ export class UsersService {
     async findByEmail(email: string): Promise<User | null> {
         return this.usersRepository.findOne({
             where: { email },
-            select: ['id', 'email', 'password', 'nombre', 'rol'] // Ensure password is included for login
+            select: ['id', 'email', 'password', 'nombre', 'rol', 'activo'] // Include activo
         });
     }
 
     async create(userData: Partial<User>): Promise<User> {
+        if (userData.password) {
+            userData.password = await bcrypt.hash(userData.password, 10);
+        }
         const user = this.usersRepository.create(userData);
-        return this.usersRepository.save(user);
+        const saved = await this.usersRepository.save(user);
+        await this.activityLogsService.log('CREATE_USER', `Usuario creado: ${user.email}`, undefined, 'USER', saved.id);
+        return saved;
+    }
+
+    async update(id: string, updateData: Partial<User>): Promise<User> {
+        const user = await this.usersRepository.findOne({ where: { id } });
+        if (!user) throw new Error('Usuario no encontrado');
+
+        if (updateData.password) {
+            updateData.password = await bcrypt.hash(updateData.password, 10);
+        }
+
+        Object.assign(user, updateData);
+        const saved = await this.usersRepository.save(user);
+        await this.activityLogsService.log('UPDATE_USER', `Usuario actualizado/estado cambiado: ${user.email}`, undefined, 'USER', id);
+        return saved;
     }
 
     async updateResetToken(id: string, token: string, expires: Date) {
@@ -49,7 +68,7 @@ export class UsersService {
 
     async findAll(): Promise<User[]> {
         return this.usersRepository.find({
-            select: ['id', 'nombre', 'email', 'rol']
+            select: ['id', 'nombre', 'email', 'rol', 'activo']
         });
     }
 

@@ -39,6 +39,9 @@ export class User {
     @Column({ nullable: true, select: false })
     resetTokenExpires: Date;
 
+    @Column({ default: true })
+    activo: boolean;
+
     @OneToMany(() => Ticket, (ticket) => ticket.usuario)
     tickets: Ticket[];
 

@@ -18,6 +18,7 @@ let Category = class Category {
     nombre;
     descripcion;
     prefijo;
+    rolesAutorizados;
     usuariosAutorizados;
     tickets;
 };
@@ -38,6 +39,14 @@ __decorate([
     (0, typeorm_1.Column)({ length: 5, nullable: true }),
     __metadata("design:type", String)
 ], Category.prototype, "prefijo", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'simple-array',
+        nullable: true,
+        default: ''
+    }),
+    __metadata("design:type", Array)
+], Category.prototype, "rolesAutorizados", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => user_entity_1.User),
     (0, typeorm_1.JoinTable)({

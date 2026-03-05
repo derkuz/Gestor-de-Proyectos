@@ -34,6 +34,17 @@ export const useAdminStore = defineStore('admin', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        async purgeTechnicalLogs() {
+            try {
+                await api.post('/activity-logs/purge');
+                await Promise.all([this.fetchStats(), this.fetchActivityLogs()]);
+                return true;
+            } catch (error) {
+                console.error('Error purging logs:', error);
+                return false;
+            }
         }
     }
 });

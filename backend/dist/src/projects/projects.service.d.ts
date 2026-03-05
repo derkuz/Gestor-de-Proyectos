@@ -12,4 +12,5 @@ export declare class ProjectsService {
     remove(id: number): Promise<void>;
     assignUser(projectId: number, userId: string): Promise<Project>;
     removeUser(projectId: number, userId: string): Promise<Project>;
+    getStats(): Promise<any>;
 }

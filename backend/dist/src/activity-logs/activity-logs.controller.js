@@ -27,6 +27,10 @@ let ActivityLogsController = class ActivityLogsController {
     findAll(limit) {
         return this.activityLogsService.findAll(limit ? Number(limit) : 50);
     }
+    async purge() {
+        const deletedCount = await this.activityLogsService.purgeOldLogs();
+        return { message: 'Logs técnicos depurados', deletedCount };
+    }
 };
 exports.ActivityLogsController = ActivityLogsController;
 __decorate([
@@ -37,6 +41,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ActivityLogsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)('purge'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ActivityLogsController.prototype, "purge", null);
 exports.ActivityLogsController = ActivityLogsController = __decorate([
     (0, common_1.Controller)('activity-logs'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

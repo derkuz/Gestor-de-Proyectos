@@ -27,6 +27,12 @@ let UsersController = class UsersController {
     findAll() {
         return this.usersService.findAll();
     }
+    create(userData) {
+        return this.usersService.create(userData);
+    }
+    update(id, updateData) {
+        return this.usersService.update(id, updateData);
+    }
     async adminResetPassword(id, newPass) {
         return this.usersService.adminUpdatePassword(id, newPass);
     }
@@ -38,6 +44,23 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "update", null);
 __decorate([
     (0, common_1.Patch)(':id/password'),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),

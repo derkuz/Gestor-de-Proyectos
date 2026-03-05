@@ -24,29 +24,34 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_2 = require("../entities/user.entity");
+const activity_logs_service_1 = require("./activity-logs.service");
 let StatsController = class StatsController {
     userRepo;
     projectRepo;
     ticketRepo;
     taskRepo;
-    constructor(userRepo, projectRepo, ticketRepo, taskRepo) {
+    activityLogsService;
+    constructor(userRepo, projectRepo, ticketRepo, taskRepo, activityLogsService) {
         this.userRepo = userRepo;
         this.projectRepo = projectRepo;
         this.ticketRepo = ticketRepo;
         this.taskRepo = taskRepo;
+        this.activityLogsService = activityLogsService;
     }
     async getStats() {
-        const [users, projects, tickets, tasks] = await Promise.all([
+        const [users, projects, tickets, tasks, technical] = await Promise.all([
             this.userRepo.count(),
             this.projectRepo.count(),
             this.ticketRepo.count(),
             this.taskRepo.count(),
+            this.activityLogsService.getTechnicalMetrics()
         ]);
         return {
             users,
             projects,
             tickets,
             tasks,
+            technical,
             lastUpdate: new Date()
         };
     }
@@ -69,6 +74,7 @@ exports.StatsController = StatsController = __decorate([
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        activity_logs_service_1.ActivityLogsService])
 ], StatsController);
 //# sourceMappingURL=stats.controller.js.map

@@ -85,6 +85,44 @@ let ProjectsService = class ProjectsService {
         await this.activityLogsService.log('REMOVE_USER', `Usuario removido del proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id));
         return saved;
     }
+    async getStats() {
+        const projectsCount = await this.projectsRepository.count();
+        const tasksSummary = await this.projectsRepository.manager
+            .createQueryBuilder('task', 'task')
+            .select("COUNT(*)", "total")
+            .addSelect("COUNT(*) FILTER (WHERE LOWER(task.estado) = 'finalizado')", "finalizadas")
+            .where("task.esSubtarea = :esSubtarea", { esSubtarea: false })
+            .getRawOne();
+        const totalTasks = parseInt(tasksSummary.total) || 0;
+        const finishedTasks = parseInt(tasksSummary.finalizadas) || 0;
+        const progresoGlobal = totalTasks > 0 ? Math.round((finishedTasks / totalTasks) * 100) : 0;
+        const projectsWithTasks = await this.projectsRepository.find({
+            relations: ['tareas'],
+        });
+        const proyectosDetalle = projectsWithTasks.map(p => {
+            const tareasPrincipales = p.tareas.filter(t => !t.esSubtarea);
+            const total = tareasPrincipales.length;
+            const finalizadas = tareasPrincipales.filter(t => t.estado.toLowerCase() === 'finalizado').length;
+            const progreso = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
+            return {
+                id: p.id,
+                nombre: p.nombre,
+                estado: p.estado,
+                totalTareas: total,
+                tareasFinalizadas: finalizadas,
+                progreso
+            };
+        });
+        const ticketsCount = await this.projectsRepository.manager.count('ticket');
+        return {
+            proyectos: projectsCount,
+            totalTareasPrincipales: totalTasks,
+            tareasFinalizadas: finishedTasks,
+            progresoGlobal,
+            tickets: ticketsCount,
+            proyectosDetalle
+        };
+    }
 };
 exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = __decorate([

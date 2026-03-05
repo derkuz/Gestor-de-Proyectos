@@ -77,6 +77,9 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException('El correo electrónico no está registrado');
         }
+        if (user.activo === false) {
+            throw new common_1.UnauthorizedException('Tu cuenta ha sido deshabilitada. Contacta al administrador.');
+        }
         const isPasswordMatching = await bcrypt.compare(pass, user.password);
         if (!isPasswordMatching) {
             throw new common_1.UnauthorizedException('La contraseña es incorrecta');

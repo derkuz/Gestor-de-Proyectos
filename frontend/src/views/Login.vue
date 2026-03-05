@@ -7,10 +7,10 @@
 
     <div class="w-full max-w-md bg-app-surface backdrop-blur-xl border border-app-border rounded-[2.5rem] p-10 shadow-2xl relative z-10 transition-colors">
       <div class="text-center mb-10">
-        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 mb-2">
-          GPPT
+        <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 mb-2 tracking-tighter">
+          PRISMA
         </h1>
-        <p class="text-app-text-muted font-black uppercase tracking-widest text-[10px]">Gestiona tus proyectos con estilo</p>
+        <p class="text-app-text-muted font-black uppercase tracking-widest text-[10px]">Gestión inteligente de proyectos</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-6">

@@ -29,7 +29,13 @@ const tasks_module_1 = require("./tasks/tasks.module");
 const tickets_module_1 = require("./tickets/tickets.module");
 const documentation_module_1 = require("./documentation/documentation.module");
 const categories_module_1 = require("./categories/categories.module");
+const http_logging_middleware_1 = require("./middleware/http-logging.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer
+            .apply(http_logging_middleware_1.HttpLoggingMiddleware)
+            .forRoutes('*');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([

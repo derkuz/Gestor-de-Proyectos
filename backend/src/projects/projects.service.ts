@@ -82,4 +82,53 @@ export class ProjectsService {
         await this.activityLogsService.log('REMOVE_USER', `Usuario removido del proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id));
         return saved;
     }
+
+    async getStats(): Promise<any> {
+        const projectsCount = await this.projectsRepository.count();
+
+        // 1. Cálculo de progreso GLOBAL basado en Tareas Principales (RF-09)
+        const tasksSummary = await this.projectsRepository.manager
+            .createQueryBuilder('task', 'task')
+            .select("COUNT(*)", "total")
+            .addSelect("COUNT(*) FILTER (WHERE LOWER(task.estado) = 'finalizado')", "finalizadas")
+            .where("task.esSubtarea = :esSubtarea", { esSubtarea: false })
+            .getRawOne();
+
+        const totalTasks = parseInt(tasksSummary.total) || 0;
+        const finishedTasks = parseInt(tasksSummary.finalizadas) || 0;
+        const progresoGlobal = totalTasks > 0 ? Math.round((finishedTasks / totalTasks) * 100) : 0;
+
+        // 2. Cálculo de progreso POR PROYECTO
+        const projectsWithTasks = await this.projectsRepository.find({
+            relations: ['tareas'],
+        });
+
+        const proyectosDetalle = projectsWithTasks.map(p => {
+            const tareasPrincipales = p.tareas.filter(t => !t.esSubtarea);
+            const total = tareasPrincipales.length;
+            const finalizadas = tareasPrincipales.filter(t => t.estado.toLowerCase() === 'finalizado').length;
+            const progreso = total > 0 ? Math.round((finalizadas / total) * 100) : 0;
+
+            return {
+                id: p.id,
+                nombre: p.nombre,
+                estado: p.estado,
+                totalTareas: total,
+                tareasFinalizadas: finalizadas,
+                progreso
+            };
+        });
+
+        // 3. Conteo de tickets
+        const ticketsCount = await this.projectsRepository.manager.count('ticket');
+
+        return {
+            proyectos: projectsCount,
+            totalTareasPrincipales: totalTasks,
+            tareasFinalizadas: finishedTasks,
+            progresoGlobal,
+            tickets: ticketsCount,
+            proyectosDetalle
+        };
+    }
 }

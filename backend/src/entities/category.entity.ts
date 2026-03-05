@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { User } from './user.entity';
+import { User, UserRole } from './user.entity';
 import { Ticket } from './ticket.entity';
 
 @Entity()
@@ -15,6 +15,13 @@ export class Category {
 
     @Column({ length: 5, nullable: true })
     prefijo: string;
+
+    @Column({
+        type: 'simple-array',
+        nullable: true,
+        default: ''
+    })
+    rolesAutorizados: UserRole[];
 
     @ManyToMany(() => User)
     @JoinTable({

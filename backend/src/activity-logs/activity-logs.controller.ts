@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Query } from '@nestjs/common';
 import { ActivityLogsService } from './activity-logs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -14,5 +14,12 @@ export class ActivityLogsController {
     @Roles(UserRole.ADMIN)
     findAll(@Query('limit') limit?: number) {
         return this.activityLogsService.findAll(limit ? Number(limit) : 50);
+    }
+
+    @Post('purge')
+    @Roles(UserRole.ADMIN)
+    async purge() {
+        const deletedCount = await this.activityLogsService.purgeOldLogs();
+        return { message: 'Logs técnicos depurados', deletedCount };
     }
 }

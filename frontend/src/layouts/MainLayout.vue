@@ -4,7 +4,7 @@
     <aside class="w-64 bg-app-surface/50 backdrop-blur-xl border-r border-app-border flex flex-col z-20 transition-all">
       <div class="p-8 flex items-center justify-between">
         <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500 tracking-tighter">
-          GPPT
+          PRISMA
         </h1>
         
         <!-- Theme Toggle -->

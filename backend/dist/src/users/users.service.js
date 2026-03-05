@@ -62,12 +62,29 @@ let UsersService = class UsersService {
     async findByEmail(email) {
         return this.usersRepository.findOne({
             where: { email },
-            select: ['id', 'email', 'password', 'nombre', 'rol']
+            select: ['id', 'email', 'password', 'nombre', 'rol', 'activo']
         });
     }
     async create(userData) {
+        if (userData.password) {
+            userData.password = await bcrypt.hash(userData.password, 10);
+        }
         const user = this.usersRepository.create(userData);
-        return this.usersRepository.save(user);
+        const saved = await this.usersRepository.save(user);
+        await this.activityLogsService.log('CREATE_USER', `Usuario creado: ${user.email}`, undefined, 'USER', saved.id);
+        return saved;
+    }
+    async update(id, updateData) {
+        const user = await this.usersRepository.findOne({ where: { id } });
+        if (!user)
+            throw new Error('Usuario no encontrado');
+        if (updateData.password) {
+            updateData.password = await bcrypt.hash(updateData.password, 10);
+        }
+        Object.assign(user, updateData);
+        const saved = await this.usersRepository.save(user);
+        await this.activityLogsService.log('UPDATE_USER', `Usuario actualizado/estado cambiado: ${user.email}`, undefined, 'USER', id);
+        return saved;
     }
     async updateResetToken(id, token, expires) {
         await this.usersRepository.update(id, {
@@ -90,7 +107,7 @@ let UsersService = class UsersService {
     }
     async findAll() {
         return this.usersRepository.find({
-            select: ['id', 'nombre', 'email', 'rol']
+            select: ['id', 'nombre', 'email', 'rol', 'activo']
         });
     }
     async adminUpdatePassword(id, newPass) {

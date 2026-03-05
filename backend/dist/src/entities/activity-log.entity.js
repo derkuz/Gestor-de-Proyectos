@@ -20,6 +20,8 @@ let ActivityLog = class ActivityLog {
     usuario;
     entidadTipo;
     entidadId;
+    duracionMs;
+    categoria;
 };
 exports.ActivityLog = ActivityLog;
 __decorate([
@@ -50,6 +52,14 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], ActivityLog.prototype, "entidadId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    __metadata("design:type", Number)
+], ActivityLog.prototype, "duracionMs", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'BUSINESS' }),
+    __metadata("design:type", String)
+], ActivityLog.prototype, "categoria", void 0);
 exports.ActivityLog = ActivityLog = __decorate([
     (0, typeorm_1.Entity)()
 ], ActivityLog);
