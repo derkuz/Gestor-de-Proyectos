@@ -4,6 +4,43 @@ Todas las modificaciones relevantes al proyecto serán documentadas aquí con fe
 
 ---
 
+## [27] 2026-03-03 23:45
+- **Panel de Administración Integral**:
+  - Transformación de la sección de Categorías en un **Centro de Control** centralizado.
+  - Implementación de **Gestión de Usuarios**: reseteo de contraseñas directo desde la UI por administradores.
+  - Implementación de **Asignación de Proyectos**: interfaz visual para gestionar colaboradores y accesos.
+  - Nuevo **Dashboard Administrativo** con métricas clave (Usuarios, Proyectos, Tickets, Tareas) y estado del servidor.
+- **Correcciones y DevOps**:
+  - **Nginx SPA Fix**: Implementada redirección `try_files` en el servidor web para evitar errores 404 al recargar rutas de Vue.
+- **Sistema de Auditoría y Logging**:
+  - Implementación de `ActivityLog` para rastrear acciones críticas (Login, Registro, Cambios en proyectos, Reseteo de claves).
+  - Nueva pestaña de **Actividad en Tiempo Real** para supervisión administrativa.
+- **Mejoras en Autenticación**:
+  - Implementación de **Eye Toggle** (ojo) en login para visualización de contraseña.
+  - Mensajes de error específicos para "Usuario no registrado" vs "Contraseña incorrecta".
+  - Refuerzo de seguridad con `RolesGuard` en todos los nuevos endpoints administrativos.
+- **Optimización de UI/UX**:
+  - Menú lateral actualizado con acceso directo a "Administración".
+  - Sistema de pestañas premium con micro-animaciones y diseño adaptativo.
+
+---
+
+## [26] 2026-03-03 21:30
+- **Dockerización Integral del Proyecto**:
+  - Creación de `Dockerfile` optimizados para **Backend** (NestJS) y **Frontend** (Nginx/Vite).
+  - Configuración de `docker-compose.yml` para orquestar Backend, Frontend y PostgreSQL 17.
+  - Implementación de **Volúmenes persistentes** para la base de datos y archivos subidos (`uploads`).
+  - Configuración de **Healthchecks** para asegurar que el backend espere a la DB antes de iniciar.
+- **Automatización Multiplataforma**:
+  - Nuevo script `start.ps1` para Windows (PowerShell) que automatiza el despliegue y muestra accesos.
+  - Nuevo script `start.sh` para Linux/macOS (Bash) con compatibilidad total.
+- **Configuración de Entorno**:
+  - Creación de archivos `.env.example` detallados para facilitar la configuración inicial.
+- **Documentación de Despliegue**:
+  - Actualización completa del `README.MD` con la nueva guía de instalación rápida mediante Docker.
+
+---
+
 ## [25] 2026-03-01 15:15
 - **Rediseño de Lista de Tickets**:
   - Migración de diseño de tarjetas a un formato de **Filas/Tabla profesional** con mejor densidad de datos.

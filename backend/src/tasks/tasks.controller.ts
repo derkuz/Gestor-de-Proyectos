@@ -14,7 +14,7 @@ export class TasksController {
     @Post('projects/:projectId/tasks')
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER)
     create(@Param('projectId') projectId: string, @Body() taskData: Partial<Task>) {
-        return this.tasksService.create(projectId, taskData);
+        return this.tasksService.create(+projectId, taskData);
     }
 
     @Post('tasks/:taskId/subtasks')
@@ -25,7 +25,7 @@ export class TasksController {
 
     @Get('projects/:projectId/tasks')
     findAll(@Param('projectId') projectId: string) {
-        return this.tasksService.findAllByProject(projectId);
+        return this.tasksService.findAllByProject(+projectId);
     }
 
     @Get('tasks/:id')

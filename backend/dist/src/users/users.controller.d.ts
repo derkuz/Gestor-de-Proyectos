@@ -3,4 +3,5 @@ export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
     findAll(): Promise<import("../entities/user.entity").User[]>;
+    adminResetPassword(id: string, newPass: string): Promise<void>;
 }

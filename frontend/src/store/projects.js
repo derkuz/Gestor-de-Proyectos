@@ -62,6 +62,34 @@ export const useProjectStore = defineStore('projects', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        async assignUser(projectId, userId) {
+            this.loading = true;
+            try {
+                const response = await api.post(`/projects/${projectId}/assign`, { userId });
+                if (this.currentProject?.id === projectId) this.currentProject = response.data;
+                return true;
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Error al asignar usuario';
+                return false;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async removeUser(projectId, userId) {
+            this.loading = true;
+            try {
+                const response = await api.delete(`/projects/${projectId}/users/${userId}`);
+                if (this.currentProject?.id === projectId) this.currentProject = response.data;
+                return true;
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Error al eliminar usuario';
+                return false;
+            } finally {
+                this.loading = false;
+            }
         }
     }
 });

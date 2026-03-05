@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Documentation } from '../entities/documentation.entity';
+import { Documentation, DocType } from '../entities/documentation.entity';
 import { Project } from '../entities/project.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class DocumentationService {
@@ -13,10 +15,11 @@ export class DocumentationService {
         private projectsRepository: Repository<Project>,
     ) { }
 
-    async findAllByProject(projectId: string): Promise<Documentation[]> {
+    async findAllByProject(projectId: number): Promise<Documentation[]> {
         return this.docRepository.find({
             where: { proyecto: { id: projectId } },
-            order: { ultimaActualizacion: 'DESC' }
+            order: { ultimaActualizacion: 'DESC' },
+            select: ['id', 'titulo', 'tipo', 'url', 'ultimaActualizacion']
         });
     }
 
@@ -26,30 +29,107 @@ export class DocumentationService {
             relations: ['proyecto']
         });
         if (!doc) throw new NotFoundException('Documento no encontrado');
+
+        // Si es MD, leer el contenido del archivo físico
+        if (doc.tipo === DocType.MD && doc.url) {
+            try {
+                const filePath = path.resolve('.' + doc.url);
+                if (fs.existsSync(filePath)) {
+                    (doc as any).contenido = fs.readFileSync(filePath, 'utf8');
+                }
+            } catch (error) {
+                console.error('Error leyendo archivo físico:', error);
+            }
+        }
+
         return doc;
     }
 
-    async create(projectId: string, docData: Partial<Documentation>): Promise<Documentation> {
+    async create(projectId: number, docData: Partial<Documentation>): Promise<Documentation> {
         const project = await this.projectsRepository.findOne({ where: { id: projectId } });
         if (!project) throw new NotFoundException('Proyecto no encontrado');
 
+        const content = (docData as any).contenido;
+        const { contenido, ...rest } = docData as any;
+
         const doc = this.docRepository.create({
-            ...docData,
+            ...rest,
             proyecto: project
         });
-        return this.docRepository.save(doc);
+
+        const savedDoc = (await this.docRepository.save(doc)) as unknown as Documentation;
+
+        if (savedDoc.tipo === DocType.MD && content) {
+            const currentYear = new Date().getFullYear().toString();
+            const relativeDir = `/uploads/proyectos/${currentYear}/${projectId}`;
+            const uploadDir = path.resolve('.' + relativeDir);
+
+            if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+            const safeTitle = savedDoc.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const fileName = `${safeTitle}.md`;
+            const filePath = path.join(uploadDir, fileName);
+
+            fs.writeFileSync(filePath, content);
+
+            savedDoc.url = `${relativeDir}/${fileName}`;
+            await this.docRepository.update(savedDoc.id, { url: savedDoc.url });
+            (savedDoc as any).contenido = content;
+        }
+
+        return savedDoc;
     }
 
     async update(id: string, docData: Partial<Documentation>): Promise<Documentation> {
         const doc = await this.findOne(id);
-        Object.assign(doc, docData);
-        return this.docRepository.save(doc);
+        const project = doc.proyecto;
+        const content = (docData as any).contenido;
+
+        const { contenido, ...rest } = docData as any;
+        Object.assign(doc, rest);
+
+        const savedDoc = (await this.docRepository.save(doc)) as unknown as Documentation;
+
+        if (savedDoc.tipo === DocType.MD && content !== undefined) {
+            const currentYear = new Date().getFullYear().toString();
+            const relativeDir = `/uploads/proyectos/${currentYear}/${project.id}`;
+            const uploadDir = path.resolve('.' + relativeDir);
+
+            if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+            const safeTitle = savedDoc.titulo.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const fileName = `${safeTitle}.md`;
+            const filePath = path.join(uploadDir, fileName);
+
+            if (savedDoc.url && savedDoc.url !== `${relativeDir}/${fileName}`) {
+                const oldPath = path.resolve('.' + savedDoc.url);
+                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+            }
+
+            fs.writeFileSync(filePath, content);
+            savedDoc.url = `${relativeDir}/${fileName}`;
+            await this.docRepository.update(savedDoc.id, { url: savedDoc.url });
+            (savedDoc as any).contenido = content;
+        }
+
+        return savedDoc;
     }
 
     async remove(id: string): Promise<void> {
-        const result = await this.docRepository.delete(id);
-        if (result.affected === 0) {
-            throw new NotFoundException('Documento no encontrado');
+        const doc = await this.docRepository.findOne({ where: { id } });
+        if (!doc) throw new NotFoundException('Documento no encontrado');
+
+        if (doc.tipo === DocType.MD && doc.url) {
+            try {
+                const filePath = path.resolve('.' + doc.url);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            } catch (error) {
+                console.error('Error eliminando archivo físico:', error);
+            }
         }
+
+        await this.docRepository.delete(id);
     }
 }

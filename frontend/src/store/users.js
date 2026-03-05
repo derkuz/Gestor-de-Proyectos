@@ -20,6 +20,19 @@ export const useUsersStore = defineStore('users', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        async adminResetPassword(userId, newPassword) {
+            this.loading = true;
+            try {
+                await api.patch(`/users/${userId}/password`, { password: newPassword });
+                return true;
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Error al resetear contraseña';
+                return false;
+            } finally {
+                this.loading = false;
+            }
         }
     }
 });

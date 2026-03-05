@@ -30,7 +30,7 @@ let DocumentationController = class DocumentationController {
         this.documentationService = documentationService;
     }
     findAll(projectId) {
-        return this.documentationService.findAllByProject(projectId);
+        return this.documentationService.findAllByProject(+projectId);
     }
     uploadFile(projectId, file, titulo) {
         console.log('Backend: Recibida petición de subida', { projectId, titulo, file: file?.filename });
@@ -52,7 +52,7 @@ let DocumentationController = class DocumentationController {
         return this.documentationService.findOne(id);
     }
     create(projectId, docData) {
-        return this.documentationService.create(projectId, docData);
+        return this.documentationService.create(+projectId, docData);
     }
     update(id, docData) {
         return this.documentationService.update(id, docData);

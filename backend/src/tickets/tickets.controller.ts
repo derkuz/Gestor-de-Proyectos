@@ -17,40 +17,16 @@ export class TicketsController {
     constructor(private readonly ticketsService: TicketsService) { }
 
     @Post()
-    @UseInterceptors(FileInterceptor('image', {
-        storage: diskStorage({
-            destination: (req, file, cb) => {
-                const ticketId = randomUUID();
-                (req as any).ticketId = ticketId;
-                const basePath = process.env.TICKETS_UPLOAD_PATH || 'uploads/tickets';
-                const path = getDynamicUploadPath(basePath, ticketId);
-                cb(null, path);
-            },
-            filename: (req, file, cb) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-                cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
-            },
-        }),
-    }))
-    create(@Body() ticketData: any, @Req() req: any, @UploadedFile() file: Express.Multer.File) {
-        const payload = { ...ticketData };
-        if (file) {
-            const now = new Date();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = String(now.getFullYear());
-            const ticketId = (req as any).ticketId;
-
-            payload.id = ticketId; // Usar el mismo ID que la carpeta
-            payload.imagenUrl = `/uploads/tickets/${ticketId}/${month}/${year}/${file.filename}`;
-        }
-
+    @UseInterceptors(FileInterceptor('image'))
+    async create(@Body() ticketData: any, @Req() req: any, @UploadedFile() file: Express.Multer.File) {
         // Map categoriaRelacionadaId if present
+        const payload = { ...ticketData };
         if (ticketData.categoriaRelacionadaId) {
             payload.categoriaRelacionada = { id: ticketData.categoriaRelacionadaId };
             delete payload.categoriaRelacionadaId;
         }
 
-        return this.ticketsService.create(payload, req.user.userId);
+        return this.ticketsService.createWithAttachment(payload, req.user.userId, file);
     }
 
     @Get()

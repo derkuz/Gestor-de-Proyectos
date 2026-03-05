@@ -39,11 +39,12 @@ let TicketsController = class TicketsController {
             payload.id = ticketId;
             payload.imagenUrl = `/uploads/tickets/${ticketId}/${month}/${year}/${file.filename}`;
         }
+        const payload = { ...ticketData };
         if (ticketData.categoriaRelacionadaId) {
             payload.categoriaRelacionada = { id: ticketData.categoriaRelacionadaId };
             delete payload.categoriaRelacionadaId;
         }
-        return this.ticketsService.create(payload, req.user.userId);
+        return this.ticketsService.createWithAttachment(payload, req.user.userId, file);
     }
     findAll(req) {
         return this.ticketsService.findAll(req.user.userId, req.user.rol);

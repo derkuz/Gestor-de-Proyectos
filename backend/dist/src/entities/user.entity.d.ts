@@ -1,4 +1,5 @@
 import { Ticket } from './ticket.entity';
+import { Project } from './project.entity';
 export declare enum UserRole {
     ADMIN = "ADMIN",
     PROJECT_MANAGER = "PROJECT_MANAGER",
@@ -15,4 +16,5 @@ export declare class User {
     resetToken: string;
     resetTokenExpires: Date;
     tickets: Ticket[];
+    proyectos: Project[];
 }

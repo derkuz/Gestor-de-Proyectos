@@ -31,13 +31,19 @@ let ProjectsController = class ProjectsController {
         return this.projectsService.findAll();
     }
     findOne(id) {
-        return this.projectsService.findOne(id);
+        return this.projectsService.findOne(+id);
     }
     update(id, updateData) {
-        return this.projectsService.update(id, updateData);
+        return this.projectsService.update(+id, updateData);
     }
     remove(id) {
-        return this.projectsService.remove(id);
+        return this.projectsService.remove(+id);
+    }
+    assignUser(projectId, userId) {
+        return this.projectsService.assignUser(+projectId, userId);
+    }
+    removeUser(projectId, userId) {
+        return this.projectsService.removeUser(+projectId, userId);
     }
 };
 exports.ProjectsController = ProjectsController;
@@ -79,6 +85,24 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':id/assign'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "assignUser", null);
+__decorate([
+    (0, common_1.Delete)(':id/users/:userId'),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "removeUser", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('projects'),

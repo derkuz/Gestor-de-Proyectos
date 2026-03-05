@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import * as bcrypt from 'bcrypt';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private activityLogsService: ActivityLogsService,
     ) { }
 
     async findByEmail(email: string): Promise<User | null> {
@@ -48,5 +51,12 @@ export class UsersService {
         return this.usersRepository.find({
             select: ['id', 'nombre', 'email', 'rol']
         });
+    }
+
+    async adminUpdatePassword(id: string, newPass: string) {
+        const user = await this.usersRepository.findOne({ where: { id } });
+        const passwordHash = await bcrypt.hash(newPass, 10);
+        await this.activityLogsService.log('ADMIN_RESET_PASSWORD', `Contraseña reseteada para el usuario: ${user ? user.email : id}`, undefined, 'USER', id);
+        return this.updatePassword(id, passwordHash);
     }
 }

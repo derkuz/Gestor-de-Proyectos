@@ -17,14 +17,20 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const project_entity_1 = require("../entities/project.entity");
+const user_entity_1 = require("../entities/user.entity");
+const activity_logs_service_1 = require("../activity-logs/activity-logs.service");
 let ProjectsService = class ProjectsService {
     projectsRepository;
-    constructor(projectsRepository) {
+    activityLogsService;
+    constructor(projectsRepository, activityLogsService) {
         this.projectsRepository = projectsRepository;
+        this.activityLogsService = activityLogsService;
     }
     async create(projectData) {
         const project = this.projectsRepository.create(projectData);
-        return this.projectsRepository.save(project);
+        const saved = await this.projectsRepository.save(project);
+        await this.activityLogsService.log('CREATE_PROJECT', `Proyecto creado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id));
+        return saved;
     }
     async findAll() {
         return this.projectsRepository.find({ relations: ['documentos'] });
@@ -32,7 +38,7 @@ let ProjectsService = class ProjectsService {
     async findOne(id) {
         const project = await this.projectsRepository.findOne({
             where: { id },
-            relations: ['tareas', 'documentos'],
+            relations: ['tareas', 'documentos', 'usuarios'],
         });
         if (!project)
             throw new common_1.NotFoundException('Proyecto no encontrado');
@@ -41,17 +47,50 @@ let ProjectsService = class ProjectsService {
     async update(id, updateData) {
         const project = await this.findOne(id);
         Object.assign(project, updateData);
-        return this.projectsRepository.save(project);
+        const saved = await this.projectsRepository.save(project);
+        await this.activityLogsService.log('UPDATE_PROJECT', `Proyecto actualizado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id));
+        return saved;
     }
     async remove(id) {
         const project = await this.findOne(id);
+        await this.activityLogsService.log('DELETE_PROJECT', `Proyecto eliminado: ${project.nombre}`, undefined, 'PROJECT', String(project.id));
         await this.projectsRepository.remove(project);
+    }
+    async assignUser(projectId, userId) {
+        const project = await this.projectsRepository.findOne({
+            where: { id: projectId },
+            relations: ['usuarios']
+        });
+        if (!project)
+            throw new common_1.NotFoundException('Proyecto no encontrado');
+        const user = await this.projectsRepository.manager.findOne(user_entity_1.User, { where: { id: userId } });
+        if (!user)
+            throw new common_1.NotFoundException('Usuario no encontrado');
+        if (!project.usuarios.some(u => u.id === user.id)) {
+            project.usuarios.push(user);
+        }
+        const saved = await this.projectsRepository.save(project);
+        await this.activityLogsService.log('ASSIGN_USER', `Usuario ${user.nombre} asignado al proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id));
+        return saved;
+    }
+    async removeUser(projectId, userId) {
+        const project = await this.projectsRepository.findOne({
+            where: { id: projectId },
+            relations: ['usuarios']
+        });
+        if (!project)
+            throw new common_1.NotFoundException('Proyecto no encontrado');
+        project.usuarios = project.usuarios.filter(u => u.id !== userId);
+        const saved = await this.projectsRepository.save(project);
+        await this.activityLogsService.log('REMOVE_USER', `Usuario removido del proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id));
+        return saved;
     }
 };
 exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(project_entity_1.Project)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        activity_logs_service_1.ActivityLogsService])
 ], ProjectsService);
 //# sourceMappingURL=projects.service.js.map

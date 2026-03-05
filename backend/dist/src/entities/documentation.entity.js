@@ -22,7 +22,6 @@ let Documentation = class Documentation {
     id;
     titulo;
     tipo;
-    contenido;
     url;
     ultimaActualizacion;
     proyecto;
@@ -44,10 +43,6 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], Documentation.prototype, "tipo", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
-    __metadata("design:type", String)
-], Documentation.prototype, "contenido", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)

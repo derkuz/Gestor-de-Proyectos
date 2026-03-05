@@ -24,18 +24,30 @@ export class ProjectsController {
 
     @Get(':id')
     findOne(@Param('id') id: string) {
-        return this.projectsService.findOne(id);
+        return this.projectsService.findOne(+id);
     }
 
     @Patch(':id')
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER)
     update(@Param('id') id: string, @Body() updateData: Partial<Project>) {
-        return this.projectsService.update(id, updateData);
+        return this.projectsService.update(+id, updateData);
     }
 
     @Delete(':id')
     @Roles(UserRole.ADMIN)
     remove(@Param('id') id: string) {
-        return this.projectsService.remove(id);
+        return this.projectsService.remove(+id);
+    }
+
+    @Post(':id/assign')
+    @Roles(UserRole.ADMIN)
+    assignUser(@Param('id') projectId: string, @Body('userId') userId: string) {
+        return this.projectsService.assignUser(+projectId, userId);
+    }
+
+    @Delete(':id/users/:userId')
+    @Roles(UserRole.ADMIN)
+    removeUser(@Param('id') projectId: string, @Param('userId') userId: string) {
+        return this.projectsService.removeUser(+projectId, userId);
     }
 }

@@ -13,6 +13,7 @@ exports.Project = exports.ProjectStatus = void 0;
 const typeorm_1 = require("typeorm");
 const task_entity_1 = require("./task.entity");
 const documentation_entity_1 = require("./documentation.entity");
+const user_entity_1 = require("./user.entity");
 var ProjectStatus;
 (function (ProjectStatus) {
     ProjectStatus["ACTIVO"] = "ACTIVO";
@@ -28,11 +29,12 @@ let Project = class Project {
     fechaCreacion;
     tareas;
     documentos;
+    usuarios;
 };
 exports.Project = Project;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
-    __metadata("design:type", String)
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
 ], Project.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
@@ -66,6 +68,11 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => documentation_entity_1.Documentation, (doc) => doc.proyecto),
     __metadata("design:type", Array)
 ], Project.prototype, "documentos", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => user_entity_1.User, (user) => user.proyectos),
+    (0, typeorm_1.JoinTable)({ name: 'project_users' }),
+    __metadata("design:type", Array)
+], Project.prototype, "usuarios", void 0);
 exports.Project = Project = __decorate([
     (0, typeorm_1.Entity)()
 ], Project);

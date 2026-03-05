@@ -55,9 +55,34 @@
     </div>
 
     <!-- Toolbar -->
-    <div class="h-12 border-b border-app-border bg-app-surface px-6 flex items-center space-x-1 overflow-x-auto no-scrollbar shrink-0">
+    <div class="h-12 border-b border-app-border bg-app-surface px-6 flex items-center space-x-1 overflow-visible shrink-0 relative z-[60]">
       <template v-for="(btn, idx) in toolbarButtons" :key="idx">
         <div v-if="btn.type === 'separator'" class="w-px h-6 bg-app-border mx-2"></div>
+        
+        <!-- Template Select -->
+        <div v-else-if="btn.type === 'template-select'" class="relative">
+           <button 
+             @click="showTemplates = !showTemplates"
+             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-blue-500 bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all flex items-center space-x-2"
+           >
+              <span>Plantillas</span>
+              <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': showTemplates }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+           </button>
+           
+           <div v-if="showTemplates" class="absolute left-0 mt-2 w-64 bg-app-surface border border-app-border rounded-2xl shadow-2xl z-[100] p-2 space-y-1 animate-pop-in">
+              <div class="absolute inset-0 bg-app-surface/50 backdrop-blur-xl rounded-2xl -z-10"></div>
+              <button 
+                v-for="tmp in templates" 
+                :key="tmp.id"
+                @click="handleApplyTemplate(tmp)"
+                class="w-full text-left px-4 py-3 rounded-xl hover:bg-app-bg transition-all flex flex-col group/item"
+              >
+                 <span class="text-xs font-black text-app-text group-hover/item:text-blue-400 transition-colors">{{ tmp.name }}</span>
+                 <span class="text-[10px] text-app-text-muted mt-0.5">{{ tmp.desc }}</span>
+              </button>
+           </div>
+        </div>
+
         <button 
           v-else
           @click="insertMarkdown(btn.action)"
@@ -161,6 +186,7 @@ const docTitle = ref('')
 const docContent = ref('')
 const showPreview = ref(true)
 const showMermaidHelper = ref(false)
+const showTemplates = ref(false)
 const saving = ref(false)
 const editorRef = ref(null)
 
@@ -268,6 +294,18 @@ const insertMarkdown = (action) => {
             insertion = `\n- ${selected || 'Item'}`
             cursorOffset = insertion.length
             break
+        case 'checklist':
+            insertion = `\n- [ ] ${selected || 'Tarea pendiente'}`
+            cursorOffset = insertion.length
+            break
+        case 'table':
+            insertion = `\n| Cabecera 1 | Cabecera 2 |\n| :--- | :--- |\n| Celda 1 | Celda 2 |\n`
+            cursorOffset = insertion.length
+            break
+        case 'image':
+            insertion = `![Descripción de la imagen](https://url-de-la-imagen.com)`
+            cursorOffset = 2
+            break
         case 'flowchart':
             insertion = `\n\`\`\`mermaid\ngraph TD\n    A[Inicio] --> B{¿Procesar?}\n    B -- Sí --> C[Tarea]\n    B -- No --> D[Fin]\n    C --> D\n\`\`\`\n`
             cursorOffset = insertion.length
@@ -280,6 +318,17 @@ const insertMarkdown = (action) => {
         el.focus()
         el.setSelectionRange(start + cursorOffset, start + cursorOffset)
     })
+}
+
+const applyTemplate = (template) => {
+    if (docContent.value && !confirm('¿Deseas reemplazar el contenido actual con la plantilla?')) return
+    docContent.value = template.content
+    if (!docTitle.value) docTitle.value = template.name
+}
+
+const handleApplyTemplate = (template) => {
+    applyTemplate(template)
+    showTemplates.value = false
 }
 
 const handleSave = async () => {
@@ -305,9 +354,14 @@ const HeadingIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="cu
 const LinkIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>' }
 const CodeIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>' }
 const ListIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>' }
+const ChecklistIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-6 9l2 2 4-4" /></svg>' }
+const TableIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>' }
+const ImageIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>' }
 const JustifyIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>' }
 
 const toolbarButtons = [
+    { type: 'template-select' },
+    { type: 'separator' },
     { title: 'Negrita', action: 'bold', icon: BoldIcon },
     { title: 'Itálica', action: 'italic', icon: ItalicIcon },
     { type: 'separator' },
@@ -315,9 +369,189 @@ const toolbarButtons = [
     { title: 'Título 2', action: 'h2', icon: HeadingIcon },
     { type: 'separator' },
     { title: 'Enlace', action: 'link', icon: LinkIcon },
+    { title: 'Imagen', action: 'image', icon: ImageIcon },
+    { title: 'Tabla', action: 'table', icon: TableIcon },
     { title: 'Bloque de Código', action: 'code', icon: CodeIcon },
     { title: 'Lista', action: 'list', icon: ListIcon },
+    { title: 'Lista de Tareas', action: 'checklist', icon: ChecklistIcon },
     { title: 'Justificar (HTML)', action: 'justify', icon: JustifyIcon },
+]
+
+const templates = [
+    {
+        id: 'requerimientos',
+        name: 'Relevamiento de Requerimientos',
+        desc: 'Estructura para captura inicial de necesidades.',
+        content: `# 📋 Relevamiento de Requerimientos (Norma IEEE 830 - SRS)
+## 1. Información del Cliente
+- **Stakeholders:** [Nombres y cargos de los interesados]
+- **Analista Responsable:** [Tu Nombre]
+
+## 2. Objetivo General
+> *Define en un párrafo el propósito principal de este sistema o módulo. ¿Qué problema resuelve?*
+
+## 3. Requerimientos Funcionales (Estándar IEEE 830)
+| ID | Descripción | Prioridad | Observaciones |
+| :--- | :--- | :--- | :--- |
+| RF-01 | El sistema debe permitir... | ALTA | *Esencial para el MVP* |
+
+## 4. Requerimientos No Funcionales (Atributos de Calidad - ISO/IEC 25010)
+- **Rendimiento:** *Ej: Carga de reportes en < 2 segundos.*
+- **Seguridad:** *Ej: Autenticación mediante JWT y roles.*
+
+## 5. Casos de Uso (Notación UML 2.5)
+\`\`\`mermaid
+graph LR
+    U[Usuario] --> UC1((Ver Tareas))
+    U --> UC2((Crear Ticket))
+    A[Admin] --> UC3((Gestionar Roles))
+\`\`\` `
+    },
+    {
+        id: 'user-manual',
+        name: 'Manual de Usuario',
+        desc: 'Guía de uso para el usuario final.',
+        content: `# 📖 Manual de Usuario (Norma IEEE 26514 - Software Documentation)
+## 1. Introducción
+*Bienvenido al manual de [Nombre del sistema]. Esta guía te ayudará a comprender las funciones principales.*
+
+## 2. Primeros Pasos
+### Acceso al Sistema
+1. Ingresa a la URL: \`http://ejemplo.com\`
+...`
+    },
+    {
+        id: 'data-dictionary',
+        name: 'Diccionario de Datos',
+        desc: 'Documentación técnica de la Base de Datos.',
+        content: `# 🗄️ Diccionario de Datos (Norma ISO/IEC 11179)
+## Entidad: [Nombre de la Tabla] (Modelo Entidad-Relación - Notación de Chen/Crow's Foot)
+*Descripción: Almacena la información de...*
+
+| Campo | Tipo | Nulo | Descripción | Ejemplo |
+| :--- | :--- | :---: | :--- | :--- |
+| **id** | UUID | No | Clave primaria autogenerada | \`550e8400...\` |
+
+## Relaciones (Diagrama ER Notación UML/Relacional)
+\`\`\`mermaid
+erDiagram
+    USUARIO ||--o{ TICKET : crea
+    PROYECTO ||--|{ TAREA : tiene
+\`\`\` `
+    },
+    {
+        id: 'minuta',
+        name: 'Minuta de Reunión',
+        desc: 'Estructura para actas y acuerdos.',
+        content: `# 📅 Minuta de Reunión (Basado en Robert's Rules of Order)
+## Información General
+- **Fecha:** ${new Date().toLocaleDateString()}
+- **Asistentes:** [Nombres...]
+...`
+    },
+    {
+        id: 'tech-spec',
+        name: 'Especificación Técnica',
+        desc: 'Arquitectura y lógica interna.',
+        content: `# 🛠️ Especificación Técnica (Norma IEEE 1016 - Software Design Description)
+## 1. Resumen de Implementación
+*Descripción de la lógica de negocio y arquitectura.*
+
+## 2. Diagrama de Flujo / Lógica (Notación UML 2.5 - Sequence Diagram)
+\`\`\`mermaid
+sequenceDiagram
+    Participante A->>Participante B: Petición
+    Participante B-->>Participante A: Respuesta (JSON)
+\`\`\` `
+    },
+    {
+        id: 'test-plan',
+        name: 'Plan de Pruebas (QA)',
+        desc: 'Para asegurar la calidad del software.',
+        content: `# 🧪 Plan de Pruebas (Norma IEEE 829 - Standard for Software Test Documentation)
+## 1. Alcance de las Pruebas
+*¿Qué funcionalidades se van a probar en este ciclo?*
+
+## 2. Casos de Prueba (Estándar IEEE 829)
+| ID | Descripción | Entrada | Esperado | Estado |
+| :--- | :--- | :--- | :--- | :---: |
+| CP-01 | Login exitoso | Credenciales válidas | Redirección al Home | 🟢 |
+...`
+    },
+    {
+        id: 'user-stories',
+        name: 'Historias de Usuario',
+        desc: 'Definición ágil de requerimientos.',
+        content: `# 📋 Historias de Usuario (Backlog - Estándar Agile / Metodología XP)
+## HU-01: [Título] (Bajo Criterios INVEST)
+**Como** [Rol del usuario]
+**Quiero** [Acción/Funcionalidad]
+**Para** [Valor de negocio/Motivo]
+...`
+    },
+    {
+        id: 'risk-analysis',
+        name: 'Análisis de Riesgos',
+        desc: 'Prevención de problemas en el proyecto.',
+        content: `# ⚠️ Análisis de Riesgos (Norma ISO 31000 / Estándar PMBOK)
+## 1. Matriz de Riesgos (Nivel de Exposición = Impacto x Probabilidad)
+| Riesgo | Impacto | Probabilidad | Plan de Mitigación |
+| :--- | :--- | :--- | :--- |
+...`
+    },
+    {
+        id: 'release-notes',
+        name: 'Notas de Lanzamiento',
+        desc: 'Documentación para despliegues (Releases).',
+        content: `# 🚀 Notas de Lanzamiento (Estándar Semantic Versioning - SemVer 2.0.0)
+*Basado en el estándar "Keep a Changelog"*
+## 🆕 Novedades (What's New)
+- **[Módulo A]:** Implementación de...
+...`
+    },
+    {
+        id: 'deployment-checklist',
+        name: 'Checklist de Despliegue',
+        desc: 'Pasos críticos para pasar a producción.',
+        content: `# 🚀 Checklist de Despliegue (Norma ISO/IEC 27001 / DevOps Best Practices)
+## 1. Pre-Despliegue (Entorno)
+- [ ] **Backup:** Backup de BD realizado y verificado.
+- [ ] **Env Vars:** Todas las variables de entorno configuradas en el servidor.
+- [ ] **Secrets:** Claves API y JWT actualizadas a valores de producción.
+
+## 2. Despliegue (Ejecución)
+- [ ] **Build:** Build de Frontend y Backend generado sin errores.
+- [ ] **Docker:** Imágenes actualizadas y contenedores reiniciados.
+- [ ] **Migrations:** Migraciones de base de datos ejecutadas con éxito.
+
+## 3. Post-Despliegue (Verificación)
+- [ ] **Smoke Test:** Las rutas principales (Login, CRUD central) funcionan.
+- [ ] **Logs:** No hay errores críticos ("FATAL" / "ERROR") en la consola.
+- [ ] **SSL:** Certificados HTTPS renovados y activos.
+
+---
+*Aprobado por:* [Nombre/Rol]*`
+    },
+    {
+        id: 'requirements-checklist',
+        name: 'Checklist Relevamiento',
+        desc: 'Para asegurar que no falte nada al capturar requisitos.',
+        content: `# 📋 Checklist de Relevamiento (Basado en BABOK Guide / IIBA)
+## 1. Preparación y Contexto
+- [ ] **Stakeholders:** Se han identificado todos los interesados clave.
+- [ ] **Objetivo:** El "dolor" o problema principal está claramente definido.
+- [ ] **Alcance:** Se definió qué NO hará el sistema (Límites).
+
+## 2. Captura de Requerimientos
+- [ ] **Procesos:** Se mapeó el proceso actual ("As-Is").
+- [ ] **Funcionales:** Se listaron las acciones que el usuario debe realizar.
+- [ ] **Seguridad:** Se definieron niveles de acceso y roles.
+
+## 3. Validación y Cierre
+- [ ] **Prioridades:** El cliente validó qué es "Básico", "Deseable" y "Futuro".
+- [ ] **Conflictos:** No hay requerimientos que se contradigan entre sí.
+- [ ] **Firma:** El documento de relevamiento fue validado por el responsable.*`
+    }
 ]
 </script>
 

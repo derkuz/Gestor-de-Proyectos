@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
@@ -19,6 +20,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         signOptions: { expiresIn: '1d' },
       }),
     }),
+    ActivityLogsModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

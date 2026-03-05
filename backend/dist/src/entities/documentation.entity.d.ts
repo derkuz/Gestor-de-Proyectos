@@ -8,7 +8,6 @@ export declare class Documentation {
     id: string;
     titulo: string;
     tipo: DocType;
-    contenido: string;
     url: string;
     ultimaActualizacion: Date;
     proyecto: Project;

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Task } from './task.entity';
 import { Documentation } from './documentation.entity';
+import { User } from './user.entity';
 
 export enum ProjectStatus {
     ACTIVO = 'ACTIVO',
@@ -10,8 +11,8 @@ export enum ProjectStatus {
 
 @Entity()
 export class Project {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     nombre: string;
@@ -37,4 +38,8 @@ export class Project {
 
     @OneToMany(() => Documentation, (doc) => doc.proyecto)
     documentos: Documentation[];
+
+    @ManyToMany(() => User, (user) => user.proyectos)
+    @JoinTable({ name: 'project_users' })
+    usuarios: User[];
 }

@@ -1,12 +1,13 @@
 import { Task } from './task.entity';
 import { Documentation } from './documentation.entity';
+import { User } from './user.entity';
 export declare enum ProjectStatus {
     ACTIVO = "ACTIVO",
     PAUSADO = "PAUSADO",
     FINALIZADO = "FINALIZADO"
 }
 export declare class Project {
-    id: string;
+    id: number;
     nombre: string;
     descripcion: string;
     columnasKanban: any;
@@ -14,4 +15,5 @@ export declare class Project {
     fechaCreacion: Date;
     tareas: Task[];
     documentos: Documentation[];
+    usuarios: User[];
 }

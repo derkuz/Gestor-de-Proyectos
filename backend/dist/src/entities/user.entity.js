@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = exports.UserRole = void 0;
 const typeorm_1 = require("typeorm");
 const ticket_entity_1 = require("./ticket.entity");
+const project_entity_1 = require("./project.entity");
 var UserRole;
 (function (UserRole) {
     UserRole["ADMIN"] = "ADMIN";
@@ -29,6 +30,7 @@ let User = class User {
     resetToken;
     resetTokenExpires;
     tickets;
+    proyectos;
 };
 exports.User = User;
 __decorate([
@@ -71,6 +73,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => ticket_entity_1.Ticket, (ticket) => ticket.usuario),
     __metadata("design:type", Array)
 ], User.prototype, "tickets", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => project_entity_1.Project, (project) => project.usuarios),
+    __metadata("design:type", Array)
+], User.prototype, "proyectos", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);
