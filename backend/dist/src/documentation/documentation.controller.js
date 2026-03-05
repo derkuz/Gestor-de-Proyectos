@@ -23,6 +23,7 @@ const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_1 = require("../entities/user.entity");
 const documentation_entity_1 = require("../entities/documentation.entity");
+const file_upload_utils_1 = require("../utils/file-upload.utils");
 let DocumentationController = class DocumentationController {
     documentationService;
     constructor(documentationService) {
@@ -35,11 +36,16 @@ let DocumentationController = class DocumentationController {
         console.log('Backend: Recibida petición de subida', { projectId, titulo, file: file?.filename });
         if (!file) {
             console.error('Backend: No se recibió ningún archivo');
+            return;
         }
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = String(now.getFullYear());
+        const url = `/uploads/projects/${projectId}/${month}/${year}/${file.filename}`;
         return this.documentationService.create(projectId, {
             titulo: titulo || file?.originalname,
             tipo: documentation_entity_1.DocType.FILE,
-            url: `/uploads/${file?.filename}`,
+            url: url,
         });
     }
     findOne(id) {
@@ -69,7 +75,12 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER, user_entity_1.UserRole.COLABORADOR),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
-            destination: './uploads',
+            destination: (req, file, cb) => {
+                const projectId = req.params.projectId;
+                const basePath = process.env.PROJECTS_UPLOAD_PATH || 'uploads/projects';
+                const path = (0, file_upload_utils_1.getDynamicUploadPath)(basePath, projectId);
+                cb(null, path);
+            },
             filename: (req, file, cb) => {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                 cb(null, `${uniqueSuffix}${(0, path_1.extname)(file.originalname)}`);

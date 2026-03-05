@@ -8,6 +8,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { Documentation, DocType } from '../entities/documentation.entity';
+import { getDynamicUploadPath } from '../utils/file-upload.utils';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('projects/:projectId/documentation')
@@ -23,7 +24,12 @@ export class DocumentationController {
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.COLABORADOR)
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
-            destination: './uploads',
+            destination: (req, file, cb) => {
+                const projectId = req.params.projectId;
+                const basePath = process.env.PROJECTS_UPLOAD_PATH || 'uploads/projects';
+                const path = getDynamicUploadPath(basePath, projectId);
+                cb(null, path);
+            },
             filename: (req, file, cb) => {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                 cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
@@ -38,11 +44,18 @@ export class DocumentationController {
         console.log('Backend: Recibida petición de subida', { projectId, titulo, file: file?.filename });
         if (!file) {
             console.error('Backend: No se recibió ningún archivo');
+            return; // O lanzar error
         }
+
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = String(now.getFullYear());
+        const url = `/uploads/projects/${projectId}/${month}/${year}/${file.filename}`;
+
         return this.documentationService.create(projectId, {
             titulo: titulo || file?.originalname,
             tipo: DocType.FILE,
-            url: `/uploads/${file?.filename}`,
+            url: url,
         });
     }
 

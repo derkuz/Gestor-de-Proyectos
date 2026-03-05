@@ -17,11 +17,13 @@ const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const path_1 = require("path");
+const crypto_1 = require("crypto");
 const tickets_service_1 = require("./tickets.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_1 = require("../entities/user.entity");
+const file_upload_utils_1 = require("../utils/file-upload.utils");
 let TicketsController = class TicketsController {
     ticketsService;
     constructor(ticketsService) {
@@ -30,7 +32,12 @@ let TicketsController = class TicketsController {
     create(ticketData, req, file) {
         const payload = { ...ticketData };
         if (file) {
-            payload.imagenUrl = `/uploads/${file.filename}`;
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = String(now.getFullYear());
+            const ticketId = req.ticketId;
+            payload.id = ticketId;
+            payload.imagenUrl = `/uploads/tickets/${ticketId}/${month}/${year}/${file.filename}`;
         }
         if (ticketData.categoriaRelacionadaId) {
             payload.categoriaRelacionada = { id: ticketData.categoriaRelacionadaId };
@@ -56,7 +63,13 @@ __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
         storage: (0, multer_1.diskStorage)({
-            destination: './uploads',
+            destination: (req, file, cb) => {
+                const ticketId = (0, crypto_1.randomUUID)();
+                req.ticketId = ticketId;
+                const basePath = process.env.TICKETS_UPLOAD_PATH || 'uploads/tickets';
+                const path = (0, file_upload_utils_1.getDynamicUploadPath)(basePath, ticketId);
+                cb(null, path);
+            },
             filename: (req, file, cb) => {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                 cb(null, `${uniqueSuffix}${(0, path_1.extname)(file.originalname)}`);
