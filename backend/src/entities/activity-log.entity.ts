@@ -1,32 +1,43 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from 'typeorm';
-import { User } from './user.entity';
 
-@Entity()
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './user.entity';
+import { Empresa } from './empresa.entity';
+
+@Entity('ActivityLog')
 export class ActivityLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column()
-    accion: string; // Ejemplo: 'LOGIN', 'CREATE_PROJECT', 'UPDATE_TASK'
+    accion: string;
 
-    @Column({ type: 'text', nullable: true })
-    detalles: string; // Información adicional en JSON o texto plano
+    @Column({ name: 'detalle', type: 'text', nullable: true })
+    detalles: string;
 
     @CreateDateColumn()
     fecha: Date;
 
-    @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
-    usuario: User;
-
-    @Column({ nullable: true })
-    entidadTipo: string; // 'PROJECT', 'TASK', 'TICKET', etc.
+    @Column({ name: 'tipo', nullable: true })
+    entidadTipo: string;
 
     @Column({ nullable: true })
     entidadId: string;
 
-    @Column({ type: 'int', nullable: true })
+    @Column({ name: 'duracionms', type: 'int', nullable: true })
     duracionMs: number;
 
-    @Column({ default: 'BUSINESS' })
-    categoria: string; // 'BUSINESS' o 'TECHNICAL'
+    @Column({ name: 'categoria', default: 'BUSINESS' })
+    categoria: string;
+
+    @ManyToOne(() => Empresa)
+    @JoinColumn({ name: 'empresaId' })
+    empresa: Empresa;
+
+    @Column()
+    empresaId: string;
+
+    // The current schema doesn't seem to have a userId column in ActivityLog based on information_schema, 
+    // but Prisma defines a relation? Wait, let's re-check information_schema output.
+    // column_name: id, accion, detalle, ip, tipo, entidadId, fecha, empresaId.
+    // Indeed, NO userId.
 }

@@ -1,15 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToMany, ManyToOne } from 'typeorm';
 import { Ticket } from './ticket.entity';
 import { Project } from './project.entity';
+import { Empresa } from './empresa.entity';
 
 export enum UserRole {
+    SUPER_ADMIN = 'SUPER_ADMIN',
     ADMIN = 'ADMIN',
     PROJECT_MANAGER = 'PROJECT_MANAGER',
     COLABORADOR = 'COLABORADOR',
     EXTERNO = 'EXTERNO',
 }
 
-@Entity()
+@Entity('User')
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -24,8 +26,8 @@ export class User {
     nombre: string;
 
     @Column({
-        type: 'enum',
-        enum: UserRole,
+        type: 'varchar',
+        length: 20,
         default: UserRole.COLABORADOR,
     })
     rol: UserRole;
@@ -47,4 +49,10 @@ export class User {
 
     @ManyToMany(() => Project, (project) => project.usuarios)
     proyectos: Project[];
+
+    @ManyToOne(() => Empresa, (empresa) => empresa.usuarios)
+    empresa: Empresa;
+
+    @Column()
+    empresaId: string;
 }

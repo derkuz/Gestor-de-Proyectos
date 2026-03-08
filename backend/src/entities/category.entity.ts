@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, ManyToOne } from 'typeorm';
 import { User, UserRole } from './user.entity';
 import { Ticket } from './ticket.entity';
+import { Empresa } from './empresa.entity';
 
-@Entity()
+@Entity('Category')
 export class Category {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -33,4 +34,10 @@ export class Category {
 
     @OneToMany(() => Ticket, (ticket) => ticket.categoriaRelacionada)
     tickets: Ticket[];
+
+    @ManyToOne(() => Empresa, (empresa) => empresa.categorias)
+    empresa: Empresa;
+
+    @Column()
+    empresaId: string;
 }

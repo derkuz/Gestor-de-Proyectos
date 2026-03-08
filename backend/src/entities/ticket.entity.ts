@@ -2,8 +2,9 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne
 import { Task } from './task.entity';
 import { User } from './user.entity';
 import { Category } from './category.entity';
+import { Empresa } from './empresa.entity';
 
-@Entity()
+@Entity('Ticket')
 export class Ticket {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -42,4 +43,10 @@ export class Ticket {
 
     @ManyToOne(() => User, (user) => user.tickets)
     usuario: User;
+
+    @ManyToOne(() => Empresa, (empresa) => empresa.tickets)
+    empresa: Empresa;
+
+    @Column()
+    empresaId: string;
 }

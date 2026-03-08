@@ -20,6 +20,9 @@ import { TasksModule } from './tasks/tasks.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { DocumentationModule } from './documentation/documentation.module';
 import { CategoriesModule } from './categories/categories.module';
+import { CompaniesModule } from './companies/companies.module';
+import { AdminModule } from './admin/admin.module';
+import { Empresa } from './entities/empresa.entity';
 import { HttpLoggingMiddleware } from './middleware/http-logging.middleware';
 
 @Module({
@@ -41,7 +44,7 @@ import { HttpLoggingMiddleware } from './middleware/http-logging.middleware';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User, Project, Task, Ticket, Documentation, Category, ActivityLog],
+        entities: [User, Project, Task, Ticket, Documentation, Category, ActivityLog, Empresa],
         synchronize: true,
       }),
     }),
@@ -53,6 +56,8 @@ import { HttpLoggingMiddleware } from './middleware/http-logging.middleware';
     DocumentationModule,
     CategoriesModule,
     ActivityLogsModule,
+    CompaniesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -23,6 +23,7 @@ export class HttpLoggingMiddleware implements NestMiddleware {
                     userId,
                     'HTTP',
                     undefined,
+                    undefined,
                     duration,
                     'TECHNICAL'
                 ).catch(err => console.error('Error logging HTTP request:', err));

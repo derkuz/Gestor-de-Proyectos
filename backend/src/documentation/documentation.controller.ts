@@ -9,6 +9,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../entities/user.entity';
 import { Documentation, DocType } from '../entities/documentation.entity';
 import { getDynamicUploadPath } from '../utils/file-upload.utils';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('projects/:projectId/documentation')
@@ -16,8 +17,8 @@ export class DocumentationController {
     constructor(private readonly documentationService: DocumentationService) { }
 
     @Get()
-    findAll(@Param('projectId') projectId: string) {
-        return this.documentationService.findAllByProject(+projectId);
+    findAll(@Param('projectId') projectId: string, @GetUser('empresaId') empresaId: string) {
+        return this.documentationService.findAllByProject(+projectId, empresaId);
     }
 
     @Post('upload')
@@ -40,12 +41,9 @@ export class DocumentationController {
         @Param('projectId') projectId: string,
         @UploadedFile() file: Express.Multer.File,
         @Body('titulo') titulo: string,
+        @GetUser('empresaId') empresaId: string,
     ) {
-        console.log('Backend: Recibida petición de subida', { projectId, titulo, file: file?.filename });
-        if (!file) {
-            console.error('Backend: No se recibió ningún archivo');
-            return; // O lanzar error
-        }
+        if (!file) throw new Error('No se recibió ningún archivo');
         const now = new Date();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const year = String(now.getFullYear());
@@ -55,30 +53,29 @@ export class DocumentationController {
             titulo: titulo || file?.originalname,
             tipo: DocType.FILE,
             url: url,
-        });
+        }, empresaId);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.documentationService.findOne(id);
+    findOne(@Param('id') id: string, @GetUser('empresaId') empresaId: string) {
+        return this.documentationService.findOne(id, empresaId);
     }
 
     @Post()
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.COLABORADOR)
-    create(@Param('projectId') projectId: string, @Body() docData: Partial<Documentation>) {
-        return this.documentationService.create(+projectId, docData);
+    create(@Param('projectId') projectId: string, @Body() docData: Partial<Documentation>, @GetUser('empresaId') empresaId: string) {
+        return this.documentationService.create(+projectId, docData, empresaId);
     }
 
     @Patch(':id')
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.COLABORADOR)
-    update(@Param('id') id: string, @Body() docData: Partial<Documentation>) {
-        return this.documentationService.update(id, docData);
+    update(@Param('id') id: string, @Body() docData: Partial<Documentation>, @GetUser('empresaId') empresaId: string) {
+        return this.documentationService.update(id, docData, empresaId);
     }
 
     @Delete(':id')
     @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER)
-    remove(@Param('id') id: string) {
-        console.log('Backend: Eliminando documento con ID:', id);
-        return this.documentationService.remove(id);
+    remove(@Param('id') id: string, @GetUser('empresaId') empresaId: string) {
+        return this.documentationService.remove(id, empresaId);
     }
 }

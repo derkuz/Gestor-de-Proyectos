@@ -25,7 +25,7 @@ export class AuthService {
         const user = await this.usersService.create({
             ...userData,
             password: hashedPassword,
-        });
+        }, userData.empresaId || '');
 
         await this.activityLogsService.log('REGISTER', `Nuevo usuario registrado: ${user.email}`, user.id);
 
@@ -53,8 +53,8 @@ export class AuthService {
     }
 
     async login(user: any) {
-        await this.activityLogsService.log('LOGIN', `Inicio de sesión exitoso: ${user.email}`, user.id);
-        const payload = { email: user.email, sub: user.id, rol: user.rol };
+        await this.activityLogsService.log('LOGIN', `Inicio de sesión exitoso: ${user.email}`, user.id, undefined, undefined, user.empresaId);
+        const payload = { email: user.email, sub: user.id, rol: user.rol, empresaId: user.empresaId };
         return {
             access_token: this.jwtService.sign(payload),
             user: {
@@ -62,6 +62,7 @@ export class AuthService {
                 email: user.email,
                 nombre: user.nombre,
                 rol: user.rol,
+                empresaId: user.empresaId,
             },
         };
     }

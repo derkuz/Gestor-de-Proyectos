@@ -12,6 +12,9 @@ RUN npm install
 # Copiar el resto del código
 COPY . .
 
+# Generar cliente Prisma
+RUN npx prisma generate
+
 # Construir la aplicación
 RUN npm run build
 
@@ -24,6 +27,7 @@ WORKDIR /app
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
 
 # Crear el directorio para los archivos subidos
 RUN mkdir -p /app/uploads

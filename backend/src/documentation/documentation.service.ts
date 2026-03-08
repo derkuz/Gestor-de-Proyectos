@@ -15,20 +15,20 @@ export class DocumentationService {
         private projectsRepository: Repository<Project>,
     ) { }
 
-    async findAllByProject(projectId: number): Promise<Documentation[]> {
+    async findAllByProject(projectId: number, empresaId: string): Promise<Documentation[]> {
         return this.docRepository.find({
-            where: { proyecto: { id: projectId } },
+            where: { proyecto: { id: projectId, empresaId } },
             order: { ultimaActualizacion: 'DESC' },
             select: ['id', 'titulo', 'tipo', 'url', 'ultimaActualizacion']
         });
     }
 
-    async findOne(id: string): Promise<Documentation> {
+    async findOne(id: string, empresaId: string): Promise<Documentation> {
         const doc = await this.docRepository.findOne({
-            where: { id },
+            where: { id, proyecto: { empresaId } },
             relations: ['proyecto']
         });
-        if (!doc) throw new NotFoundException('Documento no encontrado');
+        if (!doc) throw new NotFoundException('Documento no encontrado en tu empresa');
 
         // Si es MD, leer el contenido del archivo físico
         if (doc.tipo === DocType.MD && doc.url) {
@@ -45,9 +45,9 @@ export class DocumentationService {
         return doc;
     }
 
-    async create(projectId: number, docData: Partial<Documentation>): Promise<Documentation> {
-        const project = await this.projectsRepository.findOne({ where: { id: projectId } });
-        if (!project) throw new NotFoundException('Proyecto no encontrado');
+    async create(projectId: number, docData: Partial<Documentation>, empresaId: string): Promise<Documentation> {
+        const project = await this.projectsRepository.findOne({ where: { id: projectId, empresaId } });
+        if (!project) throw new NotFoundException('Proyecto no encontrado en tu empresa');
 
         const content = (docData as any).contenido;
         const { contenido, ...rest } = docData as any;
@@ -80,8 +80,8 @@ export class DocumentationService {
         return savedDoc;
     }
 
-    async update(id: string, docData: Partial<Documentation>): Promise<Documentation> {
-        const doc = await this.findOne(id);
+    async update(id: string, docData: Partial<Documentation>, empresaId: string): Promise<Documentation> {
+        const doc = await this.findOne(id, empresaId);
         const project = doc.proyecto;
         const content = (docData as any).contenido;
 
@@ -115,9 +115,8 @@ export class DocumentationService {
         return savedDoc;
     }
 
-    async remove(id: string): Promise<void> {
-        const doc = await this.docRepository.findOne({ where: { id } });
-        if (!doc) throw new NotFoundException('Documento no encontrado');
+    async remove(id: string, empresaId: string): Promise<void> {
+        const doc = await this.findOne(id, empresaId);
 
         if (doc.tipo === DocType.MD && doc.url) {
             try {

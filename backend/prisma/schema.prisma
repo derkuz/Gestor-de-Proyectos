@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  PROJECT_MANAGER
+  COLABORADOR
+  EXTERNO
+}
+
+enum ProjectStatus {
+  ACTIVO
+  PAUSADO
+  FINALIZADO
+}
+
+enum TaskPriority {
+  BAJA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+model Empresa {
+  id            String    @id @default(uuid())
+  nombre        String
+  cuit          String?   @unique
+  plan          String    @default("BASIC")
+  fechaRegistro DateTime  @default(now())
+  activo        Boolean   @default(true)
+
+  usuarios      User[]
+  proyectos     Project[]
+  tickets       Ticket[]
+  categorias    Category[]
+  logs          ActivityLog[]
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String
+  nombre            String
+  rol               UserRole  @default(COLABORADOR)
+  fechaRegistro     DateTime  @default(now())
+  resetToken        String?
+  resetTokenExpires DateTime?
+  activo            Boolean   @default(true)
+
+  empresaId         String
+  empresa           Empresa   @relation(fields: [empresaId], references: [id])
+
+  tickets           Ticket[]
+  proyectos         Project[] @relation("ProjectToUser")
+  tasks             Task[]    @relation("TaskToUser")
+}
+
+model Project {
+  id             Int           @id @default(autoincrement())
+  nombre         String
+  descripcion    String?
+  columnasKanban Json?
+  estado         ProjectStatus @default(ACTIVO)
+  fechaCreacion  DateTime      @default(now())
+
+  empresaId      String
+  empresa        Empresa       @relation(fields: [empresaId], references: [id])
+
+  tareas         Task[]
+  documentos     Documentation[]
+  usuarios       User[]        @relation("ProjectToUser")
+}
+
+model Task {
+  id               String       @id @default(uuid())
+  nombre           String
+  descripcion      String?
+  prioridad        TaskPriority @default(MEDIA)
+  estado           String       @default("Pendiente")
+  esSubtarea       Boolean      @default(false)
+  fechaInicio      DateTime?
+  fechaFin         DateTime?
+
+  proyectoId       Int
+  proyecto         Project      @relation(fields: [proyectoId], references: [id])
+  
+  padreId          String?
+  padre            Task?        @relation("Subtasks", fields: [padreId], references: [id])
+  subtareas        Task[]       @relation("Subtasks")
+
+  asignados        User[]       @relation("TaskToUser")
+  ticket           Ticket?
+}
+
+model Ticket {
+  id                   String    @id @default(uuid())
+  codigo               String    @unique
+  titulo               String
+  categoria            String    @default("Soporte General")
+  mensaje              String
+  imagenUrl            String?
+  estado               String    @default("ABIERTO")
+  respuestas           Json?     @default("[]")
+  fechaCreacion        DateTime  @default(now())
+
+  empresaId            String
+  empresa              Empresa   @relation(fields: [empresaId], references: [id])
+
+  usuarioId            String
+  usuario              User      @relation(fields: [usuarioId], references: [id])
+
+  categoriaId          String?
+  categoriaRelacionada Category? @relation(fields: [categoriaId], references: [id])
+
+  tareaRelacionadaId   String?   @unique
+  tareaRelacionada     Task?     @relation(fields: [tareaRelacionadaId], references: [id])
+}
+
+model Documentation {
+  id                 String   @id @default(uuid())
+  titulo             String
+  tipo               String
+  url                String?
+  ultimaActualizacion DateTime @updatedAt
+
+  proyectoId         Int
+  proyecto           Project  @relation(fields: [proyectoId], references: [id])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  nombre    String
+  empresaId String
+  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+  tickets   Ticket[]
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  accion    String
+  detalle   String
+  ip        String?
+  tipo      String?
+  entidadId String?
+  fecha     DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+}

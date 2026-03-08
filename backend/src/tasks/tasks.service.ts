@@ -13,17 +13,17 @@ export class TasksService {
         private projectsRepository: Repository<Project>,
     ) { }
 
-    private async checkProjectStatus(projectId: number, allowedStatuses: ProjectStatus[] = [ProjectStatus.ACTIVO]) {
-        const project = await this.projectsRepository.findOne({ where: { id: projectId } });
-        if (!project) throw new NotFoundException('Proyecto no encontrado');
+    private async checkProjectStatus(projectId: number, empresaId: string, allowedStatuses: ProjectStatus[] = [ProjectStatus.ACTIVO]) {
+        const project = await this.projectsRepository.findOne({ where: { id: projectId, empresaId } });
+        if (!project) throw new NotFoundException('Proyecto no encontrado en tu empresa');
         if (!allowedStatuses.includes(project.estado)) {
             throw new ForbiddenException(`Operación no permitida: el proyecto está en estado ${project.estado}`);
         }
         return project;
     }
 
-    async create(projectId: number, taskData: any): Promise<Task> {
-        await this.checkProjectStatus(projectId);
+    async create(projectId: number, taskData: any, empresaId: string): Promise<Task> {
+        await this.checkProjectStatus(projectId, empresaId);
         const { asignados, ...rest } = taskData;
         const task = this.tasksRepository.create({
             ...rest,
@@ -34,9 +34,9 @@ export class TasksService {
         return this.tasksRepository.save(task);
     }
 
-    async createSubtask(padreId: string, taskData: any): Promise<Task> {
-        const padre = await this.findOne(padreId);
-        await this.checkProjectStatus(padre.proyecto.id);
+    async createSubtask(padreId: string, taskData: any, empresaId: string): Promise<Task> {
+        const padre = await this.findOne(padreId, empresaId);
+        await this.checkProjectStatus(padre.proyecto.id, empresaId);
         const { asignados, ...rest } = taskData;
         const task = this.tasksRepository.create({
             ...rest,
@@ -48,25 +48,32 @@ export class TasksService {
         return this.tasksRepository.save(task);
     }
 
-    async findAllByProject(projectId: number): Promise<Task[]> {
+    async findAll(empresaId: string): Promise<Task[]> {
         return this.tasksRepository.find({
-            where: { proyecto: { id: projectId } },
+            where: { proyecto: { empresaId } },
+            relations: ['proyecto', 'subtareas', 'padre', 'asignados'],
+        });
+    }
+
+    async findAllByProject(projectId: number, empresaId: string): Promise<Task[]> {
+        return this.tasksRepository.find({
+            where: { proyecto: { id: projectId, empresaId } },
             relations: ['subtareas', 'padre', 'asignados', 'ticketLigado'],
         });
     }
 
-    async findOne(id: string): Promise<Task> {
+    async findOne(id: string, empresaId: string): Promise<Task> {
         const task = await this.tasksRepository.findOne({
-            where: { id },
+            where: { id, proyecto: { empresaId } },
             relations: ['proyecto', 'subtareas', 'padre', 'proyecto.tareas', 'asignados'],
         });
-        if (!task) throw new NotFoundException('Tarea no encontrada');
+        if (!task) throw new NotFoundException('Tarea no encontrada en tu empresa');
         return task;
     }
 
-    async update(id: string, updateData: any): Promise<Task> {
-        const task = await this.findOne(id);
-        await this.checkProjectStatus(task.proyecto.id);
+    async update(id: string, updateData: any, empresaId: string): Promise<Task> {
+        const task = await this.findOne(id, empresaId);
+        await this.checkProjectStatus(task.proyecto.id, empresaId);
 
         const { asignados, ...rest } = updateData;
         Object.assign(task, rest);
@@ -78,9 +85,9 @@ export class TasksService {
         return this.tasksRepository.save(task);
     }
 
-    async remove(id: string): Promise<void> {
-        const task = await this.findOne(id);
-        await this.checkProjectStatus(task.proyecto.id);
+    async remove(id: string, empresaId: string): Promise<void> {
+        const task = await this.findOne(id, empresaId);
+        await this.checkProjectStatus(task.proyecto.id, empresaId);
         await this.tasksRepository.remove(task);
     }
 }

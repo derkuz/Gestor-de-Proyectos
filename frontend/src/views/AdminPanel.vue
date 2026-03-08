@@ -9,6 +9,14 @@
       
       <div class="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 backdrop-blur-sm overflow-x-auto no-scrollbar">
         <button 
+          v-if="auth.isSuperAdmin"
+          @click="activeTab = 'companies'"
+          :class="activeTab === 'companies' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+        >
+          Empresas
+        </button>
+        <button 
           @click="activeTab = 'dashboard'"
           :class="activeTab === 'dashboard' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
           class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
@@ -37,6 +45,7 @@
           Asignaciones
         </button>
         <button 
+          v-if="auth.isSuperAdmin"
           @click="activeTab = 'activity'"
           :class="activeTab === 'activity' ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/20' : 'text-slate-400 hover:text-white'"
           class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
@@ -51,6 +60,78 @@
     </div>
 
     <div v-else>
+      <!-- TAB: COMPANIES (SUPER_ADMIN ONLY) -->
+      <div v-if="activeTab === 'companies'" class="space-y-8 animate-fade-in">
+        <div class="stats-overview">
+          <div class="stat-card">
+            <span class="stat-label">Total Empresas</span>
+            <span class="stat-value">{{ companiesStore.companies.length }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Usuarios Globales</span>
+            <span class="stat-value">{{ totalUsers }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Proyectos Totales</span>
+            <span class="stat-value">{{ totalProjects }}</span>
+          </div>
+        </div>
+
+        <div class="companies-table-container">
+          <div class="table-header">
+            <h2 class="text-xl font-black">Empresas Registradas</h2>
+            <button @click="showCreateCompanyModal = true" class="btn-create">
+              <span class="icon">+</span> Nueva Empresa
+            </button>
+          </div>
+
+          <table class="companies-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>CUIT</th>
+                <th>Plan</th>
+                <th>Usuarios</th>
+                <th>Proyectos</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="company in companiesStore.companies" :key="company.id">
+                <td>
+                  <div class="company-name-cell">
+                    <strong>{{ company.nombre }}</strong>
+                    <span class="company-id">{{ company.id }}</span>
+                  </div>
+                </td>
+                <td>{{ company.cuit || 'N/A' }}</td>
+                <td>
+                  <span :class="['plan-badge', company.plan?.toLowerCase()]">
+                    {{ company.plan }}
+                  </span>
+                </td>
+                <td>{{ company.stats?.users || 0 }}</td>
+                <td>{{ company.stats?.projects || 0 }}</td>
+                <td>
+                  <span :class="['status-badge', company.activo ? 'active' : 'inactive']">
+                    {{ company.activo ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  <button 
+                    @click="toggleCompanyStatus(company)" 
+                    :class="['btn-action', company.activo ? 'disable' : 'enable']"
+                  >
+                    {{ company.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- TAB: DASHBOARD (Stats) -->
       <div v-if="activeTab === 'dashboard'" class="space-y-8 animate-fade-in">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -402,7 +483,7 @@
                           <p class="text-sm font-black text-slate-900 dark:text-slate-300">{{ user.nombre }}</p>
                           <p class="text-[9px] text-slate-500 font-black uppercase tracking-widest">{{ user.rol }}</p>
                         </div>
-                        <button @click="handleAddUserToProject(user.id)" class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-slate-200 dark:border-transparent">
+                        <button @click="handleAddUserToProject(userId)" class="p-2.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-slate-200 dark:border-transparent">
                           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v16m8-8H4" stroke-width="3" stroke-linecap="round"/></svg>
                         </button>
                       </div>
@@ -607,8 +688,18 @@
                 <option value="COLABORADOR">Colaborador (Proyectos)</option>
                 <option value="PROJECT_MANAGER">Project Manager</option>
                 <option value="ADMIN">Administrador General</option>
+                <option v-if="auth.isSuperAdmin" value="SUPER_ADMIN">Super Administrador</option>
               </select>
             </div>
+          </div>
+          
+          <div v-if="auth.isSuperAdmin">
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Empresa / Cliente</label>
+            <select v-model="userForm.empresaId" required class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer">
+              <option v-for="empresa in companiesStore.companies" :key="empresa.id" :value="empresa.id">
+                {{ empresa.nombre }}
+              </option>
+            </select>
           </div>
           
           <div>
@@ -667,6 +758,40 @@
         </form>
       </div>
     </div>
+
+    <!-- MODAL: CREATE COMPANY -->
+    <div v-if="showCreateCompanyModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-md" @click="showCreateCompanyModal = false"></div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-10 w-full max-w-md relative z-10 shadow-2xl animate-pop-in">
+        <h3 class="text-3xl font-black mb-1 text-slate-900 dark:text-white">Nueva Empresa</h3>
+        <p class="text-slate-500 dark:text-slate-400 mb-8 font-medium">Registrar nuevo cliente en el sistema.</p>
+
+        <form @submit.prevent="handleCreateCompany" class="space-y-6">
+          <div class="form-group">
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nombre de la Empresa</label>
+            <input v-model="newCompany.nombre" required class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all" placeholder="Ej: Tech Solutions SA">
+          </div>
+          <div class="form-group">
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">CUIT</label>
+            <input v-model="newCompany.cuit" class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all" placeholder="30-XXXXXXXX-X">
+          </div>
+          <div class="form-group">
+            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Plan Comercial</label>
+            <select v-model="newCompany.plan" class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-cyan-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="BASIC">BASIC</option>
+              <option value="PREMIUM">PREMIUM</option>
+              <option value="ENTERPRISE">ENTERPRISE</option>
+            </select>
+          </div>
+          <div class="flex space-x-4 pt-6">
+            <button type="button" @click="showCreateCompanyModal = false" class="flex-1 py-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-white transition-colors">Cancelar</button>
+            <button type="submit" class="flex-1 py-4 bg-cyan-600 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-500/20" :disabled="creatingCompany">
+              {{ creatingCompany ? 'Creando...' : 'Crear Empresa' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -676,13 +801,18 @@ import { useCategoryStore } from '../store/categories'
 import { useUsersStore } from '../store/users'
 import { useProjectStore } from '../store/projects'
 import { useAdminStore } from '../store/admin'
+import { useCompaniesStore } from '../store/companies'
+import { useAuthStore } from '../store/auth'
+import api from '../api'
 
 const categoryStore = useCategoryStore()
 const usersStore = useUsersStore()
 const projectStore = useProjectStore()
 const adminStore = useAdminStore()
+const companiesStore = useCompaniesStore()
+const auth = useAuthStore()
 
-const activeTab = ref('dashboard')
+const activeTab = ref(auth.isSuperAdmin ? 'companies' : 'dashboard')
 const loading = ref(false)
 
 // Activity Tab Logic
@@ -706,23 +836,60 @@ const categoryForm = ref({ nombre: '', descripcion: '', prefijo: '', usuariosIds
 // Users Tab Logic
 const showUserModal = ref(false)
 const editingUser = ref(null)
-const userForm = ref({ nombre: '', email: '', rol: 'COLABORADOR', password: '', activo: true })
+const userForm = ref({ nombre: '', email: '', rol: 'COLABORADOR', password: '', activo: true, empresaId: auth.user?.empresaId })
 const showResetModal = ref(false)
 const targetUser = ref(null)
 const newPassword = ref('')
+
+// Companies (SuperAdmin) Logic
+const showCreateCompanyModal = ref(false)
+const creatingCompany = ref(false)
+const newCompany = ref({ nombre: '', cuit: '', plan: 'BASIC' })
+
+const totalUsers = computed(() => {
+  return companiesStore.companies.reduce((acc, c) => acc + (c.stats?.users || 0), 0);
+})
+
+const totalProjects = computed(() => {
+  return companiesStore.companies.reduce((acc, c) => acc + (c.stats?.projects || 0), 0);
+})
+
+const toggleCompanyStatus = async (company) => {
+  if (confirm(`¿Estás seguro de que deseas ${company.activo ? 'desactivar' : 'activar'} la empresa ${company.nombre}?`)) {
+    await companiesStore.toggleCompanyStatus(company.id);
+  }
+}
+
+const handleCreateCompany = async () => {
+  creatingCompany.value = true
+  try {
+    await companiesStore.createCompany(newCompany.value)
+    showCreateCompanyModal.value = false
+    newCompany.value = { nombre: '', cuit: '', plan: 'BASIC' }
+  } catch (error) {
+    alert('Error al crear empresa')
+  } finally {
+    creatingCompany.value = false
+  }
+}
 
 // Assignments Tab Logic
 const selectedProjectId = ref(null)
 
 onMounted(async () => {
-  loading.value = true
-  await Promise.all([
+  const promises = [
     categoryStore.fetchCategories(),
     usersStore.fetchUsers(),
     projectStore.fetchProjects(),
     adminStore.fetchStats(),
-    adminStore.fetchActivityLogs()
-  ])
+  ]
+  
+  if (auth.isSuperAdmin) {
+    promises.push(companiesStore.fetchCompanies())
+    promises.push(adminStore.fetchActivityLogs())
+  }
+  
+  await Promise.all(promises)
   loading.value = false
 })
 
@@ -805,7 +972,14 @@ const handleDeleteCategory = async (id) => {
 // Users Actions
 const openCreateUserModal = () => {
     editingUser.value = null
-    userForm.value = { nombre: '', email: '', rol: 'COLABORADOR', password: '', activo: true }
+    userForm.value = { 
+        nombre: '', 
+        email: '', 
+        rol: 'COLABORADOR', 
+        password: '', 
+        activo: true, 
+        empresaId: auth.user?.empresaId 
+    }
     showUserModal.value = true
 }
 
@@ -816,6 +990,7 @@ const openEditUserModal = (user) => {
         email: user.email, 
         rol: user.rol, 
         activo: user.activo,
+        empresaId: user.empresaId,
         password: ''
     }
     showUserModal.value = true
@@ -957,5 +1132,109 @@ const InfoIcon = { template: '<svg fill="none" viewBox="0 0 24 24" stroke="curre
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
   background: var(--text-secondary);
   opacity: 0.2;
+}
+
+/* Companies Table Specific Styles */
+.companies-table-container {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.companies-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.companies-table th {
+  text-align: left;
+  padding: 1.2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #888;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.companies-table td {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.company-name-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-id {
+  font-size: 0.65rem;
+  color: #555;
+  margin-top: 0.2rem;
+}
+
+.plan-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.plan-badge.basic { background: #333; color: #aaa; }
+.plan-badge.premium { background: rgba(8, 145, 178, 0.2); color: #06b6d4; }
+.plan-badge.enterprise { background: rgba(219, 39, 119, 0.2); color: #ec4899; }
+
+.status-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.status-badge.active { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.status-badge.inactive { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+.btn-action {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.btn-action.disable {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-action.enable {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.btn-create {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.3s;
+}
+
+.table-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 </style>

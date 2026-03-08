@@ -13,17 +13,17 @@ export class TicketsService {
         private ticketsRepository: Repository<Ticket>,
     ) { }
 
-    async create(ticketData: any, userId: string): Promise<Ticket> {
+    async create(ticketData: any, userId: string, empresaId: string): Promise<Ticket> {
         let codigo = `TK-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
 
         if (ticketData.categoriaRelacionada?.id) {
             const category = await this.ticketsRepository.manager.findOne(Category, {
-                where: { id: ticketData.categoriaRelacionada.id },
+                where: { id: ticketData.categoriaRelacionada.id, empresaId },
             }) as Category;
 
             if (category && category.prefijo) {
                 const count = await this.ticketsRepository.count({
-                    where: { categoriaRelacionada: { id: category.id } },
+                    where: { categoriaRelacionada: { id: category.id }, empresaId },
                 });
                 codigo = `${category.prefijo.toUpperCase()}-${(count + 1).toString().padStart(3, '0')}`;
             }
@@ -33,12 +33,13 @@ export class TicketsService {
             ...ticketData,
             codigo: ticketData.codigo || codigo,
             usuario: { id: userId } as any,
+            empresaId,
         }) as unknown as Ticket;
         return this.ticketsRepository.save(ticket);
     }
 
-    async createWithAttachment(ticketData: any, userId: string, file?: Express.Multer.File): Promise<Ticket> {
-        const ticket = await this.create(ticketData, userId);
+    async createWithAttachment(ticketData: any, userId: string, empresaId: string, file?: Express.Multer.File): Promise<Ticket> {
+        const ticket = await this.create(ticketData, userId, empresaId);
 
         if (file) {
             const currentYear = new Date().getFullYear().toString();
@@ -59,38 +60,37 @@ export class TicketsService {
         return ticket;
     }
 
-    async findAll(userId: string, role: string): Promise<Ticket[]> {
+    async findAll(userId: string, role: string, empresaId: string): Promise<Ticket[]> {
         const query = this.ticketsRepository.createQueryBuilder('ticket')
             .leftJoinAndSelect('ticket.tareaRelacionada', 'tareaRelacionada')
             .leftJoinAndSelect('ticket.usuario', 'usuario')
             .leftJoinAndSelect('ticket.categoriaRelacionada', 'categoriaRelacionada')
-            .leftJoin('categoriaRelacionada.usuariosAutorizados', 'autorizado');
+            .leftJoin('categoriaRelacionada.usuariosAutorizados', 'autorizado')
+            .where('ticket.empresaId = :empresaId', { empresaId });
 
         if (role === 'ADMIN') {
-            // ADMIN ve todo
+            // ADMIN ve todo de su empresa
         } else {
-            // Ver si el usuario es el dueño, 
-            // O si está en la lista de usuarios autorizados,
-            // O si su ROL está en la lista de roles autorizados de la categoría.
-            query.where('usuario.id = :userId', { userId })
-                .orWhere('autorizado.id = :userId', { userId })
-                .orWhere('categoriaRelacionada.rolesAutorizados LIKE :role', { role: `%${role}%` });
+            query.andWhere(
+                '(usuario.id = :userId OR autorizado.id = :userId OR categoriaRelacionada.rolesAutorizados LIKE :role)',
+                { userId, role: `%${role}%` }
+            );
         }
 
         return query.getMany();
     }
 
-    async findOne(id: string): Promise<Ticket> {
+    async findOne(id: string, empresaId: string): Promise<Ticket> {
         const ticket = await this.ticketsRepository.findOne({
-            where: { id },
+            where: { id, empresaId },
             relations: ['tareaRelacionada', 'usuario', 'categoriaRelacionada', 'categoriaRelacionada.usuariosAutorizados'],
         });
-        if (!ticket) throw new NotFoundException('Ticket no encontrado');
+        if (!ticket) throw new NotFoundException('Ticket no encontrado en tu empresa');
         return ticket;
     }
 
-    async update(id: string, updateData: Partial<Ticket>, userId?: string, role?: string): Promise<Ticket> {
-        const ticket = await this.findOne(id);
+    async update(id: string, updateData: Partial<Ticket>, empresaId: string, userId?: string, role?: string): Promise<Ticket> {
+        const ticket = await this.findOne(id, empresaId);
 
         if (userId && role && role !== 'ADMIN') {
             const isOwner = ticket.usuario?.id === userId;
@@ -106,8 +106,8 @@ export class TicketsService {
         return this.ticketsRepository.save(ticket);
     }
 
-    async remove(id: string): Promise<void> {
-        const ticket = await this.findOne(id);
+    async remove(id: string, empresaId: string): Promise<void> {
+        const ticket = await this.findOne(id, empresaId);
         await this.ticketsRepository.remove(ticket);
     }
 }
