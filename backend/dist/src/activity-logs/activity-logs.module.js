@@ -16,7 +16,6 @@ const user_entity_1 = require("../entities/user.entity");
 const project_entity_1 = require("../entities/project.entity");
 const ticket_entity_1 = require("../entities/ticket.entity");
 const task_entity_1 = require("../entities/task.entity");
-const stats_controller_1 = require("./stats.controller");
 let ActivityLogsModule = class ActivityLogsModule {
 };
 exports.ActivityLogsModule = ActivityLogsModule;
@@ -24,7 +23,7 @@ exports.ActivityLogsModule = ActivityLogsModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([activity_log_entity_1.ActivityLog, user_entity_1.User, project_entity_1.Project, ticket_entity_1.Ticket, task_entity_1.Task])],
         providers: [activity_logs_service_1.ActivityLogsService],
-        controllers: [activity_logs_controller_1.ActivityLogsController, stats_controller_1.StatsController],
+        controllers: [activity_logs_controller_1.ActivityLogsController],
         exports: [activity_logs_service_1.ActivityLogsService],
     })
 ], ActivityLogsModule);

@@ -13,6 +13,7 @@ exports.Category = void 0;
 const typeorm_1 = require("typeorm");
 const user_entity_1 = require("./user.entity");
 const ticket_entity_1 = require("./ticket.entity");
+const empresa_entity_1 = require("./empresa.entity");
 let Category = class Category {
     id;
     nombre;
@@ -21,6 +22,8 @@ let Category = class Category {
     rolesAutorizados;
     usuariosAutorizados;
     tickets;
+    empresa;
+    empresaId;
 };
 exports.Category = Category;
 __decorate([
@@ -60,7 +63,15 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => ticket_entity_1.Ticket, (ticket) => ticket.categoriaRelacionada),
     __metadata("design:type", Array)
 ], Category.prototype, "tickets", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => empresa_entity_1.Empresa, (empresa) => empresa.categorias),
+    __metadata("design:type", empresa_entity_1.Empresa)
+], Category.prototype, "empresa", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Category.prototype, "empresaId", void 0);
 exports.Category = Category = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('Category')
 ], Category);
 //# sourceMappingURL=category.entity.js.map

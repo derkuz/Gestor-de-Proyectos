@@ -1,6 +1,7 @@
 import { Task } from './task.entity';
 import { Documentation } from './documentation.entity';
 import { User } from './user.entity';
+import { Empresa } from './empresa.entity';
 export declare enum ProjectStatus {
     ACTIVO = "ACTIVO",
     PAUSADO = "PAUSADO",
@@ -16,4 +17,6 @@ export declare class Project {
     tareas: Task[];
     documentos: Documentation[];
     usuarios: User[];
+    empresa: Empresa;
+    empresaId: string;
 }

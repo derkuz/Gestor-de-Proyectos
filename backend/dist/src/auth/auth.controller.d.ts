@@ -10,6 +10,7 @@ export declare class AuthController {
             email: any;
             nombre: any;
             rol: any;
+            empresaId: any;
         };
     }>;
     login(body: any): Promise<{
@@ -19,6 +20,7 @@ export declare class AuthController {
             email: any;
             nombre: any;
             rol: any;
+            empresaId: any;
         };
     }>;
     forgotPassword(email: string): Promise<{

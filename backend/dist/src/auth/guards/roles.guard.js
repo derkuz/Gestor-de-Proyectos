@@ -13,6 +13,7 @@ exports.RolesGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const roles_decorator_1 = require("../decorators/roles.decorator");
+const user_entity_1 = require("../../entities/user.entity");
 let RolesGuard = class RolesGuard {
     reflector;
     constructor(reflector) {
@@ -29,6 +30,9 @@ let RolesGuard = class RolesGuard {
         const { user } = context.switchToHttp().getRequest();
         if (!user || !user.rol) {
             throw new common_1.ForbiddenException('Usuario sin privilegios');
+        }
+        if (user.rol === user_entity_1.UserRole.SUPER_ADMIN) {
+            return true;
         }
         const hasRole = requiredRoles.some((role) => user.rol === role);
         if (!hasRole) {

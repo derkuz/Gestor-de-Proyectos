@@ -58,15 +58,15 @@ let TicketsService = class TicketsService {
     constructor(ticketsRepository) {
         this.ticketsRepository = ticketsRepository;
     }
-    async create(ticketData, userId) {
+    async create(ticketData, userId, empresaId) {
         let codigo = `TK-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
         if (ticketData.categoriaRelacionada?.id) {
             const category = await this.ticketsRepository.manager.findOne(category_entity_1.Category, {
-                where: { id: ticketData.categoriaRelacionada.id },
+                where: { id: ticketData.categoriaRelacionada.id, empresaId },
             });
             if (category && category.prefijo) {
                 const count = await this.ticketsRepository.count({
-                    where: { categoriaRelacionada: { id: category.id } },
+                    where: { categoriaRelacionada: { id: category.id }, empresaId },
                 });
                 codigo = `${category.prefijo.toUpperCase()}-${(count + 1).toString().padStart(3, '0')}`;
             }
@@ -75,11 +75,12 @@ let TicketsService = class TicketsService {
             ...ticketData,
             codigo: ticketData.codigo || codigo,
             usuario: { id: userId },
+            empresaId,
         });
         return this.ticketsRepository.save(ticket);
     }
-    async createWithAttachment(ticketData, userId, file) {
-        const ticket = await this.create(ticketData, userId);
+    async createWithAttachment(ticketData, userId, empresaId, file) {
+        const ticket = await this.create(ticketData, userId, empresaId);
         if (file) {
             const currentYear = new Date().getFullYear().toString();
             const relativeDir = `/uploads/Ticket_adjuntos/${currentYear}/${ticket.id}`;
@@ -94,32 +95,31 @@ let TicketsService = class TicketsService {
         }
         return ticket;
     }
-    async findAll(userId, role) {
+    async findAll(userId, role, empresaId) {
         const query = this.ticketsRepository.createQueryBuilder('ticket')
             .leftJoinAndSelect('ticket.tareaRelacionada', 'tareaRelacionada')
             .leftJoinAndSelect('ticket.usuario', 'usuario')
             .leftJoinAndSelect('ticket.categoriaRelacionada', 'categoriaRelacionada')
-            .leftJoin('categoriaRelacionada.usuariosAutorizados', 'autorizado');
+            .leftJoin('categoriaRelacionada.usuariosAutorizados', 'autorizado')
+            .where('ticket.empresaId = :empresaId', { empresaId });
         if (role === 'ADMIN') {
         }
         else {
-            query.where('usuario.id = :userId', { userId })
-                .orWhere('autorizado.id = :userId', { userId })
-                .orWhere('categoriaRelacionada.rolesAutorizados LIKE :role', { role: `%${role}%` });
+            query.andWhere('(usuario.id = :userId OR autorizado.id = :userId OR categoriaRelacionada.rolesAutorizados LIKE :role)', { userId, role: `%${role}%` });
         }
         return query.getMany();
     }
-    async findOne(id) {
+    async findOne(id, empresaId) {
         const ticket = await this.ticketsRepository.findOne({
-            where: { id },
+            where: { id, empresaId },
             relations: ['tareaRelacionada', 'usuario', 'categoriaRelacionada', 'categoriaRelacionada.usuariosAutorizados'],
         });
         if (!ticket)
-            throw new common_1.NotFoundException('Ticket no encontrado');
+            throw new common_1.NotFoundException('Ticket no encontrado en tu empresa');
         return ticket;
     }
-    async update(id, updateData, userId, role) {
-        const ticket = await this.findOne(id);
+    async update(id, updateData, empresaId, userId, role) {
+        const ticket = await this.findOne(id, empresaId);
         if (userId && role && role !== 'ADMIN') {
             const isOwner = ticket.usuario?.id === userId;
             const isExplicitAuthorized = ticket.categoriaRelacionada?.usuariosAutorizados?.some(u => u.id === userId);
@@ -131,8 +131,8 @@ let TicketsService = class TicketsService {
         Object.assign(ticket, updateData);
         return this.ticketsRepository.save(ticket);
     }
-    async remove(id) {
-        const ticket = await this.findOne(id);
+    async remove(id, empresaId) {
+        const ticket = await this.findOne(id, empresaId);
         await this.ticketsRepository.remove(ticket);
     }
 };

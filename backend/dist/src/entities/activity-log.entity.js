@@ -11,17 +11,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActivityLog = void 0;
 const typeorm_1 = require("typeorm");
-const user_entity_1 = require("./user.entity");
+const empresa_entity_1 = require("./empresa.entity");
 let ActivityLog = class ActivityLog {
     id;
     accion;
     detalles;
     fecha;
-    usuario;
     entidadTipo;
     entidadId;
     duracionMs;
     categoria;
+    empresa;
+    empresaId;
 };
 exports.ActivityLog = ActivityLog;
 __decorate([
@@ -33,7 +34,7 @@ __decorate([
     __metadata("design:type", String)
 ], ActivityLog.prototype, "accion", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'detalle', type: 'text', nullable: true }),
     __metadata("design:type", String)
 ], ActivityLog.prototype, "detalles", void 0);
 __decorate([
@@ -41,11 +42,7 @@ __decorate([
     __metadata("design:type", Date)
 ], ActivityLog.prototype, "fecha", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: true, onDelete: 'SET NULL' }),
-    __metadata("design:type", user_entity_1.User)
-], ActivityLog.prototype, "usuario", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ name: 'tipo', nullable: true }),
     __metadata("design:type", String)
 ], ActivityLog.prototype, "entidadTipo", void 0);
 __decorate([
@@ -53,14 +50,23 @@ __decorate([
     __metadata("design:type", String)
 ], ActivityLog.prototype, "entidadId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'duracionms', type: 'int', nullable: true }),
     __metadata("design:type", Number)
 ], ActivityLog.prototype, "duracionMs", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: 'BUSINESS' }),
+    (0, typeorm_1.Column)({ name: 'categoria', default: 'BUSINESS' }),
     __metadata("design:type", String)
 ], ActivityLog.prototype, "categoria", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => empresa_entity_1.Empresa),
+    (0, typeorm_1.JoinColumn)({ name: 'empresaId' }),
+    __metadata("design:type", empresa_entity_1.Empresa)
+], ActivityLog.prototype, "empresa", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], ActivityLog.prototype, "empresaId", void 0);
 exports.ActivityLog = ActivityLog = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('ActivityLog')
 ], ActivityLog);
 //# sourceMappingURL=activity-log.entity.js.map

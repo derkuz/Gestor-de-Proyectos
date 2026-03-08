@@ -19,34 +19,35 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_1 = require("../entities/user.entity");
+const get_user_decorator_1 = require("../auth/decorators/get-user.decorator");
 let ProjectsController = class ProjectsController {
     projectsService;
     constructor(projectsService) {
         this.projectsService = projectsService;
     }
-    create(projectData) {
-        return this.projectsService.create(projectData);
+    create(projectData, empresaId) {
+        return this.projectsService.create(projectData, empresaId);
     }
-    findAll() {
-        return this.projectsService.findAll();
+    findAll(empresaId) {
+        return this.projectsService.findAll(empresaId);
     }
-    getStats() {
-        return this.projectsService.getStats();
+    getStats(empresaId) {
+        return this.projectsService.getStats(empresaId);
     }
-    findOne(id) {
-        return this.projectsService.findOne(+id);
+    findOne(id, empresaId) {
+        return this.projectsService.findOne(+id, empresaId);
     }
-    update(id, updateData) {
-        return this.projectsService.update(+id, updateData);
+    update(id, updateData, empresaId) {
+        return this.projectsService.update(+id, updateData, empresaId);
     }
-    remove(id) {
-        return this.projectsService.remove(+id);
+    remove(id, empresaId) {
+        return this.projectsService.remove(+id, empresaId);
     }
-    assignUser(projectId, userId) {
-        return this.projectsService.assignUser(+projectId, userId);
+    assignUser(projectId, userId, empresaId) {
+        return this.projectsService.assignUser(+projectId, userId, empresaId);
     }
-    removeUser(projectId, userId) {
-        return this.projectsService.removeUser(+projectId, userId);
+    removeUser(projectId, userId, empresaId) {
+        return this.projectsService.removeUser(+projectId, userId, empresaId);
     }
 };
 exports.ProjectsController = ProjectsController;
@@ -54,27 +55,31 @@ __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('stats'),
+    __param(0, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "getStats", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "findOne", null);
 __decorate([
@@ -82,16 +87,18 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "remove", null);
 __decorate([
@@ -99,8 +106,9 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)('userId')),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "assignUser", null);
 __decorate([
@@ -108,8 +116,9 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Param)('userId')),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "removeUser", null);
 exports.ProjectsController = ProjectsController = __decorate([

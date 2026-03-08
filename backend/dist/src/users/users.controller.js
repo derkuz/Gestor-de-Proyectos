@@ -19,37 +19,41 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_1 = require("../entities/user.entity");
+const get_user_decorator_1 = require("../auth/decorators/get-user.decorator");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
         this.usersService = usersService;
     }
-    findAll() {
-        return this.usersService.findAll();
+    findAll(empresaId, rol) {
+        return this.usersService.findAll(empresaId, rol === user_entity_1.UserRole.SUPER_ADMIN);
     }
-    create(userData) {
-        return this.usersService.create(userData);
+    create(userData, empresaId) {
+        return this.usersService.create(userData, empresaId);
     }
-    update(id, updateData) {
-        return this.usersService.update(id, updateData);
+    update(id, updateData, empresaId, rol) {
+        return this.usersService.update(id, updateData, empresaId, rol === user_entity_1.UserRole.SUPER_ADMIN);
     }
-    async adminResetPassword(id, newPass) {
-        return this.usersService.adminUpdatePassword(id, newPass);
+    async adminResetPassword(id, newPass, empresaId, rol) {
+        return this.usersService.adminUpdatePassword(id, newPass, empresaId, rol === user_entity_1.UserRole.SUPER_ADMIN);
     }
 };
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, get_user_decorator_1.GetUser)('empresaId')),
+    __param(1, (0, get_user_decorator_1.GetUser)('rol')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "create", null);
 __decorate([
@@ -57,8 +61,10 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
+    __param(3, (0, get_user_decorator_1.GetUser)('rol')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String, String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "update", null);
 __decorate([
@@ -66,8 +72,10 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)('password')),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
+    __param(3, (0, get_user_decorator_1.GetUser)('rol')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "adminResetPassword", null);
 exports.UsersController = UsersController = __decorate([

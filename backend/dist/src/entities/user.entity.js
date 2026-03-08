@@ -13,8 +13,10 @@ exports.User = exports.UserRole = void 0;
 const typeorm_1 = require("typeorm");
 const ticket_entity_1 = require("./ticket.entity");
 const project_entity_1 = require("./project.entity");
+const empresa_entity_1 = require("./empresa.entity");
 var UserRole;
 (function (UserRole) {
+    UserRole["SUPER_ADMIN"] = "SUPER_ADMIN";
     UserRole["ADMIN"] = "ADMIN";
     UserRole["PROJECT_MANAGER"] = "PROJECT_MANAGER";
     UserRole["COLABORADOR"] = "COLABORADOR";
@@ -32,6 +34,8 @@ let User = class User {
     activo;
     tickets;
     proyectos;
+    empresa;
+    empresaId;
 };
 exports.User = User;
 __decorate([
@@ -52,8 +56,8 @@ __decorate([
 ], User.prototype, "nombre", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
-        enum: UserRole,
+        type: 'varchar',
+        length: 20,
         default: UserRole.COLABORADOR,
     }),
     __metadata("design:type", String)
@@ -82,7 +86,15 @@ __decorate([
     (0, typeorm_1.ManyToMany)(() => project_entity_1.Project, (project) => project.usuarios),
     __metadata("design:type", Array)
 ], User.prototype, "proyectos", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => empresa_entity_1.Empresa, (empresa) => empresa.usuarios),
+    __metadata("design:type", empresa_entity_1.Empresa)
+], User.prototype, "empresa", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "empresaId", void 0);
 exports.User = User = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('User')
 ], User);
 //# sourceMappingURL=user.entity.js.map

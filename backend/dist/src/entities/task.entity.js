@@ -96,6 +96,6 @@ __decorate([
     __metadata("design:type", Array)
 ], Task.prototype, "asignados", void 0);
 exports.Task = Task = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('Task')
 ], Task);
 //# sourceMappingURL=task.entity.js.map

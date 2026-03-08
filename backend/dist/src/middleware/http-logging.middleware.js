@@ -25,7 +25,7 @@ let HttpLoggingMiddleware = class HttpLoggingMiddleware {
             const statusCode = res.statusCode;
             if (!originalUrl.includes('/activity-logs')) {
                 const userId = req.user?.id;
-                this.activityLogsService.log('HTTP_REQUEST', `[${method}] ${originalUrl} ${statusCode}`, userId, 'HTTP', undefined, duration, 'TECHNICAL').catch(err => console.error('Error logging HTTP request:', err));
+                this.activityLogsService.log('HTTP_REQUEST', `[${method}] ${originalUrl} ${statusCode}`, userId, 'HTTP', undefined, undefined, duration, 'TECHNICAL').catch(err => console.error('Error logging HTTP request:', err));
             }
         });
         next();

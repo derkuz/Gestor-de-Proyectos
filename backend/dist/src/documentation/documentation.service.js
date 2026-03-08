@@ -60,20 +60,20 @@ let DocumentationService = class DocumentationService {
         this.docRepository = docRepository;
         this.projectsRepository = projectsRepository;
     }
-    async findAllByProject(projectId) {
+    async findAllByProject(projectId, empresaId) {
         return this.docRepository.find({
-            where: { proyecto: { id: projectId } },
+            where: { proyecto: { id: projectId, empresaId } },
             order: { ultimaActualizacion: 'DESC' },
             select: ['id', 'titulo', 'tipo', 'url', 'ultimaActualizacion']
         });
     }
-    async findOne(id) {
+    async findOne(id, empresaId) {
         const doc = await this.docRepository.findOne({
-            where: { id },
+            where: { id, proyecto: { empresaId } },
             relations: ['proyecto']
         });
         if (!doc)
-            throw new common_1.NotFoundException('Documento no encontrado');
+            throw new common_1.NotFoundException('Documento no encontrado en tu empresa');
         if (doc.tipo === documentation_entity_1.DocType.MD && doc.url) {
             try {
                 const filePath = path.resolve('.' + doc.url);
@@ -87,10 +87,10 @@ let DocumentationService = class DocumentationService {
         }
         return doc;
     }
-    async create(projectId, docData) {
-        const project = await this.projectsRepository.findOne({ where: { id: projectId } });
+    async create(projectId, docData, empresaId) {
+        const project = await this.projectsRepository.findOne({ where: { id: projectId, empresaId } });
         if (!project)
-            throw new common_1.NotFoundException('Proyecto no encontrado');
+            throw new common_1.NotFoundException('Proyecto no encontrado en tu empresa');
         const content = docData.contenido;
         const { contenido, ...rest } = docData;
         const doc = this.docRepository.create({
@@ -114,8 +114,8 @@ let DocumentationService = class DocumentationService {
         }
         return savedDoc;
     }
-    async update(id, docData) {
-        const doc = await this.findOne(id);
+    async update(id, docData, empresaId) {
+        const doc = await this.findOne(id, empresaId);
         const project = doc.proyecto;
         const content = docData.contenido;
         const { contenido, ...rest } = docData;
@@ -142,10 +142,8 @@ let DocumentationService = class DocumentationService {
         }
         return savedDoc;
     }
-    async remove(id) {
-        const doc = await this.docRepository.findOne({ where: { id } });
-        if (!doc)
-            throw new common_1.NotFoundException('Documento no encontrado');
+    async remove(id, empresaId) {
+        const doc = await this.findOne(id, empresaId);
         if (doc.tipo === documentation_entity_1.DocType.MD && doc.url) {
             try {
                 const filePath = path.resolve('.' + doc.url);

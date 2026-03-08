@@ -6,11 +6,12 @@ export declare class UsersService {
     private activityLogsService;
     constructor(usersRepository: Repository<User>, activityLogsService: ActivityLogsService);
     findByEmail(email: string): Promise<User | null>;
-    create(userData: Partial<User>): Promise<User>;
-    update(id: string, updateData: Partial<User>): Promise<User>;
+    create(userData: Partial<User>, empresaId: string): Promise<User>;
+    update(id: string, updateData: Partial<User>, empresaId: string, isSuperAdmin?: boolean): Promise<User>;
     updateResetToken(id: string, token: string, expires: Date): Promise<void>;
     findByResetToken(token: string): Promise<User | null>;
     updatePassword(id: string, passwordHash: string): Promise<void>;
-    findAll(): Promise<User[]>;
-    adminUpdatePassword(id: string, newPass: string): Promise<void>;
+    findAll(empresaId: string, isSuperAdmin?: boolean): Promise<User[]>;
+    adminUpdatePassword(id: string, newPass: string, empresaId: string, isSuperAdmin?: boolean): Promise<void>;
+    count(empresaId: string, isSuperAdmin?: boolean): Promise<number>;
 }

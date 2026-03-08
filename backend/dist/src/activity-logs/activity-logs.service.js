@@ -23,36 +23,43 @@ let ActivityLogsService = class ActivityLogsService {
         this.activityLogRepository = activityLogRepository;
         this.purgeOldLogs().catch(console.error);
     }
-    async log(accion, detalles, userId, entidadTipo, entidadId, duracionMs, categoria = 'BUSINESS') {
+    async log(accion, detalles, userId, entidadTipo, entidadId, empresaId, duracionMs, categoria = 'BUSINESS') {
         const log = this.activityLogRepository.create({
             accion,
             detalles,
-            usuario: userId ? { id: userId } : null,
             entidadTipo,
             entidadId,
+            empresaId,
             duracionMs,
             categoria
         });
         return this.activityLogRepository.save(log);
     }
-    async getTechnicalMetrics() {
+    async getTechnicalMetrics(empresaId, isSuperAdmin = false) {
         this.purgeOldLogs().catch(console.error);
         const yesterday = new Date();
         yesterday.setHours(yesterday.getHours() - 24);
-        const metrics = await this.activityLogRepository
+        const metricsQuery = this.activityLogRepository
             .createQueryBuilder('log')
             .select('AVG(log.duracionMs)', 'avgResponseTime')
             .addSelect('COUNT(*)', 'totalRequests')
             .where('log.categoria = :categoria', { categoria: 'TECHNICAL' })
-            .andWhere('log.fecha > :yesterday', { yesterday })
-            .getRawOne();
-        const timeline = await this.activityLogRepository
+            .andWhere('log.fecha > :yesterday', { yesterday });
+        if (!isSuperAdmin) {
+            metricsQuery.andWhere('log.empresaId = :empresaId', { empresaId });
+        }
+        const metrics = await metricsQuery.getRawOne();
+        const timelineQuery = this.activityLogRepository
             .createQueryBuilder('log')
             .select("DATE_TRUNC('hour', log.fecha)", 'hour')
             .addSelect('AVG(log.duracionMs)', 'avgResponseTime')
             .addSelect('COUNT(*)', 'requestCount')
             .where('log.categoria = :categoria', { categoria: 'TECHNICAL' })
-            .andWhere('log.fecha > :yesterday', { yesterday })
+            .andWhere('log.fecha > :yesterday', { yesterday });
+        if (!isSuperAdmin) {
+            timelineQuery.andWhere('log.empresaId = :empresaId', { empresaId });
+        }
+        const timeline = await timelineQuery
             .groupBy("DATE_TRUNC('hour', log.fecha)")
             .orderBy('hour', 'ASC')
             .getRawMany();
@@ -73,8 +80,10 @@ let ActivityLogsService = class ActivityLogsService {
             .execute();
         return result.affected || 0;
     }
-    async findAll(limit = 100) {
+    async findAll(empresaId, limit = 100, isSuperAdmin = false) {
+        const where = isSuperAdmin ? {} : { empresaId };
         return this.activityLogRepository.find({
+            where,
             relations: ['usuario'],
             order: { fecha: 'DESC' },
             take: limit,

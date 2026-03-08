@@ -14,6 +14,7 @@ export declare class AuthService {
             email: any;
             nombre: any;
             rol: any;
+            empresaId: any;
         };
     }>;
     validateUser(email: string, pass: string): Promise<any>;
@@ -24,6 +25,7 @@ export declare class AuthService {
             email: any;
             nombre: any;
             rol: any;
+            empresaId: any;
         };
     }>;
     requestPasswordReset(email: string): Promise<{

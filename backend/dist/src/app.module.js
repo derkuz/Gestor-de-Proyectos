@@ -29,6 +29,9 @@ const tasks_module_1 = require("./tasks/tasks.module");
 const tickets_module_1 = require("./tickets/tickets.module");
 const documentation_module_1 = require("./documentation/documentation.module");
 const categories_module_1 = require("./categories/categories.module");
+const companies_module_1 = require("./companies/companies.module");
+const admin_module_1 = require("./admin/admin.module");
+const empresa_entity_1 = require("./entities/empresa.entity");
 const http_logging_middleware_1 = require("./middleware/http-logging.middleware");
 let AppModule = class AppModule {
     configure(consumer) {
@@ -58,7 +61,7 @@ exports.AppModule = AppModule = __decorate([
                     username: configService.get('DB_USERNAME'),
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_NAME'),
-                    entities: [user_entity_1.User, project_entity_1.Project, task_entity_1.Task, ticket_entity_1.Ticket, documentation_entity_1.Documentation, category_entity_1.Category, activity_log_entity_1.ActivityLog],
+                    entities: [user_entity_1.User, project_entity_1.Project, task_entity_1.Task, ticket_entity_1.Ticket, documentation_entity_1.Documentation, category_entity_1.Category, activity_log_entity_1.ActivityLog, empresa_entity_1.Empresa],
                     synchronize: true,
                 }),
             }),
@@ -70,6 +73,8 @@ exports.AppModule = AppModule = __decorate([
             documentation_module_1.DocumentationModule,
             categories_module_1.CategoriesModule,
             activity_logs_module_1.ActivityLogsModule,
+            companies_module_1.CompaniesModule,
+            admin_module_1.AdminModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

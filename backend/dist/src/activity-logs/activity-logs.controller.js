@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActivityLogsController = void 0;
 const common_1 = require("@nestjs/common");
+const get_user_decorator_1 = require("../auth/decorators/get-user.decorator");
 const activity_logs_service_1 = require("./activity-logs.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
@@ -24,8 +25,8 @@ let ActivityLogsController = class ActivityLogsController {
     constructor(activityLogsService) {
         this.activityLogsService = activityLogsService;
     }
-    findAll(limit) {
-        return this.activityLogsService.findAll(limit ? Number(limit) : 50);
+    findAll(limit, empresaId, rol) {
+        return this.activityLogsService.findAll(empresaId, limit ? Number(limit) : 50, rol === user_entity_1.UserRole.SUPER_ADMIN);
     }
     async purge() {
         const deletedCount = await this.activityLogsService.purgeOldLogs();
@@ -35,15 +36,17 @@ let ActivityLogsController = class ActivityLogsController {
 exports.ActivityLogsController = ActivityLogsController;
 __decorate([
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),
     __param(0, (0, common_1.Query)('limit')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
+    __param(2, (0, get_user_decorator_1.GetUser)('rol')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, String, String]),
     __metadata("design:returntype", void 0)
 ], ActivityLogsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)('purge'),
-    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

@@ -26,77 +26,88 @@ let ProjectsService = class ProjectsService {
         this.projectsRepository = projectsRepository;
         this.activityLogsService = activityLogsService;
     }
-    async create(projectData) {
-        const project = this.projectsRepository.create(projectData);
+    async create(projectData, empresaId) {
+        const project = this.projectsRepository.create({ ...projectData, empresaId });
         const saved = await this.projectsRepository.save(project);
-        await this.activityLogsService.log('CREATE_PROJECT', `Proyecto creado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id));
+        await this.activityLogsService.log('CREATE_PROJECT', `Proyecto creado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id), empresaId);
         return saved;
     }
-    async findAll() {
-        return this.projectsRepository.find({ relations: ['documentos'] });
+    async findAll(empresaId, isSuperAdmin = false) {
+        const where = isSuperAdmin ? {} : { empresaId };
+        return this.projectsRepository.find({
+            where,
+            relations: ['documentos']
+        });
     }
-    async findOne(id) {
+    async findOne(id, empresaId, isSuperAdmin = false) {
+        const where = isSuperAdmin ? { id } : { id, empresaId };
         const project = await this.projectsRepository.findOne({
-            where: { id },
+            where: where,
             relations: ['tareas', 'documentos', 'usuarios'],
         });
         if (!project)
             throw new common_1.NotFoundException('Proyecto no encontrado');
         return project;
     }
-    async update(id, updateData) {
-        const project = await this.findOne(id);
+    async update(id, updateData, empresaId) {
+        const project = await this.findOne(id, empresaId);
         Object.assign(project, updateData);
         const saved = await this.projectsRepository.save(project);
-        await this.activityLogsService.log('UPDATE_PROJECT', `Proyecto actualizado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id));
+        await this.activityLogsService.log('UPDATE_PROJECT', `Proyecto actualizado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id), empresaId);
         return saved;
     }
-    async remove(id) {
-        const project = await this.findOne(id);
-        await this.activityLogsService.log('DELETE_PROJECT', `Proyecto eliminado: ${project.nombre}`, undefined, 'PROJECT', String(project.id));
+    async remove(id, empresaId) {
+        const project = await this.findOne(id, empresaId);
+        await this.activityLogsService.log('DELETE_PROJECT', `Proyecto eliminado: ${project.nombre}`, undefined, 'PROJECT', String(project.id), empresaId);
         await this.projectsRepository.remove(project);
     }
-    async assignUser(projectId, userId) {
+    async assignUser(projectId, userId, empresaId) {
         const project = await this.projectsRepository.findOne({
-            where: { id: projectId },
+            where: { id: projectId, empresaId },
             relations: ['usuarios']
         });
         if (!project)
             throw new common_1.NotFoundException('Proyecto no encontrado');
-        const user = await this.projectsRepository.manager.findOne(user_entity_1.User, { where: { id: userId } });
+        const user = await this.projectsRepository.manager.findOne(user_entity_1.User, { where: { id: userId, empresaId } });
         if (!user)
-            throw new common_1.NotFoundException('Usuario no encontrado');
+            throw new common_1.NotFoundException('Usuario no encontrado en tu empresa');
         if (!project.usuarios.some(u => u.id === user.id)) {
             project.usuarios.push(user);
         }
         const saved = await this.projectsRepository.save(project);
-        await this.activityLogsService.log('ASSIGN_USER', `Usuario ${user.nombre} asignado al proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id));
+        await this.activityLogsService.log('ASSIGN_USER', `Usuario ${user.nombre} asignado al proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id), empresaId);
         return saved;
     }
-    async removeUser(projectId, userId) {
+    async removeUser(projectId, userId, empresaId) {
         const project = await this.projectsRepository.findOne({
-            where: { id: projectId },
+            where: { id: projectId, empresaId },
             relations: ['usuarios']
         });
         if (!project)
             throw new common_1.NotFoundException('Proyecto no encontrado');
         project.usuarios = project.usuarios.filter(u => u.id !== userId);
         const saved = await this.projectsRepository.save(project);
-        await this.activityLogsService.log('REMOVE_USER', `Usuario removido del proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id));
+        await this.activityLogsService.log('REMOVE_USER', `Usuario removido del proyecto ${project.nombre}`, undefined, 'PROJECT', String(project.id), empresaId);
         return saved;
     }
-    async getStats() {
-        const projectsCount = await this.projectsRepository.count();
-        const tasksSummary = await this.projectsRepository.manager
+    async getStats(empresaId, isSuperAdmin = false) {
+        const where = isSuperAdmin ? {} : { empresaId };
+        const projectsCount = await this.projectsRepository.count({ where });
+        const tasksQuery = this.projectsRepository.manager
             .createQueryBuilder('task', 'task')
+            .innerJoin('task.proyecto', 'project')
             .select("COUNT(*)", "total")
             .addSelect("COUNT(*) FILTER (WHERE LOWER(task.estado) = 'finalizado')", "finalizadas")
-            .where("task.esSubtarea = :esSubtarea", { esSubtarea: false })
-            .getRawOne();
+            .where("task.esSubtarea = :esSubtarea", { esSubtarea: false });
+        if (!isSuperAdmin) {
+            tasksQuery.andWhere("project.empresaId = :empresaId", { empresaId });
+        }
+        const tasksSummary = await tasksQuery.getRawOne();
         const totalTasks = parseInt(tasksSummary.total) || 0;
         const finishedTasks = parseInt(tasksSummary.finalizadas) || 0;
         const progresoGlobal = totalTasks > 0 ? Math.round((finishedTasks / totalTasks) * 100) : 0;
         const projectsWithTasks = await this.projectsRepository.find({
+            where,
             relations: ['tareas'],
         });
         const proyectosDetalle = projectsWithTasks.map(p => {
@@ -113,7 +124,7 @@ let ProjectsService = class ProjectsService {
                 progreso
             };
         });
-        const ticketsCount = await this.projectsRepository.manager.count('ticket');
+        const ticketsCount = await this.projectsRepository.manager.count('ticket', { where: where });
         return {
             proyectos: projectsCount,
             totalTareasPrincipales: totalTasks,

@@ -19,28 +19,29 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_1 = require("../entities/user.entity");
+const get_user_decorator_1 = require("../auth/decorators/get-user.decorator");
 let TasksController = class TasksController {
     tasksService;
     constructor(tasksService) {
         this.tasksService = tasksService;
     }
-    create(projectId, taskData) {
-        return this.tasksService.create(+projectId, taskData);
+    create(projectId, taskData, empresaId) {
+        return this.tasksService.create(+projectId, taskData, empresaId);
     }
-    createSubtask(taskId, taskData) {
-        return this.tasksService.createSubtask(taskId, taskData);
+    createSubtask(taskId, taskData, empresaId) {
+        return this.tasksService.createSubtask(taskId, taskData, empresaId);
     }
-    findAll(projectId) {
-        return this.tasksService.findAllByProject(+projectId);
+    findAll(projectId, empresaId) {
+        return this.tasksService.findAllByProject(+projectId, empresaId);
     }
-    findOne(id) {
-        return this.tasksService.findOne(id);
+    findOne(id, empresaId) {
+        return this.tasksService.findOne(id, empresaId);
     }
-    update(id, updateData) {
-        return this.tasksService.update(id, updateData);
+    update(id, updateData, empresaId) {
+        return this.tasksService.update(id, updateData, empresaId);
     }
-    remove(id) {
-        return this.tasksService.remove(id);
+    remove(id, empresaId) {
+        return this.tasksService.remove(id, empresaId);
     }
 };
 exports.TasksController = TasksController;
@@ -49,8 +50,9 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER),
     __param(0, (0, common_1.Param)('projectId')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "create", null);
 __decorate([
@@ -58,22 +60,25 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER, user_entity_1.UserRole.COLABORADOR),
     __param(0, (0, common_1.Param)('taskId')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "createSubtask", null);
 __decorate([
     (0, common_1.Get)('projects/:projectId/tasks'),
     __param(0, (0, common_1.Param)('projectId')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('tasks/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "findOne", null);
 __decorate([
@@ -81,16 +86,18 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER, user_entity_1.UserRole.COLABORADOR),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)('tasks/:id'),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "remove", null);
 exports.TasksController = TasksController = __decorate([

@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const task_entity_1 = require("./task.entity");
 const documentation_entity_1 = require("./documentation.entity");
 const user_entity_1 = require("./user.entity");
+const empresa_entity_1 = require("./empresa.entity");
 var ProjectStatus;
 (function (ProjectStatus) {
     ProjectStatus["ACTIVO"] = "ACTIVO";
@@ -30,6 +31,8 @@ let Project = class Project {
     tareas;
     documentos;
     usuarios;
+    empresa;
+    empresaId;
 };
 exports.Project = Project;
 __decorate([
@@ -73,7 +76,15 @@ __decorate([
     (0, typeorm_1.JoinTable)({ name: 'project_users' }),
     __metadata("design:type", Array)
 ], Project.prototype, "usuarios", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => empresa_entity_1.Empresa, (empresa) => empresa.proyectos),
+    __metadata("design:type", empresa_entity_1.Empresa)
+], Project.prototype, "empresa", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Project.prototype, "empresaId", void 0);
 exports.Project = Project = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('Project')
 ], Project);
 //# sourceMappingURL=project.entity.js.map

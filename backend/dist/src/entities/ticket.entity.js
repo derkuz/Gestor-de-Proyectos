@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const task_entity_1 = require("./task.entity");
 const user_entity_1 = require("./user.entity");
 const category_entity_1 = require("./category.entity");
+const empresa_entity_1 = require("./empresa.entity");
 let Ticket = class Ticket {
     id;
     codigo;
@@ -27,6 +28,8 @@ let Ticket = class Ticket {
     fechaCreacion;
     tareaRelacionada;
     usuario;
+    empresa;
+    empresaId;
 };
 exports.Ticket = Ticket;
 __decorate([
@@ -78,7 +81,15 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.tickets),
     __metadata("design:type", user_entity_1.User)
 ], Ticket.prototype, "usuario", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => empresa_entity_1.Empresa, (empresa) => empresa.tickets),
+    __metadata("design:type", empresa_entity_1.Empresa)
+], Ticket.prototype, "empresa", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Ticket.prototype, "empresaId", void 0);
 exports.Ticket = Ticket = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('Ticket')
 ], Ticket);
 //# sourceMappingURL=ticket.entity.js.map

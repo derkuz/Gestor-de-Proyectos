@@ -379,6 +379,89 @@ const toolbarButtons = [
 
 const templates = [
     {
+        id: 'relevamiento-corporativo',
+        name: 'Relevamiento Corporativo (Formal OR/UI)',
+        desc: 'Estructura oficial para proyectos corporativos y gubernamentales.',
+        content: `# 🏢 Relevamiento de Requerimientos (Estructura OR/UI)
+
+## 1. Introducción (Obligatorio para el OR)
+### 1.1 Objetivo
+### 1.2 Destinatarios
+### 1.3 Alcance
+### 1.4 Beneficios y Restricciones
+### 1.5 Criticidad
+
+## 2. Documentos de Soporte (Obligatorio para el OR)
+*Referencia a leyes, normativas, manuales o documentación previa.*
+
+## 3. Circuitos Administrativos (Obligatorio para el OR)
+*Mapeo de los procesos actuales y los cambios propuestos.*
+
+## 4. Requerimientos Funcionales (a completar por la UI)
+### 4.1 Lista de Requerimientos
+| ID | Descripción | Prioridad |
+| :--- | :--- | :--- |
+| RF-01 | El sistema debe permitir... | ALTA |
+
+### 4.2 Impacto Presupuestario, Contable y Financiero (a completar por la UI)
+### 4.3 Validaciones y Controles (a completar por la UI)
+### 4.4 Prototipos de Salidas de Información y/o Pantallas (a completar por la UI)
+
+## 5. Requerimientos de Especificación (a completar por la UI)
+*Detalles sobre arquitectura, base de datos y lenguajes.*
+
+## 6. Perfiles de Usuarios (a completar por la UI)
+*Definición de roles y permisos en el sistema.*
+
+## 7. Referentes de Consulta (Obligatorio para el OR y UI)
+*Expertos en el negocio y/o técnicos para resolver dudas.*
+
+## 8. Firmas Necesarias (Obligatorio para el OR)
+| Área | Nombre | Firma | Fecha |
+| :--- | :--- | :--- | :--- |
+| Responsable OR | | | |
+| Responsable UI | | | |
+
+## 9. Control de Cambios del Documento (a completar por la UI y OR)
+| Versión | Fecha | Autor | Descripción |
+| :--- | :--- | :--- | :--- |
+| 1.0 | ${new Date().toLocaleDateString()} | Admin | Versión Inicial |
+
+## 10. Glosario (a completar por la UI y OR)
+- **OR:** Organismo Requirente
+- **UI:** Unidad de Implementación`
+    },
+    {
+        id: 'entrevista-inicial',
+        name: 'Guía de Entrevista (Principiantes)',
+        desc: 'Preguntas clave para el primer contacto con el cliente.',
+        content: `# 🎤 Guía de Primer Relevamiento (Entrevista Inicial)
+## 1. El "Dolor" (El Problema)
+> *Pregunta clave: "¿Qué es lo que hoy te quita más tiempo o te genera más errores?" o "¿Por qué decidiste buscarnos ahora?"*
+- **Respuesta del cliente:** [Escribe aquí el motivo principal]
+
+## 2. El Proceso Actual (¿Cómo lo hacen hoy?)
+> *Dile al cliente: "Cuéntame el paso a paso de cómo se hace esto hoy (aunque sea en Excel o papel)".*
+1. **Inicio:** [Ej: Reciben un mail con el pedido]
+2. **Proceso:** [Ej: Cargan los datos en un Excel]
+3. **Fin:** [Ej: Envían una factura manual]
+
+## 3. Los Protagonistas (Roles)
+> *Pregunta clave: "¿Quiénes van a usar el sistema y qué se imagina cada uno haciendo?"*
+- **Usuario Tipo A (Ej: Vendedor):** [Ej: Quiere cargar pedidos rápido desde el móvil]
+- **Usuario Tipo B (Ej: Dueño):** [Ej: Quiere ver un gráfico con las ventas del mes]
+
+## 4. El "Mínimo Viable" (Lo indispensable)
+> *Pregunta clave: "Si tuviéramos que lanzar una versión pequeñita en 15 días, ¿qué es lo único que NO puede faltar?"*
+- [ ] **Función 1:** [Lo más importante]
+- [ ] **Función 2:** [Lo segundo más importante]
+
+## 5. Restricciones y Miedos
+> *Pregunta clave: "¿Hay algo que te preocupe? ¿Alguna tecnología que prefieras usar o evitar? ¿Tienen una fecha límite inamovible?"*
+- **Miedos/Riesgos:** [Ej: "Me preocupa que los empleados no lo quieran usar"]
+- **Plazos:** [Ej: "Tenemos que estar listos para la temporada de verano"]`
+    },
+    {
         id: 'requerimientos',
         name: 'Relevamiento de Requerimientos',
         desc: 'Estructura para captura inicial de necesidades.',
@@ -405,20 +488,60 @@ graph LR
     U[Usuario] --> UC1((Ver Tareas))
     U --> UC2((Crear Ticket))
     A[Admin] --> UC3((Gestionar Roles))
-\`\`\` `
+\`\`\` 
+
+## 6. Fuera de Alcance (Exclusiones)
+> *Es vital definir qué NO hará el sistema para evitar falsas expectativas.*
+- **Ejemplo:** El sistema no procesará pagos con tarjeta de crédito en esta fase.
+- **Ejemplo:** No se incluye la carga de inventario histórico.`
     },
     {
         id: 'user-manual',
-        name: 'Manual de Usuario',
-        desc: 'Guía de uso para el usuario final.',
-        content: `# 📖 Manual de Usuario (Norma IEEE 26514 - Software Documentation)
-## 1. Introducción
-*Bienvenido al manual de [Nombre del sistema]. Esta guía te ayudará a comprender las funciones principales.*
+        name: 'Manual de Usuario (Profesional)',
+        desc: 'Guía completa de uso para el cliente y usuarios finales.',
+        content: `# 📖 Manual de Usuario
+> *Este documento guiará a los usuarios en el uso diario del sistema [Nombre].*
 
-## 2. Primeros Pasos
-### Acceso al Sistema
-1. Ingresa a la URL: \`http://ejemplo.com\`
-...`
+## 1. Introducción y Acceso
+### 1.1 ¿Qué es [Nombre]?
+*Breve explicación del propósito del sistema.*
+### 1.2 Requisitos del Sistema
+- **Navegador:** Chrome, Firefox o Edge actualizado.
+- **Dispositivo:** PC, Tablet o Smartphone.
+### 1.3 Inicio de Sesión
+1. Ingrese a: \`https://url-del-sistema.com\`
+2. Ingrese sus credenciales enviadas por el administrador.
+3. Si olvidó su contraseña, use la opción **"Recuperar Contraseña"**.
+
+## 2. Roles y Permisos
+*Identifica qué puedes hacer según tu perfil:*
+- **Administrador:** Gestión total, reportes y configuración.
+- **Operador:** Carga de datos y atención de solicitudes.
+- **Consulta:** Solo visualización de reportes.
+
+## 3. Guía de Uso por Módulos
+### 3.1 Módulo A: [Nombre]
+1. Diríjase a la sección **[Nombre]** en el menú lateral.
+2. Haga clic en el botón **"Nuevo"**.
+3. Complete los campos obligatorios marcados con asterisco (*).
+4. Presione **"Guardar"**.
+
+## 4. Preguntas Frecuentes (FAQ)
+- **¿Cómo cambio mi foto de perfil?**
+  *Vaya a Mi Perfil -> Editar -> Subir Imagen.*
+- **¿Los reportes se pueden descargar?**
+  *Sí, en formato PDF y Excel desde la sección de Reportes.*
+
+## 5. Solución de Problemas (Troubleshooting)
+| Problema | Soluciones Sugeridas |
+| :--- | :--- |
+| El sistema no carga | Verifique su conexión y limpie el caché del navegador. |
+| Error al guardar | Verifique que todos los campos requeridos tengan datos válidos. |
+
+## 6. Soporte y Contacto
+*Si el problema persiste, contacte a soporte:*
+- **Email:** soporte@empresa.com
+- **Horario:** Lunes a Viernes de 09:00 a 18:00.`
     },
     {
         id: 'data-dictionary',
@@ -441,28 +564,83 @@ erDiagram
     },
     {
         id: 'minuta',
-        name: 'Minuta de Reunión',
-        desc: 'Estructura para actas y acuerdos.',
-        content: `# 📅 Minuta de Reunión (Basado en Robert's Rules of Order)
-## Información General
+        name: 'Minuta de Reunión (Profesional)',
+        desc: 'Para documentar acuerdos, decisiones y tareas pendientes.',
+        content: `# 📅 Minuta de Reunión
+## 1. Información de la Sesión
 - **Fecha:** ${new Date().toLocaleDateString()}
-- **Asistentes:** [Nombres...]
-...`
+- **Hora Inicio/Fin:** [09:00 - 10:30]
+- **Lugar/Medio:** [Presencial / Google Meet / Teams]
+- **Asistentes:**
+  - [Nombre del Asistente 1] - [Rol]
+  - [Nombre del Asistente 2] - [Rol]
+
+## 2. Orden del Día (Agenda)
+*Temas previstos para tratar en la reunión:*
+1. [Tema 1]
+2. [Tema 2]
+
+## 3. Resumen de la Discusión
+*Breve descripción de los puntos clave conversados y debates:*
+- [Punto clave 1]
+- [Punto clave 2]
+
+## 4. Acuerdos y Decisiones
+> *Registra formalmente lo que se decidió para evitar malentendidos futuros.*
+- **Decisión 1:** [Descripción clara de la decisión tomada]
+- **Decisión 2:** [Descripción clara de la decisión tomada]
+
+## 5. Compromisos y Tareas Pendientes (Action Items)
+| Tarea / Acción | Responsable | Fecha Límite | Estado |
+| :--- | :--- | :---: | :---: |
+| [Ej: Enviar presupuesto] | [Nombre] | [DD/MM] | ⏳ |
+| [Ej: Validar requerimientos] | [Nombre] | [DD/MM] | ⏳ |
+
+## 6. Próxima Reunión (Opcional)
+- **Fecha tentativa:** [DD/MM/AAAA]
+- **Objetivo:** [Seguimiento de tareas / Nueva fase]`
     },
     {
         id: 'tech-spec',
-        name: 'Especificación Técnica',
-        desc: 'Arquitectura y lógica interna.',
-        content: `# 🛠️ Especificación Técnica (Norma IEEE 1016 - Software Design Description)
-## 1. Resumen de Implementación
-*Descripción de la lógica de negocio y arquitectura.*
+        name: 'Especificación Técnica (Backend/Arquitectura)',
+        desc: 'Para documentar lógica interna, base de datos y APIs.',
+        content: `# 🛠️ Especificación Técnica del Sistema
+> *Guía para desarrolladores sobre la arquitectura y lógica interna del proyecto.*
 
-## 2. Diagrama de Flujo / Lógica (Notación UML 2.5 - Sequence Diagram)
+## 1. Stack Tecnológico
+- **Frontend:** [Ej: Vue 3 + TailwindCSS]
+- **Backend:** [Ej: NestJS + TypeORM]
+- **Base de Datos:** [Ej: PostgreSQL]
+- **Infraestructura:** [Ej: Docker + AWS]
+
+## 2. Modelo de Datos (Esquema)
+*Descripción de las entidades principales:*
+\`\`\`mermaid
+erDiagram
+    ENTIDAD_A ||--o{ ENTIDAD_B : "relación"
+\`\`\`
+
+## 3. Arquitectura y Lógica de Negocio
+### 3.1 Flujo Principal
 \`\`\`mermaid
 sequenceDiagram
-    Participante A->>Participante B: Petición
-    Participante B-->>Participante A: Respuesta (JSON)
-\`\`\` `
+    Cliente->>Servidor: Petición (Request)
+    Servidor->>Base de Datos: Consulta
+    Base de Datos-->>Servidor: Resultado
+    Servidor-->>Cliente: Respuesta (JSON)
+\`\`\`
+### 3.2 Reglas de Negocio Críticas
+- **Regla 1:** [Descripción técnica de la validación o cálculo]
+
+## 4. Documentación de API (Endpoints)
+| Método | Ruta | Descripción | Autenticación |
+| :--- | :--- | :--- | :---: |
+| GET | \`/api/recursos\` | Lista todos los elementos | JWT |
+| POST | \`/api/recursos\` | Crea un nuevo elemento | Admin |
+
+## 5. Otros Detalles
+- **Seguridad:** [JWT, Hashing de claves, CORS]
+- **Observabilidad:** [Sistema de Logs, Métricas]`
     },
     {
         id: 'test-plan',
@@ -480,24 +658,46 @@ sequenceDiagram
     },
     {
         id: 'user-stories',
-        name: 'Historias de Usuario',
-        desc: 'Definición ágil de requerimientos.',
-        content: `# 📋 Historias de Usuario (Backlog - Estándar Agile / Metodología XP)
-## HU-01: [Título] (Bajo Criterios INVEST)
-**Como** [Rol del usuario]
-**Quiero** [Acción/Funcionalidad]
-**Para** [Valor de negocio/Motivo]
-...`
+        name: 'Historias de Usuario (Explicado)',
+        desc: 'Para definir qué hace el sistema de forma sencilla.',
+        content: `# 📋 Historias de Usuario (Agile)
+> *Usa este formato para explicar cada función del sistema como si fuera un cuento corto.*
+
+## HU-01: [Nombre de la función]
+- **COMO...** (quién lo usa) -> *Ej: Como Vendedor*
+- **QUIERO...** (qué hace) -> *Ej: Quiero registrar un pago en efectivo*
+- **PARA...** (por qué lo hace) -> *Ej: Para que el sistema descuente el saldo del cliente automáticamente*
+
+### ✅ Criterios de Aceptación (¿Cuándo está terminada?)
+- [ ] El sistema me deja elegir el monto.
+- [ ] El sistema me pide confirmación antes de guardar.
+- [ ] El saldo del cliente se actualiza en tiempo real.`
     },
     {
         id: 'risk-analysis',
-        name: 'Análisis de Riesgos',
-        desc: 'Prevención de problemas en el proyecto.',
-        content: `# ⚠️ Análisis de Riesgos (Norma ISO 31000 / Estándar PMBOK)
-## 1. Matriz de Riesgos (Nivel de Exposición = Impacto x Probabilidad)
-| Riesgo | Impacto | Probabilidad | Plan de Mitigación |
-| :--- | :--- | :--- | :--- |
-...`
+        name: 'Análisis de Riesgos (Guía)',
+        desc: 'Para identificar y prevenir problemas antes de que ocurran.',
+        content: `# ⚠️ Análisis de Riesgos y Plan de Contingencia
+> *Usa esta tabla para anticiparte a lo que puede salir mal. "Impacto" y "Probabilidad" se miden de 1 a 5.*
+
+## 1. Matriz de Riesgos Operativos
+| Riesgo Identificado | Impacto | Prob. | Nivel | Plan de Mitigación (Prevención) |
+| :--- | :---: | :---: | :---: | :--- |
+| **Retraso en aprobación:** El cliente no valida a tiempo. | 4 | 3 | 12 | Establecer fechas de validación por contrato. |
+| **Problemas técnicos:** Error inesperado en integración. | 5 | 2 | 10 | Tener un entorno de pruebas idéntico al real. |
+| **Baja de personal:** Un programador clave se enferma. | 3 | 2 | 6 | Documentar el código y usar Git diariamente. |
+
+## 2. Categorías de Riesgo sugeridas para analizar:
+- **Técnicos:** Bugs, servidores, pérdida de datos.
+- **Humanos:** Falta de capacitación, mala comunicación, renuncias.
+- **Externos:** Cambios legales, inflación, falta de internet.
+- **Cronograma:** Tareas que dependen de terceros.
+
+## 3. Plan de Contingencia (¿Qué hacemos si el riesgo ocurre?)
+*Si el riesgo "X" sucede, el responsable "Y" activará la acción "Z":*
+1. **Riesgo:** [Nombre del riesgo]
+2. **Acción inmediata:** [Pasos a seguir para minimizar el daño]
+3. **Comunicación:** [A quién se le avisa inmediatamente]`
     },
     {
         id: 'release-notes',

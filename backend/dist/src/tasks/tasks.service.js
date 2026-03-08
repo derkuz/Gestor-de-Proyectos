@@ -25,17 +25,17 @@ let TasksService = class TasksService {
         this.tasksRepository = tasksRepository;
         this.projectsRepository = projectsRepository;
     }
-    async checkProjectStatus(projectId, allowedStatuses = [project_entity_1.ProjectStatus.ACTIVO]) {
-        const project = await this.projectsRepository.findOne({ where: { id: projectId } });
+    async checkProjectStatus(projectId, empresaId, allowedStatuses = [project_entity_1.ProjectStatus.ACTIVO]) {
+        const project = await this.projectsRepository.findOne({ where: { id: projectId, empresaId } });
         if (!project)
-            throw new common_1.NotFoundException('Proyecto no encontrado');
+            throw new common_1.NotFoundException('Proyecto no encontrado en tu empresa');
         if (!allowedStatuses.includes(project.estado)) {
             throw new common_1.ForbiddenException(`Operación no permitida: el proyecto está en estado ${project.estado}`);
         }
         return project;
     }
-    async create(projectId, taskData) {
-        await this.checkProjectStatus(projectId);
+    async create(projectId, taskData, empresaId) {
+        await this.checkProjectStatus(projectId, empresaId);
         const { asignados, ...rest } = taskData;
         const task = this.tasksRepository.create({
             ...rest,
@@ -45,9 +45,9 @@ let TasksService = class TasksService {
         });
         return this.tasksRepository.save(task);
     }
-    async createSubtask(padreId, taskData) {
-        const padre = await this.findOne(padreId);
-        await this.checkProjectStatus(padre.proyecto.id);
+    async createSubtask(padreId, taskData, empresaId) {
+        const padre = await this.findOne(padreId, empresaId);
+        await this.checkProjectStatus(padre.proyecto.id, empresaId);
         const { asignados, ...rest } = taskData;
         const task = this.tasksRepository.create({
             ...rest,
@@ -58,24 +58,30 @@ let TasksService = class TasksService {
         });
         return this.tasksRepository.save(task);
     }
-    async findAllByProject(projectId) {
+    async findAll(empresaId) {
         return this.tasksRepository.find({
-            where: { proyecto: { id: projectId } },
+            where: { proyecto: { empresaId } },
+            relations: ['proyecto', 'subtareas', 'padre', 'asignados'],
+        });
+    }
+    async findAllByProject(projectId, empresaId) {
+        return this.tasksRepository.find({
+            where: { proyecto: { id: projectId, empresaId } },
             relations: ['subtareas', 'padre', 'asignados', 'ticketLigado'],
         });
     }
-    async findOne(id) {
+    async findOne(id, empresaId) {
         const task = await this.tasksRepository.findOne({
-            where: { id },
+            where: { id, proyecto: { empresaId } },
             relations: ['proyecto', 'subtareas', 'padre', 'proyecto.tareas', 'asignados'],
         });
         if (!task)
-            throw new common_1.NotFoundException('Tarea no encontrada');
+            throw new common_1.NotFoundException('Tarea no encontrada en tu empresa');
         return task;
     }
-    async update(id, updateData) {
-        const task = await this.findOne(id);
-        await this.checkProjectStatus(task.proyecto.id);
+    async update(id, updateData, empresaId) {
+        const task = await this.findOne(id, empresaId);
+        await this.checkProjectStatus(task.proyecto.id, empresaId);
         const { asignados, ...rest } = updateData;
         Object.assign(task, rest);
         if (asignados) {
@@ -83,9 +89,9 @@ let TasksService = class TasksService {
         }
         return this.tasksRepository.save(task);
     }
-    async remove(id) {
-        const task = await this.findOne(id);
-        await this.checkProjectStatus(task.proyecto.id);
+    async remove(id, empresaId) {
+        const task = await this.findOne(id, empresaId);
+        await this.checkProjectStatus(task.proyecto.id, empresaId);
         await this.tasksRepository.remove(task);
     }
 };

@@ -24,20 +24,18 @@ const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_entity_1 = require("../entities/user.entity");
 const documentation_entity_1 = require("../entities/documentation.entity");
 const file_upload_utils_1 = require("../utils/file-upload.utils");
+const get_user_decorator_1 = require("../auth/decorators/get-user.decorator");
 let DocumentationController = class DocumentationController {
     documentationService;
     constructor(documentationService) {
         this.documentationService = documentationService;
     }
-    findAll(projectId) {
-        return this.documentationService.findAllByProject(+projectId);
+    findAll(projectId, empresaId) {
+        return this.documentationService.findAllByProject(+projectId, empresaId);
     }
-    uploadFile(projectId, file, titulo) {
-        console.log('Backend: Recibida petición de subida', { projectId, titulo, file: file?.filename });
-        if (!file) {
-            console.error('Backend: No se recibió ningún archivo');
-            return;
-        }
+    uploadFile(projectId, file, titulo, empresaId) {
+        if (!file)
+            throw new Error('No se recibió ningún archivo');
         const now = new Date();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const year = String(now.getFullYear());
@@ -46,28 +44,28 @@ let DocumentationController = class DocumentationController {
             titulo: titulo || file?.originalname,
             tipo: documentation_entity_1.DocType.FILE,
             url: url,
-        });
+        }, empresaId);
     }
-    findOne(id) {
-        return this.documentationService.findOne(id);
+    findOne(id, empresaId) {
+        return this.documentationService.findOne(id, empresaId);
     }
-    create(projectId, docData) {
-        return this.documentationService.create(+projectId, docData);
+    create(projectId, docData, empresaId) {
+        return this.documentationService.create(+projectId, docData, empresaId);
     }
-    update(id, docData) {
-        return this.documentationService.update(id, docData);
+    update(id, docData, empresaId) {
+        return this.documentationService.update(id, docData, empresaId);
     }
-    remove(id) {
-        console.log('Backend: Eliminando documento con ID:', id);
-        return this.documentationService.remove(id);
+    remove(id, empresaId) {
+        return this.documentationService.remove(id, empresaId);
     }
 };
 exports.DocumentationController = DocumentationController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Param)('projectId')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], DocumentationController.prototype, "findAll", null);
 __decorate([
@@ -90,15 +88,17 @@ __decorate([
     __param(0, (0, common_1.Param)('projectId')),
     __param(1, (0, common_1.UploadedFile)()),
     __param(2, (0, common_1.Body)('titulo')),
+    __param(3, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, String]),
+    __metadata("design:paramtypes", [String, Object, String, String]),
     __metadata("design:returntype", void 0)
 ], DocumentationController.prototype, "uploadFile", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], DocumentationController.prototype, "findOne", null);
 __decorate([
@@ -106,8 +106,9 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER, user_entity_1.UserRole.COLABORADOR),
     __param(0, (0, common_1.Param)('projectId')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], DocumentationController.prototype, "create", null);
 __decorate([
@@ -115,16 +116,18 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER, user_entity_1.UserRole.COLABORADOR),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], DocumentationController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.ADMIN, user_entity_1.UserRole.PROJECT_MANAGER),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, get_user_decorator_1.GetUser)('empresaId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], DocumentationController.prototype, "remove", null);
 exports.DocumentationController = DocumentationController = __decorate([

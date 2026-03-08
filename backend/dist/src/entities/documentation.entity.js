@@ -56,6 +56,6 @@ __decorate([
     __metadata("design:type", project_entity_1.Project)
 ], Documentation.prototype, "proyecto", void 0);
 exports.Documentation = Documentation = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('Documentation')
 ], Documentation);
 //# sourceMappingURL=documentation.entity.js.map
