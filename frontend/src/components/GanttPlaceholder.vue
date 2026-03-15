@@ -1,12 +1,12 @@
 <template>
-  <div class="bg-app-secondary border-4 border-app-border p-6 overflow-hidden flex flex-col h-full min-h-[500px] transition-colors shadow-[8px_8px_0px_0px_rgba(0,255,65,0.1)]">
+  <div class="bg-app-surface border border-app-border rounded-3xl p-6 overflow-hidden flex flex-col h-full min-h-[500px] transition-colors shadow-sm">
       <div v-if="tasksWithDates.length === 0" class="flex-1 flex flex-col items-center justify-center text-app-text-muted py-10">
          <svg class="w-12 h-12 text-app-text-muted/50 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
          <p class="font-black uppercase tracking-widest text-xs mb-2">No hay tareas con fechas asignadas.</p>
          <p class="text-xs font-medium">Edita tus tareas y añádeles fechas para visualizarlas en el cronograma.</p>
       </div>
       
-      <div v-else class="flex-1 overflow-auto custom-scrollbar relative border-2 border-app-border bg-app-bg/20">
+      <div v-else class="flex-1 overflow-auto custom-scrollbar relative rounded-xl border border-app-border bg-app-bg/20">
          <div class="inline-block min-w-full">
              <!-- Headers (Days) -->
              <div class="flex border-b border-app-border sticky top-0 bg-app-surface/95 backdrop-blur-xl z-20">
@@ -43,13 +43,13 @@
                    <div class="w-64 shrink-0 p-4 border-r border-app-border sticky left-0 bg-app-surface group-hover:bg-app-bg transition-colors z-20 flex flex-col justify-center">
                       <span class="text-xs font-bold text-app-text truncate pr-2 w-full block" :title="task.nombre">{{ task.nombre }}</span>
                       <div class="flex items-center space-x-2 mt-1.5 w-full overflow-hidden">
-                         <span class="text-[8px] uppercase font-black px-1.5 py-0.5 shrink-0 border-2" :class="getPriorityTextClass(task.prioridad)">{{ task.prioridad }}</span>
+                         <span class="text-[8px] uppercase font-black px-1.5 py-0.5 rounded-md shrink-0 border" :class="getPriorityTextClass(task.prioridad)">{{ task.prioridad }}</span>
                          <!-- Assigned users preview -->
                          <div class="flex -space-x-1 shrink-0">
-                            <div v-for="user in (task.asignados || []).slice(0,3)" :key="user?.id" class="w-4 h-4 border border-app-text bg-app-text flex items-center justify-center text-[6px] font-black text-app-bg uppercase" :title="user?.nombre || 'Usuario'">
+                            <div v-for="user in (task.asignados || []).slice(0,3)" :key="user?.id" class="w-4 h-4 rounded-full border border-app-surface bg-app-bg flex items-center justify-center text-[6px] font-black text-app-text uppercase shadow-sm" :title="user?.nombre || 'Usuario'">
                                {{ (user?.nombre || '??').slice(0, 2) }}
                             </div>
-                            <div v-if="(task.asignados?.length || 0) > 3" class="w-4 h-4 border border-app-border bg-app-secondary flex items-center justify-center text-[5px] font-black text-app-text-secondary">
+                            <div v-if="(task.asignados?.length || 0) > 3" class="w-4 h-4 rounded-full border border-app-surface bg-app-bg flex items-center justify-center text-[5px] font-black text-app-text-muted">
                               +{{ task.asignados.length - 3 }}
                             </div>
                          </div>
@@ -60,7 +60,7 @@
                    <div class="relative flex-1 py-3" :style="{ width: `${totalDays * 48}px`, minWidth: `${totalDays * 48}px` }">
                        <div 
                           :style="getTaskStyle(task)" 
-                          class="absolute h-8 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] flex items-center px-3 overflow-hidden border-2 border-white/20 hover:brightness-110 transition-all z-10 top-0 bottom-0 my-auto group/bar select-none"
+                          class="absolute h-8 rounded-lg shadow-md flex items-center px-3 overflow-hidden border border-white/10 hover:brightness-110 transition-all z-10 top-0 bottom-0 my-auto group/bar select-none"
                           :class="[getStatusBgClass(task.estado), isDragging && dragTask?.id === task.id ? 'opacity-90 z-30 cursor-grabbing shadow-2xl scale-[1.02]' : 'cursor-grab']"
                           :title="`Inicio: ${formatDate(task.fechaInicio)}\nFin: ${formatDate(task.fechaFin)}\nEstado: ${task.estado}`"
                           @mousedown="startDrag($event, task, 'move')"

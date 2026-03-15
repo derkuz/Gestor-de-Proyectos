@@ -7,17 +7,17 @@
           <input 
             v-model="searchQuery" 
             type="text" 
-            placeholder="BUSCAR_TAREA..." 
-            class="w-full bg-app-secondary border-2 border-app-border px-4 py-3 text-app-text focus:bg-app-text focus:text-app-bg outline-none transition-all text-sm uppercase tracking-widest"
+            placeholder="Buscar tarea por nombre..." 
+            class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-app-text focus:border-purple-500 outline-none transition-all text-sm"
           >
-          <span class="absolute right-4 top-3.5 text-app-text-secondary">>></span>
+          <svg class="w-4 h-4 text-app-text-muted absolute right-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
        </div>
        
        <!-- Status Filter -->
        <div class="w-full sm:w-40">
           <select 
              v-model="statusFilter" 
-             class="w-full bg-app-secondary border-2 border-app-border px-4 py-3 text-sm text-app-text outline-none cursor-pointer focus:bg-app-text focus:text-app-bg transition-all appearance-none uppercase tracking-widest"
+             class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm text-app-text outline-none cursor-pointer focus:border-purple-500 transition-all appearance-none"
           >
              <option value="ALL" class="bg-app-surface text-app-text">Todos los estados</option>
              <option value="Pendiente" class="bg-app-surface text-app-text-muted">Pendiente</option>
@@ -31,7 +31,7 @@
        <div class="w-full sm:w-44">
           <select 
              v-model="prioritySort" 
-             class="w-full bg-app-secondary border-2 border-app-border px-4 py-3 text-sm text-app-text outline-none cursor-pointer focus:bg-app-text focus:text-app-bg transition-all appearance-none uppercase tracking-widest"
+             class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-sm text-app-text outline-none cursor-pointer focus:border-purple-500 transition-all appearance-none"
           >
              <option value="ALL" class="bg-app-surface text-app-text">Todas las prioridades</option>
              <option value="CRITICA" class="bg-app-surface text-red-400">Sólo Crítica</option>
@@ -42,15 +42,15 @@
        </div>
     </div>
     
-    <div v-if="filteredAndSortedTasks.length === 0" class="text-center py-10 bg-app-secondary border-2 border-dashed border-app-border shadow-[4px_4px_0px_0px_rgba(0,255,65,0.05)]">
-       <p class="text-app-text-secondary text-sm font-black uppercase tracking-widest">[ NO_SE_ENCONTRARON_TAREAS ]</p>
+    <div v-if="filteredAndSortedTasks.length === 0" class="text-center py-10 bg-app-surface border border-dashed border-app-border rounded-2xl shadow-sm">
+       <p class="text-app-text-muted text-sm font-black uppercase tracking-widest">No se encontraron tareas coincidentes.</p>
     </div>
 
     <div 
       v-for="task in filteredAndSortedTasks" 
       :key="task.id"
-      class="bg-app-secondary border-2 border-app-border overflow-hidden transition-all mb-4"
-      :class="expandedTasks.includes(task.id) ? 'border-app-text shadow-[4px_4px_0px_0px_rgba(0,255,65,0.2)]' : ''"
+      class="bg-app-surface rounded-2xl border border-app-border overflow-hidden transition-all shadow-sm"
+      :class="expandedTasks.includes(task.id) ? 'ring-2 ring-purple-600/30 border-purple-600/30' : ''"
     >
       <!-- Task Header -->
       <div class="flex items-center justify-between p-5 hover:bg-app-bg/50 cursor-pointer" @click="toggleExpand(task.id)">

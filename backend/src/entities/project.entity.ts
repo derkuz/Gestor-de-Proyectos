@@ -10,7 +10,7 @@ export enum ProjectStatus {
     FINALIZADO = 'FINALIZADO',
 }
 
-@Entity('Project')
+@Entity('project')
 export class Project {
     @PrimaryGeneratedColumn()
     id: number;
@@ -47,6 +47,6 @@ export class Project {
     @ManyToOne(() => Empresa, (empresa) => empresa.proyectos)
     empresa: Empresa;
 
-    @Column()
+    @Column({ nullable: true })
     empresaId: string;
 }

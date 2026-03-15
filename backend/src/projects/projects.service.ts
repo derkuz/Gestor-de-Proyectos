@@ -13,23 +13,23 @@ export class ProjectsService {
         private activityLogsService: ActivityLogsService,
     ) { }
 
-    async create(projectData: Partial<Project>, empresaId: string): Promise<Project> {
+    async create(projectData: Partial<Project>, empresaId?: string): Promise<Project> {
         const project = this.projectsRepository.create({ ...projectData, empresaId });
         const saved = await this.projectsRepository.save(project);
         await this.activityLogsService.log('CREATE_PROJECT', `Proyecto creado: ${saved.nombre}`, undefined, 'PROJECT', String(saved.id), empresaId);
         return saved;
     }
 
-    async findAll(empresaId: string, isSuperAdmin: boolean = false): Promise<Project[]> {
-        const where = isSuperAdmin ? {} : { empresaId };
+    async findAll(empresaId?: string, isSuperAdmin: boolean = false): Promise<Project[]> {
+        const where = (isSuperAdmin || !empresaId) ? {} : { empresaId };
         return this.projectsRepository.find({
             where,
             relations: ['documentos']
         });
     }
 
-    async findOne(id: number, empresaId: string, isSuperAdmin: boolean = false): Promise<Project> {
-        const where = isSuperAdmin ? { id } : { id, empresaId };
+    async findOne(id: number, empresaId?: string, isSuperAdmin: boolean = false): Promise<Project> {
+        const where = (isSuperAdmin || !empresaId) ? { id } : { id, empresaId };
         const project = await this.projectsRepository.findOne({
             where: where as any,
             relations: ['tareas', 'documentos', 'usuarios'],
@@ -38,8 +38,8 @@ export class ProjectsService {
         return project;
     }
 
-    async update(id: number, updateData: Partial<Project>, empresaId: string): Promise<Project> {
-        const project = await this.findOne(id, empresaId);
+    async update(id: number, updateData: Partial<Project>, empresaId?: string, isSuperAdmin: boolean = false): Promise<Project> {
+        const project = await this.findOne(id, empresaId, isSuperAdmin);
 
         Object.assign(project, updateData);
         const saved = await this.projectsRepository.save(project);
@@ -47,8 +47,8 @@ export class ProjectsService {
         return saved;
     }
 
-    async remove(id: number, empresaId: string): Promise<void> {
-        const project = await this.findOne(id, empresaId);
+    async remove(id: number, empresaId?: string, isSuperAdmin: boolean = false): Promise<void> {
+        const project = await this.findOne(id, empresaId, isSuperAdmin);
         await this.activityLogsService.log('DELETE_PROJECT', `Proyecto eliminado: ${project.nombre}`, undefined, 'PROJECT', String(project.id), empresaId);
         await this.projectsRepository.remove(project);
     }

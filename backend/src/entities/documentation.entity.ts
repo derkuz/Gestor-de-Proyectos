@@ -7,7 +7,7 @@ export enum DocType {
     FILE = 'FILE',
 }
 
-@Entity('Documentation')
+@Entity('documentation')
 export class Documentation {
     @PrimaryGeneratedColumn('uuid')
     id: string;

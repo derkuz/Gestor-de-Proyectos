@@ -6,7 +6,7 @@ import { Ticket } from './ticket.entity';
 import { Category } from './category.entity';
 import { ActivityLog } from './activity-log.entity';
 
-@Entity('Empresa')
+@Entity('empresa')
 export class Empresa {
     @PrimaryGeneratedColumn('uuid')
     id: string;

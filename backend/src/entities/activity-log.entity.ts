@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, Jo
 import { User } from './user.entity';
 import { Empresa } from './empresa.entity';
 
-@Entity('ActivityLog')
+@Entity('activity_log')
 export class ActivityLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -33,11 +33,7 @@ export class ActivityLog {
     @JoinColumn({ name: 'empresaId' })
     empresa: Empresa;
 
-    @Column()
-    empresaId: string;
-
-    // The current schema doesn't seem to have a userId column in ActivityLog based on information_schema, 
-    // but Prisma defines a relation? Wait, let's re-check information_schema output.
-    // column_name: id, accion, detalle, ip, tipo, entidadId, fecha, empresaId.
-    // Indeed, NO userId.
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'userId' })
+    usuario: User;
 }

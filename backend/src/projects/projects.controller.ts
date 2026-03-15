@@ -19,30 +19,35 @@ export class ProjectsController {
     }
 
     @Get()
-    findAll(@GetUser('empresaId') empresaId: string) {
-        return this.projectsService.findAll(empresaId);
+    findAll(@GetUser('empresaId') empresaId: string, @GetUser('rol') rol: UserRole) {
+        const isSuperAdmin = rol === UserRole.SUPER_ADMIN;
+        return this.projectsService.findAll(empresaId, isSuperAdmin);
     }
 
     @Get('stats')
-    getStats(@GetUser('empresaId') empresaId: string) {
-        return this.projectsService.getStats(empresaId);
+    getStats(@GetUser('empresaId') empresaId: string, @GetUser('rol') rol: UserRole) {
+        const isSuperAdmin = rol === UserRole.SUPER_ADMIN;
+        return this.projectsService.getStats(empresaId, isSuperAdmin);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string, @GetUser('empresaId') empresaId: string) {
-        return this.projectsService.findOne(+id, empresaId);
+    findOne(@Param('id') id: string, @GetUser('empresaId') empresaId: string, @GetUser('rol') rol: UserRole) {
+        const isSuperAdmin = rol === UserRole.SUPER_ADMIN;
+        return this.projectsService.findOne(+id, empresaId, isSuperAdmin);
     }
 
     @Patch(':id')
-    @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER)
-    update(@Param('id') id: string, @Body() updateData: Partial<Project>, @GetUser('empresaId') empresaId: string) {
-        return this.projectsService.update(+id, updateData, empresaId);
+    @Roles(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.SUPER_ADMIN)
+    update(@Param('id') id: string, @Body() updateData: Partial<Project>, @GetUser('empresaId') empresaId: string, @GetUser('rol') rol: UserRole) {
+        const isSuperAdmin = rol === UserRole.SUPER_ADMIN;
+        return this.projectsService.update(+id, updateData, empresaId, isSuperAdmin);
     }
 
     @Delete(':id')
     @Roles(UserRole.ADMIN)
-    remove(@Param('id') id: string, @GetUser('empresaId') empresaId: string) {
-        return this.projectsService.remove(+id, empresaId);
+    remove(@Param('id') id: string, @GetUser('empresaId') empresaId: string, @GetUser('rol') rol: UserRole) {
+        const isSuperAdmin = rol === UserRole.SUPER_ADMIN;
+        return this.projectsService.remove(+id, empresaId, isSuperAdmin);
     }
 
     @Post(':id/assign')

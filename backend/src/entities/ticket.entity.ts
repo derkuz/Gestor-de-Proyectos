@@ -4,7 +4,7 @@ import { User } from './user.entity';
 import { Category } from './category.entity';
 import { Empresa } from './empresa.entity';
 
-@Entity('Ticket')
+@Entity('ticket')
 export class Ticket {
     @PrimaryGeneratedColumn('uuid')
     id: string;

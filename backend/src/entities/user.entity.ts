@@ -11,7 +11,7 @@ export enum UserRole {
     EXTERNO = 'EXTERNO',
 }
 
-@Entity('User')
+@Entity('user')
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;

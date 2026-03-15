@@ -10,7 +10,7 @@ export enum TaskPriority {
     CRITICA = 'CRITICA',
 }
 
-@Entity('Task')
+@Entity('task')
 export class Task {
     @PrimaryGeneratedColumn('uuid')
     id: string;

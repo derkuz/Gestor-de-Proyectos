@@ -19,7 +19,8 @@ export class ActivityLogsService {
             detalles,
             entidadTipo,
             entidadId,
-            empresaId,
+            empresa: empresaId ? { id: empresaId } as any : undefined,
+            usuario: userId ? { id: userId } as any : undefined,
             duracionMs,
             categoria
         });
@@ -86,9 +87,9 @@ export class ActivityLogsService {
     }
 
     async findAll(empresaId: string, limit = 100, isSuperAdmin: boolean = false) {
-        const where = isSuperAdmin ? {} : { empresaId };
+        const where = (isSuperAdmin || !empresaId) ? {} : { empresa: { id: empresaId } };
         return this.activityLogRepository.find({
-            where,
+            where: where as any,
             relations: ['usuario'],
             order: { fecha: 'DESC' },
             take: limit,

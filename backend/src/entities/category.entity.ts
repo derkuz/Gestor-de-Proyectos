@@ -3,7 +3,7 @@ import { User, UserRole } from './user.entity';
 import { Ticket } from './ticket.entity';
 import { Empresa } from './empresa.entity';
 
-@Entity('Category')
+@Entity('category')
 export class Category {
     @PrimaryGeneratedColumn('uuid')
     id: string;

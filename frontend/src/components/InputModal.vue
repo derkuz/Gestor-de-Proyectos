@@ -1,23 +1,23 @@
 <template>
   <div v-if="modelValue" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-app-bg/90" @click="handleCancel"></div>
+    <div class="absolute inset-0 bg-app-bg/80 backdrop-blur-md" @click="handleCancel"></div>
     
     <!-- Modal -->
-    <div class="bg-app-secondary border-4 border-app-border p-8 w-full max-w-md relative z-10 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.2)] flex flex-col transition-all">
-      <h3 class="text-2xl font-black mb-2 text-app-text uppercase tracking-widest">{{ title }}</h3>
-      <p v-if="description" class="text-app-text-secondary mb-6 text-xs font-medium uppercase tracking-widest leading-relaxed">{{ description }}</p>
+    <div class="bg-app-surface border border-app-border rounded-[2.5rem] p-8 w-full max-w-md relative z-10 shadow-2xl animate-pop-in flex flex-col transition-colors">
+      <h3 class="text-2xl font-black mb-2 text-app-text">{{ title }}</h3>
+      <p v-if="description" class="text-app-text-muted mb-6 text-sm font-medium">{{ description }}</p>
       
       <form @submit.prevent="handleConfirm" class="space-y-6">
         <div>
-          <label v-if="inputLabel" class="block text-[10px] font-black text-app-text uppercase tracking-widest mb-2">{{ inputLabel }}</label>
+          <label v-if="inputLabel" class="block text-[10px] font-black text-app-text-muted uppercase tracking-widest mb-2">{{ inputLabel }}</label>
           <input 
             v-model="inputValue" 
             ref="inputRef"
             type="text" 
             :placeholder="placeholder"
             required
-            class="w-full bg-app-secondary border-2 border-app-border px-4 py-3 text-app-text placeholder-app-text-secondary/50 focus:bg-app-text focus:text-app-secondary outline-none transition-all uppercase tracking-widest"
+            class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-4 text-app-text placeholder-app-text-muted/50 focus:border-purple-500 outline-none transition-all text-sm"
           >
         </div>
         
@@ -25,15 +25,15 @@
           <button 
             type="button" 
             @click="handleCancel" 
-            class="flex-1 py-3 border-2 border-app-border font-black uppercase text-xs tracking-widest text-app-text hover:bg-app-text hover:text-app-secondary transition-colors bg-app-secondary"
+            class="flex-1 py-3.5 font-black uppercase text-[10px] tracking-widest text-app-text-muted hover:text-app-text transition-colors bg-app-bg rounded-xl border border-app-border"
           >
-            [ {{ cancelText }} ]
+            {{ cancelText }}
           </button>
           <button 
             type="submit" 
-            class="flex-1 py-3 bg-app-text border-2 border-app-text font-black uppercase text-xs tracking-widest text-app-bg hover:bg-app-secondary hover:text-app-text transition-all"
+            class="flex-1 py-3.5 bg-purple-600 rounded-xl font-black uppercase text-[10px] tracking-widest text-white hover:bg-purple-500 transition-all shadow-lg shadow-purple-500/30"
           >
-            [ {{ confirmText }} ]
+            {{ confirmText }}
           </button>
         </div>
       </form>

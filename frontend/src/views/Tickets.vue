@@ -2,189 +2,200 @@
   <div>
     <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 gap-4">
       <div>
-        <h2 class="text-3xl font-black text-app-text tracking-widest uppercase">_ SOPORTE_TÉCNICO</h2>
-        <p class="text-app-text-secondary mt-1 font-medium uppercase tracking-widest text-xs">> GESTIÓN_DE_INCIDENCIAS</p>
+        <h2 class="text-3xl font-black text-app-text">Soporte técnico</h2>
+        <p class="text-app-text-muted mt-1 font-medium">Gestiona los tickets y solicitudes de ayuda</p>
       </div>
       <div class="flex items-center space-x-3">
         <button 
           v-if="authStore.isAdmin"
           @click="$router.push('/tickets/categories')"
-          class="px-6 py-3 border-2 border-app-border bg-app-secondary text-app-text font-bold hover:bg-app-text hover:text-app-secondary transition-all uppercase tracking-widest text-xs"
+          class="px-6 py-3 rounded-2xl bg-app-surface border border-app-border text-app-text-muted font-bold hover:text-app-text transition-all flex items-center space-x-2"
         >
-          [ CONFIG_CATEGORÍAS ]
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          <span>Configurar Categorías</span>
         </button>
         <button 
           @click="showCreateModal = true"
-          class="px-8 py-3 border-2 border-app-border bg-app-secondary text-app-text font-bold hover:bg-app-text hover:text-app-secondary transition-all uppercase tracking-widest text-xs"
+          class="px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold hover:opacity-90 transition-all shadow-lg shadow-blue-500/20 active:scale-95 whitespace-nowrap"
         >
-          [+] ABRIR_TICKET
+          + Abrir Ticket
         </button>
       </div>
     </header>
     
     <!-- Error Toast -->
     <div v-if="ticketStore.error" class="fixed top-24 right-8 z-[60]">
-       <div class="bg-app-secondary border-4 border-red-500 p-4 text-red-500 font-bold shadow-[8px_8px_0px_0px_rgba(239,68,68,0.2)] flex items-center space-x-4 uppercase tracking-widest">
-          <span class="text-xl">[!]</span>
-          <span class="flex-1 text-sm">{{ ticketStore.error }}</span>
-          <button @click="ticketStore.error = null" class="p-1 border-2 border-red-500 hover:bg-red-500 hover:text-app-bg transition-colors">
-             [X]
+       <div class="bg-red-500/20 backdrop-blur-xl border border-red-500/30 px-6 py-3 rounded-2xl text-red-400 font-bold shadow-2xl flex items-center space-x-3 group relative">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-width="2"/></svg>
+          <span class="flex-1">{{ ticketStore.error }}</span>
+          <button @click="ticketStore.error = null" class="w-6 h-6 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition-colors">
+             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
        </div>
     </div>
 
     <div v-if="ticketStore.loading && ticketStore.tickets.length === 0" class="flex justify-center py-20">
-      <div class="text-app-text font-black text-xl animate-pulse tracking-[0.3em]">CARGANDO_DATOS...</div>
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 
     <div v-else class="space-y-6">
        <!-- Controls Section -->
-        <div class="pixel-card p-6 lg:p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
-           
-           <!-- Tabs -->
-           <div class="flex bg-app-secondary border-2 border-app-border p-1 w-full lg:w-auto">
-              <button 
-                v-for="tab in ['TODO', 'ABIERTO', 'EN PROCESO', 'CERRADO']" 
-                :key="tab"
-                @click="activeTab = tab"
-                class="flex-1 lg:flex-none px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
-                :class="activeTab === tab ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
-              >
-                 {{ tab === 'TODO' ? 'Todos' : tab.toLowerCase() }}
-              </button>
-           </div>
+       <div class="bg-app-surface border border-app-border rounded-3xl p-6 lg:p-4 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm transition-colors">
+          
+          <!-- Tabs -->
+          <div class="flex p-1 bg-app-bg border border-app-border rounded-2xl w-full lg:w-auto shadow-inner">
+             <button 
+               v-for="tab in ['TODO', 'ABIERTO', 'EN PROCESO', 'CERRADO']" 
+               :key="tab"
+               @click="activeTab = tab"
+               class="flex-1 lg:flex-none px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+               :class="activeTab === tab ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-app-text-muted hover:text-app-text'"
+             >
+                {{ tab === 'TODO' ? 'Todos' : tab.toLowerCase() }}
+             </button>
+          </div>
           
           <!-- Filters & Sort -->
-           <div class="flex flex-col sm:flex-row w-full lg:w-auto gap-3 text-app-text">
+          <div class="flex flex-col sm:flex-row w-full lg:w-auto gap-3 text-app-text">
+             <div class="relative w-full sm:w-48">
+                <input 
+                  v-model="searchQuery" 
+                  type="text" 
+                  placeholder="Buscar asunto..." 
+                  class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-app-text focus:border-blue-500 outline-none transition-all text-xs"
+                >
+                <svg class="w-4 h-4 text-app-text-muted absolute right-4 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+             </div>
+             
+              <div class="relative w-full sm:w-48">
+                 <select 
+                    v-model="categoryFilter" 
+                    class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-app-text outline-none cursor-pointer focus:border-blue-500 transition-all text-xs appearance-none"
+                 >
+                    <option value="ALL">Todas las categorías</option>
+                    <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.nombre">{{ cat.nombre }}</option>
+                 </select>
+                 <svg class="w-4 h-4 text-app-text-muted absolute right-4 top-2.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+
               <div class="relative w-full sm:w-48">
                  <input 
-                   v-model="searchQuery" 
-                   type="text" 
-                   placeholder="BUSCAR_ASUNTO..." 
-                   class="w-full bg-app-secondary border-2 border-app-border px-4 py-2 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all uppercase tracking-widest text-xs"
+                    v-model="userSearchQuery" 
+                    type="text" 
+                    placeholder="Usuario solicitante..." 
+                    class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-app-text focus:border-blue-500 outline-none transition-all text-xs"
                  >
+                 <svg class="w-4 h-4 text-app-text-muted absolute right-4 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
               </div>
-                           <div class="relative w-full sm:w-48">
-                  <select 
-                     v-model="categoryFilter" 
-                     class="w-full bg-app-secondary border-2 border-app-border px-4 py-2 text-app-text outline-none cursor-pointer focus:bg-app-text focus:text-app-secondary transition-all uppercase tracking-widest text-xs appearance-none"
-                  >
-                     <option value="ALL">TODAS_LAS_CATEGORÍAS</option>
-                     <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.nombre">{{ cat.nombre.toUpperCase() }}</option>
-                  </select>
-               </div>
-
-               <div class="relative w-full sm:w-48">
-                  <input 
-                     v-model="userSearchQuery" 
-                     type="text" 
-                     placeholder="USUARIO_SOLICITANTE..." 
-                     class="w-full bg-app-secondary border-2 border-app-border px-4 py-2 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all uppercase tracking-widest text-xs"
-                  >
-               </div>
-                          <select 
-                 v-model="sortOrder" 
-                 class="w-full sm:w-48 bg-app-secondary border-2 border-app-border px-4 py-2 text-app-text outline-none cursor-pointer focus:bg-app-text focus:text-app-secondary transition-all uppercase tracking-widest text-xs appearance-none"
-              >
-                 <option value="NEWEST">RECIENTES</option>
-                 <option value="OLDEST">ANTIGUOS</option>
-              </select>
-           </div>
+             
+             <select 
+                v-model="sortOrder" 
+                class="w-full sm:w-48 bg-app-bg border border-app-border rounded-xl px-4 py-2.5 text-app-text outline-none cursor-pointer focus:border-blue-500 transition-all text-xs appearance-none"
+             >
+                <option value="NEWEST">Más Recientes</option>
+                <option value="OLDEST">Más Antiguos</option>
+             </select>
+          </div>
        </div>
 
-        <div v-if="filteredTickets.length === 0" class="text-center py-20 bg-app-secondary border-2 border-dashed border-app-border shadow-sm">
-          <p class="text-app-text-secondary font-black uppercase tracking-[0.2em] text-xs">[!] NO SE ENCONTRARON TICKETS COINCIDENTES</p>
-        </div>
+       <div v-if="filteredTickets.length === 0" class="text-center py-20 bg-app-surface border border-dashed border-app-border rounded-3xl shadow-sm">
+         <p class="text-app-text-muted font-black uppercase tracking-[0.2em] text-xs">No hay tickets que coincidan con la búsqueda.</p>
+       </div>
 
        <div v-else class="space-y-4">
-          <!-- Table Header (Desktop) - Only show if there are tickets -->
-          <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-app-secondary border-2 border-app-border mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-app-text-secondary">
-             <div class="col-span-1">> ID</div>
-             <div class="col-span-5">> ASUNTO / MENSAJE</div>
-             <div class="col-span-2">> CATEGORÍA</div>
-             <div class="col-span-2">> USUARIO</div>
-             <div class="col-span-2">> ESTADO</div>
-          </div>
+         <!-- Table Header (Desktop) - Only show if there are tickets -->
+         <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-4 bg-app-surface border border-app-border rounded-2xl mb-2 text-[10px] font-black uppercase tracking-widest text-app-text-muted">
+            <div class="col-span-1">ID</div>
+            <div class="col-span-5">Asunto / Mensaje</div>
+            <div class="col-span-2">Categoría</div>
+            <div class="col-span-2">Usuario</div>
+            <div class="col-span-2">Estado</div>
+         </div>
 
-          <div class="space-y-3">
-            <div 
-              v-for="ticket in filteredTickets" 
-              :key="ticket.id"
-              class="pixel-card hover:bg-app-text/5 px-8 py-4 transition-all flex flex-col md:grid md:grid-cols-12 md:items-center gap-4 group cursor-pointer relative overflow-hidden"
-              @click="openTicketDetails(ticket)"
-            >
-            <!-- ID -->
-            <div class="col-span-1">
-               <span class="text-[10px] font-black text-app-text-secondary group-hover:text-app-text transition-colors">#{{ ticket.codigo }}</span>
-            </div>
+         <div class="space-y-2">
+           <div 
+             v-for="ticket in filteredTickets" 
+             :key="ticket.id"
+             class="bg-app-surface border border-app-border hover:border-blue-500/30 hover:shadow-lg p-4 md:px-8 md:py-4 rounded-2xl transition-all flex flex-col md:grid md:grid-cols-12 md:items-center gap-4 group cursor-pointer relative overflow-hidden"
+             @click="openTicketDetails(ticket)"
+           >
+           <!-- Selection Indicator (Desktop) -->
+           <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 transform -translate-x-full group-hover:translate-x-0 transition-transform"></div>
 
-            <!-- Subject & Preview -->
-            <div class="col-span-5 min-w-0">
-               <div class="flex items-center space-x-2">
-                  <h3 class="text-sm font-bold text-app-text truncate group-hover:underline uppercase tracking-widest">{{ ticket.titulo }}</h3>
-                  <span v-if="ticket.tareaRelacionada" class="text-[9px] font-black bg-app-text text-app-bg px-1 border border-app-text">TK</span>
-               </div>
-               <p class="text-[11px] text-app-text-secondary truncate mt-0.5 font-medium uppercase tracking-tight">{{ ticket.mensaje }}</p>
-            </div>
+           <!-- ID -->
+           <div class="col-span-1">
+              <span class="text-[10px] font-black text-app-text-muted group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">#{{ ticket.codigo }}</span>
+           </div>
 
-            <!-- Category -->
-            <div class="col-span-2">
-               <span class="inline-flex px-2 py-0.5 border-2 border-app-border bg-app-secondary text-[9px] font-bold text-app-text-secondary uppercase tracking-widest">
-                  {{ ticket.categoria || 'SOPORTE' }}
-               </span>
-            </div>
+           <!-- Subject & Preview -->
+           <div class="col-span-5 min-w-0">
+              <div class="flex items-center space-x-2">
+                 <h3 class="text-sm font-bold text-app-text truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ ticket.titulo }}</h3>
+                 <!-- Icon for linked task -->
+                 <svg v-if="ticket.tareaRelacionada" class="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <p class="text-[11px] text-app-text-muted truncate mt-0.5 font-medium">{{ ticket.mensaje }}</p>
+           </div>
 
-            <!-- User & Date -->
-            <div class="col-span-2 flex flex-col">
-               <span class="text-xs font-bold text-app-text truncate uppercase tracking-widest">{{ ticket.usuario?.nombre || 'SIST.' }}</span>
-               <span class="text-[9px] text-app-text-secondary uppercase font-black tracking-widest mt-1">{{ formatDate(ticket.fechaCreacion).split(',')[0] }}</span>
-            </div>
+           <!-- Category -->
+           <div class="col-span-2">
+              <span class="inline-flex px-2 py-0.5 rounded-md bg-app-bg border border-app-border text-[9px] font-bold text-app-text-muted uppercase tracking-tight">
+                 {{ ticket.categoria || 'Soporte' }}
+              </span>
+           </div>
 
-            <!-- Status -->
-            <div class="col-span-2 text-right md:text-left">
-               <div 
-                 class="inline-flex items-center space-x-2 px-3 py-1 border-2 text-[10px] font-black tracking-widest uppercase"
-                 :class="getBadgeClass(ticket.estado)"
-               >
-                  <span>[ {{ ticket.estado }} ]</span>
-               </div>
-            </div>
+           <!-- User & Date -->
+           <div class="col-span-2 flex flex-col">
+              <span class="text-xs font-bold text-app-text truncate">{{ ticket.usuario?.nombre || 'Sist.' }}</span>
+              <span class="text-[9px] text-app-text-muted uppercase font-black tracking-tighter">{{ formatDate(ticket.fechaCreacion).split(',')[0] }}</span>
+           </div>
+
+           <!-- Status -->
+           <div class="col-span-2 text-right md:text-left">
+              <div 
+                class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border"
+                :class="getBadgeClass(ticket.estado)"
+              >
+                 <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="ticket.estado === 'CERRADO' ? 'bg-green-400' : (ticket.estado === 'EN PROCESO' ? 'bg-orange-400' : 'bg-blue-400')"></span>
+                 <span>{{ ticket.estado }}</span>
+              </div>
+           </div>
         </div> <!-- end space-y-2 list -->
       </div> <!-- end v-else tickets -->
     </div> <!-- end v-else main content -->
 
     <!-- Create Ticket Modal -->
     <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-app-bg/90" @click="showCreateModal = false"></div>
-      <div class="bg-app-secondary border-4 border-app-border p-10 w-full max-w-2xl relative z-10 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.2)]">
-        <h3 class="text-3xl font-black mb-1 text-app-text uppercase tracking-widest">>> NUEVO_TICKET</h3>
-        <p class="text-app-text-secondary mb-8 font-medium uppercase tracking-widest text-xs">> DESCRIBE EL INCIDENTE O SOLICITUD.</p>
+      <div class="absolute inset-0 bg-app-bg/80 backdrop-blur-md" @click="showCreateModal = false"></div>
+      <div class="bg-app-surface border border-app-border rounded-[2.5rem] p-10 w-full max-w-2xl relative z-10 shadow-2xl animate-pop-in">
+        <h3 class="text-3xl font-black mb-1 text-app-text">Nuevo Ticket</h3>
+        <p class="text-app-text-muted mb-8 font-medium">Describe tu problema o solicitud de cambio.</p>
 
         <form @submit.prevent="handleCreate" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-xs font-black text-app-text uppercase tracking-widest mb-2">CATEGORÍA / TEMA</label>
-              <select v-model="newTicket.categoria" class="w-full bg-app-secondary border-2 border-app-border px-6 py-4 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all cursor-pointer appearance-none uppercase tracking-widest">
-                 <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.nombre" class="bg-app-secondary">{{ cat.nombre.toUpperCase() }}</option>
-                 <option v-if="categoryStore.categories.length === 0" value="Soporte General" class="bg-app-secondary">SOPORTE GENERAL</option>
+              <label class="block text-xs font-black text-app-text-muted uppercase tracking-widest mb-2">Categoría / Tema</label>
+              <select v-model="newTicket.categoria" class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-4 text-app-text focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none">
+                 <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.nombre" class="bg-app-surface border-b border-app-border">{{ cat.nombre }}</option>
+                 <option v-if="categoryStore.categories.length === 0" value="Soporte General" class="bg-app-surface border-b border-app-border">Soporte General</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-black text-app-text uppercase tracking-widest mb-2">ASUNTO_ESPECÍFICO</label>
-              <input v-model="newTicket.titulo" required class="w-full bg-app-secondary border-2 border-app-border px-6 py-4 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all uppercase tracking-widest" placeholder="EJ: ERROR_CARGA_DIAGRAMA">
+              <label class="block text-xs font-black text-app-text-muted uppercase tracking-widest mb-2">Asunto Específico</label>
+              <input v-model="newTicket.titulo" required class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-4 text-app-text focus:border-blue-500 outline-none transition-all" placeholder="Ej: Error al cargar diagrama">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-black text-app-text uppercase tracking-widest mb-2">DETALLE_DE_LA_SOLICITUD</label>
-            <textarea v-model="newTicket.mensaje" rows="4" required class="w-full bg-app-secondary border-2 border-app-border px-6 py-4 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all custom-scrollbar uppercase tracking-widest" placeholder="EXPLICA_DETALLADAMENTE..."></textarea>
+            <label class="block text-xs font-black text-app-text-muted uppercase tracking-widest mb-2">Detalle de la solicitud</label>
+            <textarea v-model="newTicket.mensaje" rows="4" required class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-4 text-app-text focus:border-blue-500 outline-none transition-all custom-scrollbar" placeholder="Explica detalladamente qué sucede..."></textarea>
           </div>
           <div>
-            <label class="block text-xs font-black text-app-text uppercase tracking-widest mb-2">ADJUNTAR_IMAGEN (OPCIONAL)</label>
-            <input type="file" @change="handleFileChange" accept="image/*" class="w-full bg-app-secondary border-2 border-dashed border-app-border px-6 py-3 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all text-xs cursor-pointer uppercase tracking-widest">
+            <label class="block text-xs font-black text-app-text-muted uppercase tracking-widest mb-2">Adjuntar Imagen / Captura (Opcional)</label>
+            <input type="file" @change="handleFileChange" accept="image/*" class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-3 text-app-text focus:border-blue-500 outline-none transition-all text-xs cursor-pointer">
           </div>
           <div class="flex space-x-4 pt-6">
-            <button type="button" @click="showCreateModal = false" class="flex-1 py-4 font-black uppercase text-xs tracking-widest text-app-text hover:bg-app-text hover:text-app-bg border-2 border-app-border transition-colors bg-app-secondary">[ CANCELAR ]</button>
-            <button type="submit" class="flex-1 py-4 bg-app-text border-2 border-app-text text-app-bg font-black uppercase text-xs tracking-widest hover:bg-app-secondary hover:text-app-text transition-all">[ ENVIAR_TICKET ]</button>
+            <button type="button" @click="showCreateModal = false" class="flex-1 py-4 font-black uppercase text-xs tracking-widest text-app-text-muted hover:text-app-text transition-colors">Cancelar</button>
+            <button type="submit" class="flex-1 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:opacity-90 transition-all shadow-lg shadow-blue-500/30">Enviar Ticket</button>
           </div>
         </form>
       </div>
@@ -193,111 +204,116 @@
 
     <!-- Ticket Detail & Thread Modal -->
     <div v-if="selectedTicket" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-app-bg/90" @click="selectedTicket = null"></div>
-      <div class="bg-app-secondary border-4 border-app-border p-8 w-full max-w-3xl relative z-10 shadow-[10px_10px_0px_0px_rgba(0,255,65,0.1)] flex flex-col max-h-[90vh]">
+      <div class="absolute inset-0 bg-app-bg/80 backdrop-blur-md" @click="selectedTicket = null"></div>
+      <div class="bg-app-surface border border-app-border rounded-[2.5rem] p-8 w-full max-w-3xl relative z-10 shadow-2xl flex flex-col max-h-[90vh]">
         <!-- Header -->
-        <div class="flex justify-between items-start mb-6 shrink-0 border-b-2 border-app-border pb-4">
+        <div class="flex justify-between items-start mb-6 shrink-0">
            <div>
               <div class="flex items-center space-x-3 mb-2">
-                 <span class="text-[10px] bg-app-secondary text-app-text-secondary font-bold uppercase shrink-0 px-2 py-0.5 border-2 border-app-border tracking-widest">{{ selectedTicket.categoria || 'SOPORTE GENERAL' }}</span>
-                 <span class="text-[10px] text-app-text-secondary font-bold uppercase tracking-widest">ID:#{{ selectedTicket.codigo }}</span>
+                 <span class="text-[10px] bg-app-bg text-app-text-muted font-bold uppercase shrink-0 px-2 py-1 rounded-md border border-app-border">{{ selectedTicket.categoria || 'Soporte General' }}</span>
+                 <span class="text-[10px] text-app-text-muted font-bold uppercase tracking-widest">#{{ selectedTicket.codigo }}</span>
               </div>
               <div class="flex flex-col md:flex-row md:items-center md:space-x-3 gap-2">
-                 <h3 class="text-2xl font-black text-app-text uppercase tracking-widest">>> {{ selectedTicket.titulo }}</h3>
+                 <h3 class="text-2xl font-black text-app-text">{{ selectedTicket.titulo }}</h3>
                  <div v-if="authStore.isAdmin" class="flex">
                      <button 
                         v-if="!selectedTicket.tareaRelacionada" 
                         @click="creatingTaskFromTicket = true"
-                        class="bg-app-secondary text-app-text border-2 border-app-border px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-app-text hover:text-app-secondary"
-                        title="CONVERTIR"
+                        class="bg-purple-600/10 text-purple-600 dark:text-purple-400 hover:bg-purple-600/20 border border-purple-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors flex items-center space-x-1"
+                        title="Convertir ticket en tarea de proyecto"
                      >
-                        [ CONVERTIR_A_TAREA ]
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span>Convertir a Tarea Kanban</span>
                      </button>
-                     <span v-else class="text-app-text bg-app-text/10 border-2 border-app-text px-3 py-1.5 text-[10px] font-black uppercase tracking-widest flex items-center space-x-1">
-                         <span>[ VINCULADO ]</span>
+                     <span v-else class="bg-green-600/10 text-green-600 dark:text-green-500 border border-green-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center space-x-1">
+                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                         <span>Vinculado a Tarea</span>
                      </span>
                  </div>
               </div>
            </div>
-           <button @click="selectedTicket = null" class="p-2 border-2 border-app-border text-app-text hover:bg-app-text hover:text-app-secondary transition-colors">
-              [X]
+           <button @click="selectedTicket = null" class="p-2 text-app-text-muted hover:text-app-text transition-colors bg-app-bg rounded-full border border-app-border">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
            <!-- Original Message -->
-           <div class="bg-app-secondary p-5 border-2 border-app-border text-app-text">
-               <div class="flex items-center justify-between mb-3 border-b-2 border-app-border pb-3">
+           <div class="bg-app-bg p-5 rounded-2xl border border-app-border text-app-text">
+               <div class="flex items-center justify-between mb-3 border-b border-app-border pb-3">
                   <div class="flex items-center space-x-2">
-                     <span class="w-6 h-6 border-2 border-app-border bg-app-text flex items-center justify-center text-[10px] font-black text-app-bg uppercase">{{ selectedTicket.usuario?.nombre?.slice(0, 1) || '?' }}</span>
-                     <span class="font-bold text-sm text-app-text uppercase tracking-widest">{{ selectedTicket.usuario?.nombre || 'SISTEMA' }}</span>
+                     <span class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[8px] font-black text-white uppercase">{{ selectedTicket.usuario?.nombre?.slice(0, 2) || 'UK' }}</span>
+                     <span class="font-bold text-sm text-app-text">{{ selectedTicket.usuario?.nombre || 'Desconocido' }}</span>
                   </div>
-                  <span class="text-[10px] font-black text-app-text-secondary uppercase tracking-widest">{{ formatDate(selectedTicket.fechaCreacion) }}</span>
+                  <span class="text-[10px] font-black text-app-text-muted uppercase tracking-widest">{{ formatDate(selectedTicket.fechaCreacion) }} (Apertura)</span>
                </div>
-               <p class="whitespace-pre-wrap text-sm leading-relaxed text-app-text uppercase tracking-widest">{{ selectedTicket.mensaje }}</p>
+               <p class="whitespace-pre-wrap text-sm leading-relaxed text-app-text-muted font-medium">{{ selectedTicket.mensaje }}</p>
 
                <div v-if="selectedTicket.imagenUrl" class="mt-4">
                  <a :href="`http://localhost:3000${selectedTicket.imagenUrl}`" target="_blank" class="inline-block relative group/img cursor-pointer">
-                    <img :src="`http://localhost:3000${selectedTicket.imagenUrl}`" alt="Adjunto" class="h-32 w-auto border-2 border-app-border group-hover:brightness-125 transition-all object-cover">
+                    <img :src="`http://localhost:3000${selectedTicket.imagenUrl}`" alt="Adjunto" class="h-32 w-auto rounded-lg border border-app-border group-hover/img:brightness-110 transition-all object-cover">
                  </a>
               </div>
            </div>
 
            <!-- Thread replies -->
            <div class="space-y-4 pt-4">
-              <h4 class="text-[10px] font-black text-app-text-secondary uppercase tracking-[0.2em] mb-4">> HILO_DE_RESPUESTAS</h4>
+              <h4 class="text-[10px] font-black text-app-text-muted uppercase tracking-widest mb-4">Hilo de Respuestas</h4>
               
-              <div v-if="!selectedTicket.respuestas || selectedTicket.respuestas.length === 0" class="text-center py-8 text-app-text-secondary text-sm font-medium border-2 border-dashed border-app-border bg-app-secondary uppercase tracking-widest">
-                 [ SIN RESPUESTAS HASTA EL MOMENTO ]
+              <div v-if="!selectedTicket.respuestas || selectedTicket.respuestas.length === 0" class="text-center py-8 text-app-text-muted text-sm font-medium italic border border-dashed border-app-border rounded-2xl bg-app-bg/50">
+                 Nadie ha respondido a este ticket aún.
               </div>
 
               <div 
                   v-for="(reply, idx) in (selectedTicket.respuestas || [])" 
                   :key="idx"
-                  class="bg-app-secondary p-5 border-2 border-app-border flex flex-col transition-all"
-                  :class="{'border-app-text bg-app-text/5': reply.isAdmin}"
+                  class="bg-app-bg p-5 rounded-2xl border border-app-border flex flex-col group/reply transition-all"
+                  :class="{'bg-blue-600/5 border-blue-500/20': reply.isAdmin}"
               >
                   <div class="flex justify-between items-center mb-2">
                      <div class="flex items-center space-x-2">
-                        <span class="font-bold text-xs uppercase tracking-widest" :class="reply.isAdmin ? 'text-app-text' : 'text-app-text'">{{ reply.usuarioNombre }}</span>
-                        <span v-if="reply.isAdmin" class="bg-app-text text-app-bg text-[8px] px-1.5 py-0.5 font-black tracking-widest uppercase">ADMIN</span>
+                        <span class="font-bold text-xs" :class="reply.isAdmin ? 'text-blue-600 dark:text-blue-400' : 'text-app-text'">{{ reply.usuarioNombre }}</span>
+                        <span v-if="reply.isAdmin" class="bg-blue-600/10 text-blue-600 dark:text-blue-400 text-[8px] px-1.5 py-0.5 rounded font-black tracking-widest uppercase">Admin / Staff</span>
                      </div>
-                     <span class="text-[9px] text-app-text-secondary font-black uppercase tracking-widest">{{ formatDate(reply.fecha) }}</span>
+                     <span class="text-[9px] text-app-text-muted font-black uppercase tracking-widest">{{ formatDate(reply.fecha) }}</span>
                   </div>
-                  <p class="text-sm text-app-text font-medium whitespace-pre-wrap leading-relaxed uppercase tracking-widest">{{ reply.mensaje }}</p>
+                  <p class="text-sm text-app-text-muted font-medium whitespace-pre-wrap leading-relaxed">{{ reply.mensaje }}</p>
               </div>
            </div>
         </div>
 
         <!-- Add Reply Box -->
-        <div class="mt-6 pt-6 border-t-2 border-app-border shrink-0">
+        <div class="mt-6 pt-6 border-t border-app-border shrink-0">
            <form @submit.prevent="submitReply" class="flex flex-col gap-3">
                <textarea 
                   v-model="newReply" 
                   rows="2" 
-                  class="w-full bg-app-secondary border-2 border-app-border px-5 py-3 text-app-text focus:bg-app-text focus:text-app-secondary outline-none transition-all custom-scrollbar text-sm uppercase tracking-widest" 
-                  placeholder="ESCRIBE_UNA_RESPUESTA..."
+                  class="w-full bg-app-bg border border-app-border rounded-2xl px-5 py-3 text-app-text focus:border-blue-500 outline-none transition-all custom-scrollbar text-sm" 
+                  placeholder="Escribe una respuesta para el ticket..."
                   required
                ></textarea>
                <div class="flex justify-between items-center">
                   <div class="flex items-center space-x-3">
-                      <span class="text-[10px] text-app-text-secondary font-black uppercase tracking-widest">ESTADO_INCIDENCIA:</span>
+                      <span class="text-xs text-app-text-muted font-black uppercase tracking-widest">Marcando ticket como:</span>
                       <select 
                         v-model="newReplyStatus"
-                        class="bg-app-secondary border-2 border-app-border px-3 py-1.5 text-[10px] text-app-text outline-none cursor-pointer focus:bg-app-text focus:text-app-secondary transition-all font-black tracking-widest uppercase"
+                        class="bg-app-bg border border-app-border rounded-lg px-3 py-1.5 text-xs text-app-text outline-none cursor-pointer focus:border-blue-500 transition-all font-black tracking-widest"
                         :disabled="!authStore.isAdmin"
+                        :class="!authStore.isAdmin ? 'opacity-70 cursor-not-allowed' : ''"
                       >
-                         <option value="ABIERTO">ABIERTO</option>
-                         <option value="EN PROCESO">EN PROCESO</option>
-                         <option value="CERRADO">CERRADO</option>
+                         <option value="ABIERTO" class="text-blue-400">ABIERTO</option>
+                         <option value="EN PROCESO" class="text-orange-400">EN PROCESO</option>
+                         <option value="CERRADO" class="text-green-400">CERRADO</option>
                       </select>
                   </div>
                   <button 
                      type="submit" 
-                     class="px-8 py-3 bg-app-text text-app-bg border-2 border-app-text font-black uppercase tracking-widest text-[10px] hover:bg-app-secondary hover:text-app-text transition-all"
+                     class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-blue-500 transition-all flex items-center space-x-2 shadow-lg shadow-blue-500/20"
                      :disabled="isSubmittingReply"
+                     :class="{'opacity-50 cursor-not-allowed': isSubmittingReply}"
                    >
-                     <span>[ RESPONDER ]</span>
+                     <span>Responder</span>
+                     <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                   </button>
                </div>
            </form>
@@ -307,21 +323,21 @@
       
       <!-- Mini modal to select project and convert ticket to task -->
       <div v-if="creatingTaskFromTicket" class="absolute inset-0 z-50 flex items-center justify-center p-4">
-         <div class="absolute inset-0 bg-app-bg/90" @click="creatingTaskFromTicket = false"></div>
-         <div class="bg-app-secondary border-4 border-app-border p-8 w-full max-w-sm relative z-10 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.2)]">
-            <h4 class="text-lg font-black text-app-text mb-2 uppercase tracking-widest">> VINCULAR_TAREA</h4>
-            <p class="text-xs text-app-text-secondary mb-6 font-medium uppercase tracking-widest">> SELECCIONA_PROYECTO_DESTINO.</p>
+         <div class="absolute inset-0 bg-app-bg/90 backdrop-blur-xl" @click="creatingTaskFromTicket = false"></div>
+         <div class="bg-app-surface border border-purple-500/30 rounded-3xl p-8 w-full max-w-sm relative z-10 shadow-2xl shadow-purple-900/20">
+            <h4 class="text-lg font-black text-app-text mb-2">Convertir Ticket a Tarea</h4>
+            <p class="text-xs text-app-text-muted mb-6 font-medium">Selecciona el proyecto donde se registrará la tarea para solucionar este incidente.</p>
             
-            <select v-model="selectedProjectIdForTask" class="w-full bg-app-secondary border-2 border-app-border px-4 py-3 text-app-text outline-none transition-all text-sm mb-6 cursor-pointer appearance-none uppercase tracking-widest focus:bg-app-text focus:text-app-secondary">
-               <option disabled value="">SELECCIONAR...</option>
-               <option v-for="proj in projectStore.projects" :key="proj.id" :value="proj.id" class="bg-app-secondary">{{ proj.nombre.toUpperCase() }}</option>
+            <select v-model="selectedProjectIdForTask" class="w-full bg-app-bg border border-app-border rounded-xl px-4 py-3 text-app-text focus:border-purple-500 outline-none transition-all text-sm mb-6 cursor-pointer">
+               <option disabled value="">Seleccionar Proyecto...</option>
+               <option v-for="proj in projectStore.projects" :key="proj.id" :value="proj.id" class="bg-app-bg">{{ proj.nombre }}</option>
             </select>
             
             <div class="flex space-x-3">
-               <button @click="creatingTaskFromTicket = false" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-app-text hover:bg-app-text hover:text-app-secondary border-2 border-app-border transition-colors">[ CANCELAR ]</button>
-               <button @click="createTaskFromTicket" :disabled="!selectedProjectIdForTask || isConvertingTask" class="flex-1 py-3 bg-app-text border-2 border-app-text text-app-bg text-xs font-black uppercase tracking-widest hover:bg-app-secondary hover:text-app-text transition-all">
-                   <span v-if="!isConvertingTask">[ VINCULAR ]</span>
-                   <div v-else class="text-[10px] animate-pulse">CARGANDO...</div>
+               <button @click="creatingTaskFromTicket = false" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-app-text-muted hover:text-app-text transition-colors">Cancelar</button>
+               <button @click="createTaskFromTicket" :disabled="!selectedProjectIdForTask || isConvertingTask" class="flex-1 py-3 bg-purple-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-purple-500 transition-colors disabled:opacity-50 flex justify-center items-center">
+                   <span v-if="!isConvertingTask">Vincular Tarea</span>
+                   <div v-else class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                </button>
             </div>
          </div>
@@ -528,9 +544,9 @@ const getIconBgClass = (estado) => {
 }
 
 const getBadgeClass = (estado) => {
-    if (estado === 'CERRADO') return 'border-2 border-green-500 text-green-500 bg-green-500/10'
-    if (estado === 'EN PROCESO') return 'border-2 border-yellow-500 text-yellow-500 bg-yellow-500/10'
-    return 'border-2 border-blue-500 text-blue-500 bg-blue-500/10'
+    if (estado === 'CERRADO') return 'border-green-500/30 text-green-400 bg-green-500/10 focus:border-green-500'
+    if (estado === 'EN PROCESO') return 'border-orange-500/30 text-orange-400 bg-orange-500/10 focus:border-orange-500'
+    return 'border-blue-500/30 text-blue-400 bg-blue-500/10 focus:border-blue-500'
 }
 
 </script>
@@ -542,9 +558,10 @@ const getBadgeClass = (estado) => {
 }
 .animate-pop-in { animation: pop-in 0.3s cubic-bezier(0, 0, 0.2, 1); }
 
-.custom-scrollbar::-webkit-scrollbar { width: 8px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-primary); }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--text-secondary); border: 2px solid var(--bg-primary); }
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.6); }
 
 /* Make select look consistent */
 select {

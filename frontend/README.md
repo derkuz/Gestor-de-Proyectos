@@ -56,24 +56,3 @@ Para probar el sistema de **Roles y Permisos (RBAC)**, puedes utilizar las sigui
 | **Líder (PM)** | `pm@gptt.com` | `pm123` | Gestiona proyectos y tareas. Sin acceso a categorías. |
 | **Colaborador** | `colab@gptt.com` | `colab123` | Crea subtareas y documentación. Responde tickets autorizados. |
 | **Externo** | `externo@gptt.com` | `ext123` | Solo crea sus tickets y ve el progreso del proyecto (Lectura). |
-
--- Insertar Administrador
-INSERT INTO "user" (email, password, nombre, rol) 
-VALUES ('admin@ejemplo.com', '$2b$10$EpJ6Tf.B.C6G7yP6U6G6Uu8v8z8z8z8z8z8z8z8z8z8z8z8z8z8z8', 'Admin Sistema', 'ADMIN');
-
--- Insertar Project Manager
-INSERT INTO "user" (email, password, nombre, rol) 
-VALUES ('pm@ejemplo.com', '$2b$10$EpJ6Tf.B.C6G7yP6U6G6Uu8v8z8z8z8z8z8z8z8z8z8z8z8z8z8z8', 'Gerente de Proyectos', 'PROJECT_MANAGER');
-
--- Insertar Colaborador (Desarrollador)
-INSERT INTO "user" (email, password, nombre, rol) 
-VALUES ('dev@ejemplo.com', '$2b$10$EpJ6Tf.B.C6G7yP6U6G6Uu8v8z8z8z8z8z8z8z8z8z8z8z8z8z8z8', 'Desarrollador Senior', 'COLABORADOR');
-
--- Insertar Usuario Externo (Cliente)
-INSERT INTO "user" (email, password, nombre, rol) 
-VALUES ('cliente@ejemplo.com', '$2b$10$EpJ6Tf.B.C6G7yP6U6G6Uu8v8z8z8z8z8z8z8z8z8z8z8z8z8z8z8', 'Cliente VIP', 'EXTERNO');
-
-password123
-
-
-docker exec -i sgpt_db_container psql -U postgres -d sgpt_db < init-users.sql
