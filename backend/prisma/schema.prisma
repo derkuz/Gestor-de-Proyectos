@@ -43,6 +43,8 @@ model Empresa {
   tickets       Ticket[]
   categorias    Category[]
   logs          ActivityLog[]
+
+  @@map("empresa")
 }
 
 model User {
@@ -62,6 +64,8 @@ model User {
   tickets           Ticket[]
   proyectos         Project[] @relation("ProjectToUser")
   tasks             Task[]    @relation("TaskToUser")
+
+  @@map("user")
 }
 
 model Project {
@@ -78,6 +82,8 @@ model Project {
   tareas         Task[]
   documentos     Documentation[]
   usuarios       User[]        @relation("ProjectToUser")
+
+  @@map("project")
 }
 
 model Task {
@@ -99,6 +105,8 @@ model Task {
 
   asignados        User[]       @relation("TaskToUser")
   ticket           Ticket?
+
+  @@map("task")
 }
 
 model Ticket {
@@ -123,6 +131,8 @@ model Ticket {
 
   tareaRelacionadaId   String?   @unique
   tareaRelacionada     Task?     @relation(fields: [tareaRelacionadaId], references: [id])
+
+  @@map("ticket")
 }
 
 model Documentation {
@@ -134,6 +144,8 @@ model Documentation {
 
   proyectoId         Int
   proyecto           Project  @relation(fields: [proyectoId], references: [id])
+
+  @@map("documentation")
 }
 
 model Category {
@@ -142,6 +154,8 @@ model Category {
   empresaId String
   empresa   Empresa  @relation(fields: [empresaId], references: [id])
   tickets   Ticket[]
+
+  @@map("category")
 }
 
 model ActivityLog {
@@ -155,4 +169,6 @@ model ActivityLog {
 
   empresaId String
   empresa   Empresa  @relation(fields: [empresaId], references: [id])
+
+  @@map("activity_log")
 }

@@ -4,9 +4,9 @@ services:
     container_name: sgpt_db_container
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: sgpt_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5434:5432"
     volumes:
@@ -21,15 +21,15 @@ services:
     container_name: sgpt_backend
     restart: always
     environment:
-      - PORT=3000
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=sgpt_db
-      - JWT_SECRET=algun_secreto_muy_seguro
+      - PORT=${PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
     ports:
-      - "3000:3000"
+      - "${PORT}:${PORT}"
     volumes:
       - ./backend/uploads:/app/uploads
     depends_on:
@@ -41,12 +41,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
     container_name: sgpt_frontend
     restart: always
     ports:
       - "8080:80"
     environment:
-      - VITE_API_URL=http://localhost:3000
+      - VITE_API_URL=${VITE_API_URL}
     depends_on:
       - backend
     networks:

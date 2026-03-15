@@ -5,14 +5,15 @@ docker compose down -v
 
 Write-Host ""
 Write-Host "Iniciando servicios..." -ForegroundColor Cyan
-docker compose up --build
+docker compose up -d --build
 
 Write-Host ""
-Write-Host "Esperando a que el sistema este listo..." -ForegroundColor Gray
-Start-Sleep -Seconds 5
+Write-Host "Esperando a que el sistema esté listo y se sincronice la DB (20s)..." -ForegroundColor Gray
+Start-Sleep -Seconds 20
 
-## Crea los usuarios.
-docker compose exec backend npx prisma db seed
+## Crea los usuarios usando el script SQL.
+Write-Host "Cargando usuarios base (SQL)..." -ForegroundColor Magenta
+Get-Content init-users.sql | docker exec -i sgpt_db_container psql -U postgres -d sgpt_db
 
 Clear-Host
 Write-Host "------------------------------------------------" -ForegroundColor Cyan
