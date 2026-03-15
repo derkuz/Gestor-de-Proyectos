@@ -1,71 +1,61 @@
 <template>
   <div class="min-h-screen bg-app-bg text-app-text flex overflow-hidden transition-colors duration-300">
     <!-- Sidebar -->
-    <aside class="w-64 bg-app-surface/50 backdrop-blur-xl border-r border-app-border flex flex-col z-20 transition-all">
-      <div class="p-8 flex items-center justify-between">
-        <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500 tracking-tighter">
-          PRISMA
+    <aside class="w-64 bg-app-secondary border-r-2 border-app-border flex flex-col z-20">
+      <div class="p-8 flex items-center justify-between border-b-2 border-app-border">
+        <h1 class="text-3xl font-black text-app-text tracking-widest">
+          [PRISMA]
         </h1>
         
         <!-- Theme Toggle -->
         <button 
           @click="themeStore.toggleTheme" 
-          class="p-2 rounded-xl bg-app-bg border border-app-border hover:bg-app-surface transition-all text-app-text-muted hover:text-app-text"
-          title="Cambiar tema"
+          class="p-1 border-2 border-app-border hover:bg-app-text hover:text-app-bg transition-colors text-app-text"
+          title="Modo"
         >
-          <SunIcon v-if="themeStore.theme === 'dark'" class="w-4 h-4" />
-          <MoonIcon v-else class="w-4 h-4" />
+          {{ themeStore.theme === 'dark' ? '[#]' : '[O]' }}
         </button>
       </div>
 
-      <nav class="flex-1 px-4 space-y-2">
+      <nav class="flex-1 px-2 py-4 space-y-1">
         <router-link 
           v-for="item in menuItems" 
           :key="item.path"
           :to="item.path"
-          class="flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all group"
-          :class="$route.path === item.path ? 'bg-purple-600/10 text-purple-600 dark:text-purple-400 border border-purple-500/20' : 'text-app-text-muted hover:bg-app-surface hover:text-app-text'"
+          class="flex items-center space-x-2 px-4 py-2 border-2 border-transparent transition-all group"
+          :class="$route.path === item.path ? 'border-app-border bg-app-text/10 text-app-text' : 'text-app-text-secondary hover:border-app-border hover:text-app-text'"
         >
-          <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110" />
-          <span class="font-bold tracking-wide">{{ item.name }}</span>
+          <span v-if="$route.path === item.path" class="text-app-text">></span>
+          <span v-else class="invisible">></span>
+          <span class="font-bold tracking-widest uppercase">{{ item.name }}</span>
         </router-link>
       </nav>
 
-      <div class="p-4 border-t border-app-border">
-        <div class="flex items-center space-x-3 p-4 rounded-3xl bg-app-surface/50 border border-app-border shadow-sm">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center font-black text-white shadow-lg">
+      <div class="p-4 border-t-2 border-app-border bg-app-secondary">
+        <div class="flex items-center space-x-3 p-3 border-2 border-app-border">
+          <div class="w-8 h-8 border-2 border-app-border flex items-center justify-center font-black text-app-text">
             {{ auth.user?.nombre?.charAt(0) }}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold truncate">{{ auth.user?.nombre }}</p>
-            <p class="text-[10px] text-app-text-muted font-medium uppercase tracking-widest">{{ auth.user?.rol }}</p>
+            <p class="text-xs font-bold truncate uppercase">{{ auth.user?.nombre }}</p>
+            <p class="text-[10px] text-app-text-secondary font-medium uppercase tracking-[0.2em]">{{ auth.user?.rol }}</p>
           </div>
         </div>
         
         <button 
           @click="handleLogout"
-          class="w-full mt-4 flex items-center justify-center space-x-2 py-3 text-app-text-muted hover:text-red-500 transition-colors font-bold text-sm"
+          class="w-full mt-4 flex items-center justify-center space-x-2 py-2 border-2 border-transparent hover:border-red-500 hover:text-red-500 transition-colors font-bold text-xs uppercase"
         >
-          <LogoutIcon class="w-4 h-4" />
-          <span>Cerrar Sesión</span>
+          <span>_ CERRAR SESIÓN</span>
         </button>
       </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 relative overflow-y-auto bg-app-bg custom-scrollbar transition-colors duration-300">
-      <!-- Background Blobs -->
-      <div class="fixed top-0 -left-20 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-[0.05] dark:opacity-10 pointer-events-none transition-opacity"></div>
-      <div class="fixed bottom-0 -right-20 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-[0.05] dark:opacity-10 pointer-events-none transition-opacity"></div>
-
+    <main class="flex-1 relative overflow-y-auto bg-app-bg custom-scrollbar">
       <div class="p-8 md:p-12 relative z-10">
         <router-view v-slot="{ Component }">
-          <transition 
-            name="fade-slide" 
-            mode="out-in"
-          >
-            <component :is="Component" />
-          </transition>
+          <component :is="Component" />
         </router-view>
       </div>
     </main>
@@ -121,32 +111,16 @@ const handleLogout = () => {
   router.push('/login')
 }
 </script>
-
-<style>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-
+<style scoped>
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-primary);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 10px;
+  background: var(--text-secondary);
+  border: 2px solid var(--bg-primary);
 }
 </style>
 

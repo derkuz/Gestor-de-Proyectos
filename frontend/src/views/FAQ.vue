@@ -1,52 +1,52 @@
 <template>
   <div class="faq-container space-y-10 animate-fade-in">
-    <header>
-      <h2 class="text-3xl font-black text-slate-900 dark:text-white">Centro de Ayuda PRISMA</h2>
-      <p class="text-slate-500 dark:text-slate-400 mt-2">Manuales de usuario y preguntas frecuentes según tu nivel de acceso.</p>
+    <header class="mb-10 border-b-4 border-app-border pb-6">
+      <h2 class="text-4xl font-black text-app-text tracking-widest uppercase mb-1">> CENTRO_DE_SOPORTE_PRISMA</h2>
+      <p class="text-app-text-secondary text-[10px] font-black uppercase tracking-widest leading-relaxed">> MANUALES_DE_USUARIO // PREGUNTAS_FRECUENTES</p>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <!-- Filtros de Roles (Solo visibles para quienes tienen el rol o superior) -->
       <aside class="md:col-span-1 space-y-4">
-        <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest px-2">Guías Disponibles</h4>
+        <h4 class="text-[10px] font-black text-app-text-secondary uppercase tracking-[0.2em] px-2">> GUÍAS_SISTEMA</h4>
         <nav class="space-y-2">
           <button 
             v-for="roleGroup in visibleFaqGroups" 
             :key="roleGroup.id"
             @click="activeGroupId = roleGroup.id"
-            :class="activeGroupId === roleGroup.id ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/5'"
-            class="w-full text-left p-4 rounded-2xl transition-all font-bold text-sm flex items-center justify-between group"
+            :class="activeGroupId === roleGroup.id ? 'bg-app-text text-app-bg shadow-[6px_6px_0px_0px_rgba(0,255,65,0.1)]' : 'bg-app-secondary text-app-text hover:bg-app-text hover:text-app-bg border-2 border-app-border'"
+            class="w-full text-left p-4 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-between group"
           >
             {{ roleGroup.title }}
-            <svg class="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="opacity-50 group-hover:translate-x-1 transition-transform">>></span>
           </button>
         </nav>
       </aside>
 
       <!-- Contenido de las FAQ -->
       <main class="md:col-span-2 space-y-6">
-        <div v-if="activeGroup" class="bg-white dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-xl">
-          <div class="flex items-center gap-4 mb-8">
-            <div :class="activeGroup.color" class="p-3 rounded-2xl">
-              <component :is="activeGroup.icon" class="w-6 h-6 text-white" />
+        <div v-if="activeGroup" class="pixel-card p-10">
+          <div class="flex items-center gap-6 mb-10 border-b-2 border-app-border pb-6">
+            <div class="w-16 h-16 bg-app-text text-app-bg flex items-center justify-center text-4xl font-black border-4 border-app-border">
+               ?
             </div>
             <div>
-              <h3 class="text-2xl font-black text-slate-900 dark:text-white">{{ activeGroup.title }}</h3>
-              <p class="text-sm text-slate-500">{{ activeGroup.description }}</p>
+              <h3 class="text-3xl font-black text-app-text uppercase tracking-widest">{{ activeGroup.title }}</h3>
+              <p class="text-[10px] text-app-text-secondary font-black uppercase tracking-widest leading-normal">> {{ activeGroup.description }}</p>
             </div>
           </div>
 
           <div class="space-y-4">
-            <div v-for="(item, index) in activeGroup.items" :key="index" class="border-b border-slate-100 dark:border-white/5 last:border-0 pb-4">
+            <div v-for="(item, index) in activeGroup.items" :key="index" class="border-2 border-app-border bg-app-bg/10 p-4 hover:bg-app-text/5 transition-all">
               <button 
                 @click="toggleItem(index)"
-                class="w-full text-left flex justify-between items-center py-4 group"
+                class="w-full text-left flex justify-between items-center py-2 group"
               >
-                <span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-500 transition-colors">{{ item.question }}</span>
-                <svg :class="openItems.includes(index) ? 'rotate-180' : ''" class="w-5 h-5 text-slate-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="font-black text-app-text uppercase tracking-widest text-sm group-hover:text-app-text/80 transition-colors">>> {{ item.question }}</span>
+                <span class="text-app-text font-black transition-transform" :class="openItems.includes(index) ? 'rotate-180' : ''">V</span>
               </button>
               <transition name="expand">
-                <div v-if="openItems.includes(index)" class="pb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed space-y-3 prose dark:prose-invert max-w-none">
+                <div v-if="openItems.includes(index)" class="pt-4 border-t-2 border-app-border mt-2 text-sm text-app-text/90 leading-relaxed space-y-3 uppercase tracking-widest bg-app-secondary/50 p-4">
                   <div v-html="item.answer"></div>
                 </div>
               </transition>

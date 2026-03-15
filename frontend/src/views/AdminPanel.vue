@@ -1,62 +1,62 @@
 <template>
   <div class="space-y-10">
     <!-- Header with Tabs -->
-    <header class="flex flex-col md:flex-row justify-between md:items-center gap-6">
+    <header class="flex flex-col md:flex-row justify-between md:items-center gap-6 mb-10 border-b-4 border-app-border pb-6">
       <div>
-        <h2 class="text-3xl font-black">PRISMA — Administración</h2>
-        <p class="text-slate-400 mt-1">Configuración global del sistema y gestión de usuarios</p>
+        <h2 class="text-4xl font-black text-app-text tracking-widest uppercase mb-1">> PRISMA_ADMIN</h2>
+        <p class="text-app-text-secondary text-[10px] font-black uppercase tracking-widest leading-relaxed">> CONFIGURACIÓN_GLOBAL // GESTIÓN_DE_SISTEMAS</p>
       </div>
       
-      <div class="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 backdrop-blur-sm overflow-x-auto no-scrollbar">
+      <div class="flex flex-wrap gap-2 bg-app-secondary p-2 border-2 border-app-border">
         <button 
           v-if="auth.isSuperAdmin"
           @click="activeTab = 'companies'"
-          :class="activeTab === 'companies' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+          :class="activeTab === 'companies' ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
+          class="px-5 py-2 border-2 border-transparent hover:border-app-border font-black text-xs uppercase tracking-widest transition-all"
         >
-          Empresas
+          [ EMPRESAS ]
         </button>
         <button 
           @click="activeTab = 'dashboard'"
-          :class="activeTab === 'dashboard' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+          :class="activeTab === 'dashboard' ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
+          class="px-5 py-2 border-2 border-transparent hover:border-app-border font-black text-xs uppercase tracking-widest transition-all text-emerald-500"
         >
-          Dashboard
+          [ STATS ]
         </button>
         <button 
           @click="activeTab = 'categories'"
-          :class="activeTab === 'categories' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+          :class="activeTab === 'categories' ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
+          class="px-5 py-2 border-2 border-transparent hover:border-app-border font-black text-xs uppercase tracking-widest transition-all text-blue-500"
         >
-          Tickets
+          [ TICKETS ]
         </button>
         <button 
           @click="activeTab = 'users'"
-          :class="activeTab === 'users' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+          :class="activeTab === 'users' ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
+          class="px-5 py-2 border-2 border-transparent hover:border-app-border font-black text-xs uppercase tracking-widest transition-all text-indigo-500"
         >
-          Usuarios
+          [ USUARIOS ]
         </button>
         <button 
           @click="activeTab = 'assignments'"
-          :class="activeTab === 'assignments' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+          :class="activeTab === 'assignments' ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
+          class="px-5 py-2 border-2 border-transparent hover:border-app-border font-black text-xs uppercase tracking-widest transition-all text-purple-500"
         >
-          Asignaciones
+          [ ASIGNACIONES ]
         </button>
         <button 
           v-if="auth.isSuperAdmin"
           @click="activeTab = 'activity'"
-          :class="activeTab === 'activity' ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-5 py-2 rounded-xl font-bold text-xs transition-all whitespace-nowrap"
+          :class="activeTab === 'activity' ? 'bg-app-text text-app-bg' : 'text-app-text-secondary hover:text-app-text'"
+          class="px-5 py-2 border-2 border-transparent hover:border-app-border font-black text-xs uppercase tracking-widest transition-all text-orange-500"
         >
-          Actividad
+          [ LOGS ]
         </button>
       </div>
     </header>
 
     <div v-if="loading" class="flex justify-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+      <div class="text-app-text font-black text-xl animate-pulse tracking-[0.3em]">CARGANDO_BASE_DE_DATOS...</div>
     </div>
 
     <div v-else>
@@ -135,20 +135,20 @@
       <!-- TAB: DASHBOARD (Stats) -->
       <div v-if="activeTab === 'dashboard'" class="space-y-8 animate-fade-in">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-[3rem] backdrop-blur-xl relative overflow-hidden group shadow-xl shadow-slate-200/60 dark:shadow-none transition-all hover:shadow-2xl hover:shadow-slate-300/50">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform text-slate-900 dark:text-white">
+          <div class="bg-app-secondary border-4 border-app-border p-8 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.1)] relative overflow-hidden group transition-all hover:shadow-[12px_12px_0px_0px_rgba(0,255,65,0.2)]">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform text-app-text">
               <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-width="2"/></svg>
             </div>
-            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Usuarios Totales</p>
-            <h4 class="text-5xl font-black text-slate-900 dark:text-white">{{ adminStore.stats?.users || 0 }}</h4>
+            <p class="text-[10px] font-black text-app-text-secondary uppercase tracking-widest mb-1">Usuarios Totales</p>
+            <h4 class="text-5xl font-black text-app-text">{{ adminStore.stats?.users || 0 }}</h4>
           </div>
           
-          <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-[3rem] backdrop-blur-xl relative overflow-hidden group border-b-blue-600/50 shadow-xl shadow-slate-200/60 dark:shadow-none transition-all hover:shadow-2xl hover:shadow-slate-300/50">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform text-slate-900 dark:text-white">
+          <div class="bg-app-secondary border-4 border-app-border p-8 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.1)] relative overflow-hidden group transition-all hover:shadow-[12px_12px_0px_0px_rgba(37,99,235,0.1)] border-b-blue-500">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform text-app-text">
               <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2"/></svg>
             </div>
-            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Proyectos Activos</p>
-            <h4 class="text-5xl font-black text-slate-900 dark:text-white">{{ adminStore.stats?.projects || 0 }}</h4>
+            <p class="text-[10px] font-black text-app-text-secondary uppercase tracking-widest mb-1">Proyectos Activos</p>
+            <h4 class="text-5xl font-black text-app-text">{{ adminStore.stats?.projects || 0 }}</h4>
           </div>
 
           <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-[3rem] backdrop-blur-xl relative overflow-hidden group border-b-purple-600/50 shadow-xl shadow-slate-200/60 dark:shadow-none transition-all hover:shadow-2xl hover:shadow-slate-300/50">
@@ -159,12 +159,12 @@
             <h4 class="text-5xl font-black text-slate-900 dark:text-white">{{ adminStore.stats?.tickets || 0 }}</h4>
           </div>
 
-          <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-[3rem] backdrop-blur-xl relative overflow-hidden group border-b-emerald-600/50 shadow-xl shadow-slate-200/60 dark:shadow-none transition-all hover:shadow-2xl hover:shadow-slate-300/50">
-            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform text-slate-900 dark:text-white">
+          <div class="bg-app-secondary border-4 border-app-border p-8 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.1)] relative overflow-hidden group transition-all hover:shadow-[12px_12px_0px_0px_rgba(16,185,129,0.1)] border-b-emerald-500">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform text-app-text">
               <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2" stroke-width="2"/></svg>
             </div>
-            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Tareas Totales</p>
-            <h4 class="text-5xl font-black text-slate-900 dark:text-white">{{ adminStore.stats?.tasks || 0 }}</h4>
+            <p class="text-[10px] font-black text-app-text-secondary uppercase tracking-widest mb-1">Tareas Totales</p>
+            <h4 class="text-5xl font-black text-app-text">{{ adminStore.stats?.tasks || 0 }}</h4>
           </div>
         </div>
 
@@ -281,7 +281,7 @@
           <div 
             v-for="category in categoryStore.categories" 
             :key="category.id"
-            class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-[3rem] shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all group relative overflow-hidden"
+            class="bg-app-secondary border-4 border-app-border p-8 shadow-[8px_8px_0px_0px_rgba(0,255,65,0.05)] hover:shadow-[12px_12px_0px_0px_rgba(0,255,65,0.1)] transition-all group relative overflow-hidden"
           >
             <div class="flex justify-between items-start mb-6">
               <div class="space-y-1">
@@ -337,7 +337,7 @@
           </button>
         </div>
         
-        <div class="overflow-hidden bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none">
+        <div class="overflow-hidden bg-app-secondary border-4 border-app-border shadow-[10px_10px_0px_0px_rgba(0,255,65,0.05)]">
           <table class="w-full text-left">
             <thead>
               <tr class="border-b border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5">

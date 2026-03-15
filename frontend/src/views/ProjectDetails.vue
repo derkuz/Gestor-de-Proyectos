@@ -1,46 +1,46 @@
 <template>
   <div v-if="projectStore.loading || taskStore.loading && taskStore.tasks.length === 0" class="flex justify-center py-20">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+    <div class="text-app-text font-black text-xl animate-pulse tracking-[0.3em]">CARGANDO_PROYECTO...</div>
   </div>
 
-  <div v-else-if="!projectStore.currentProject" class="text-center py-20">
-    <p class="text-app-text-muted font-medium">No se encontró el proyecto.</p>
-    <router-link to="/projects" class="text-purple-600 dark:text-purple-400 mt-4 inline-block font-bold underline">Volver a Proyectos</router-link>
+  <div v-else-if="!projectStore.currentProject" class="text-center py-20 bg-app-secondary border-4 border-app-border max-w-2xl mx-auto shadow-[10px_10px_0px_0px_rgba(0,255,65,0.1)]">
+    <h2 class="text-4xl font-black text-app-text mb-4 uppercase tracking-widest">[!] ERROR_404</h2>
+    <p class="text-app-text-secondary font-medium uppercase tracking-widest leading-relaxed">> NO_SE_ENCONTRÓ_EL_PROYECTO.</p>
+    <router-link to="/projects" class="text-app-text mt-8 inline-block font-black underline uppercase tracking-widest">[ REINTENTAR / VOLVER ]</router-link>
   </div>
 
   <div v-else>
     <header class="mb-10 flex flex-col md:flex-row justify-between items-start gap-4">
       <div>
-        <router-link to="/projects" class="text-app-text-muted hover:text-app-text transition-colors flex items-center space-x-2 mb-4 text-sm font-bold uppercase tracking-widest">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Volver a proyectos</span>
-        </router-link>
-        <h2 class="text-4xl font-black tracking-tight text-app-text">{{ projectStore.currentProject.nombre }}</h2>
-        <div class="flex items-center space-x-4 mt-3">
-          <span :class="getStatusClass(projectStore.currentProject.estado)" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border">
-            {{ projectStore.currentProject.estado }}
-          </span>
-          <p class="text-app-text-muted text-sm font-medium">Desde {{ formatDate(projectStore.currentProject.fechaCreacion) }}</p>
+        <div class="flex items-center space-x-3 mb-2">
+           <span class="text-[10px] bg-app-secondary text-app-text border-2 border-app-border font-black uppercase px-2 py-0.5 tracking-widest">
+             {{ projectStore.currentProject.estado }}
+           </span>
+           <span class="text-[10px] text-app-text-secondary font-bold uppercase tracking-widest">ID:{{ (projectStore.currentProject.id || '').split('-')[0] }}</span>
+        </div>
+        <div class="flex flex-col">
+          <h1 class="text-4xl md:text-5xl font-black text-app-text uppercase tracking-widest mb-1">> {{ projectStore.currentProject.nombre }}</h1>
+          <p class="text-app-text-secondary text-[10px] font-black uppercase tracking-widest">> INICIO: {{ formatDate(projectStore.currentProject.fechaCreacion) }}</p>
         </div>
       </div>
 
       <!-- Error Toast (Static for now) -->
       <div v-if="taskStore.error" class="fixed top-24 right-8 z-[60]">
-         <div class="bg-red-500/20 backdrop-blur-xl border border-red-500/30 px-6 py-3 rounded-2xl text-red-400 font-bold shadow-2xl flex items-center space-x-3 group relative">
-            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-width="2"/></svg>
-            <span class="flex-1">{{ taskStore.error }}</span>
-            <button @click="taskStore.error = null" class="w-6 h-6 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition-colors">
-               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+         <div class="bg-app-secondary border-4 border-red-500 p-4 text-red-500 font-bold shadow-[8px_8px_0px_0px_rgba(239,68,68,0.2)] flex items-center space-x-4 uppercase tracking-widest">
+            <span class="text-xl">[!]</span>
+            <span class="flex-1 text-sm">{{ taskStore.error }}</span>
+            <button @click="taskStore.error = null" class="p-1 border-2 border-red-500 hover:bg-red-500 hover:text-app-bg transition-colors">
+               [X]
             </button>
          </div>
       </div>
       
       <div v-if="projectStore.error" class="fixed top-24 right-8 z-[60]">
-         <div class="bg-red-500/20 backdrop-blur-xl border border-red-500/30 px-6 py-3 rounded-2xl text-red-400 font-bold shadow-2xl flex items-center space-x-3 group relative">
-            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-width="2"/></svg>
-            <span class="flex-1">{{ projectStore.error }}</span>
-            <button @click="projectStore.error = null" class="w-6 h-6 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition-colors">
-               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+         <div class="bg-app-secondary border-4 border-red-500 p-4 text-red-500 font-bold shadow-[8px_8px_0px_0px_rgba(239,68,68,0.2)] flex items-center space-x-4 uppercase tracking-widest">
+            <span class="text-xl">[!]</span>
+            <span class="flex-1 text-sm">{{ projectStore.error }}</span>
+            <button @click="projectStore.error = null" class="p-1 border-2 border-red-500 hover:bg-red-500 hover:text-app-bg transition-colors">
+               [X]
             </button>
          </div>
       </div>
@@ -65,122 +65,117 @@
       <!-- Project Overview, Progress & Documents Grid -->
       <div class="grid grid-cols-12 gap-6">
         <!-- Description block (col-span-12 lg:col-span-8) -->
-        <div class="col-span-12 lg:col-span-8 bg-app-surface border border-app-border p-6 rounded-2xl shadow-sm transition-colors">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-black text-app-text flex items-center gap-2">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              Project Overview
-            </h3>
-            <button class="text-app-text-muted hover:text-purple-500 transition-colors">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-            </button>
+        <div class="col-span-12 lg:col-span-8 pixel-card p-8">
+          <div class="flex items-center justify-between mb-6 border-b-2 border-app-border pb-4">
+            <h2 class="text-sm font-black text-app-text-secondary uppercase tracking-[0.2em]">> INFO_GENERAL</h2>
+            <div class="flex items-center space-x-2">
+                <button @click="isEditingDescription = true" class="text-[10px] font-black text-app-text hover:bg-app-text hover:text-app-bg px-2 border-2 border-app-border transition-all">
+                  [ EDITAR_INFO ]
+                </button>
+            </div>
           </div>
-          <div class="prose prose-slate dark:prose-invert max-w-none">
-            <p class="text-app-text-muted leading-relaxed font-medium">{{ projectStore.currentProject.descripcion || 'Sin descripción disponible.' }}</p>
+          <div class="bg-app-bg/20 p-6 border-2 border-app-border">
+            <p class="text-app-text leading-relaxed font-medium uppercase tracking-widest text-sm whitespace-pre-wrap">{{ projectStore.currentProject.descripcion || 'SIN_DESCRIPCIÓN_DISPONIBLE.' }}</p>
           </div>
           <div class="mt-6 flex flex-wrap gap-2">
-             <span class="px-3 py-1 bg-app-bg text-app-text-muted text-xs font-bold rounded-full border border-app-border">#infrastructure</span>
-             <span class="px-3 py-1 bg-app-bg text-app-text-muted text-xs font-bold rounded-full border border-app-border">#project</span>
+             <span class="px-3 py-1 bg-app-secondary text-app-text-secondary text-[10px] font-bold border-2 border-app-border uppercase tracking-widest">[ #INFRAESTRUCTURA ]</span>
+             <span class="px-3 py-1 bg-app-secondary text-app-text-secondary text-[10px] font-bold border-2 border-app-border uppercase tracking-widest">[ #PROYECTO ]</span>
           </div>
         </div>
 
         <!-- Right Column (Progress & Documents) -->
         <div class="col-span-12 lg:col-span-4 space-y-6">
           <!-- Progress Box -->
-          <div class="bg-app-surface border border-app-border p-6 rounded-2xl shadow-sm transition-colors">
-            <h3 class="text-sm font-black text-app-text-muted uppercase tracking-wider mb-4">Progreso de proyecto</h3>
-            <div class="flex items-end justify-between mb-2">
-              <span class="text-3xl font-black text-app-text">{{ completionPercentage }}%</span>
-              <span class="text-emerald-600 dark:text-emerald-500 text-[10px] font-black uppercase tracking-widest flex items-center">
-                 <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                 Estado actual
-              </span>
+          <div class="pixel-card p-6">
+            <h3 class="text-[10px] font-black text-app-text-secondary uppercase tracking-[0.2em] mb-4">> PROGRESO_SISTEMA</h3>
+            <div class="flex justify-between items-end mb-3">
+              <span class="text-4xl font-black text-app-text tracking-widest">{{ completionPercentage }}%</span>
+              <span class="text-[10px] text-app-text-secondary uppercase font-black">ESTADO: OK</span>
             </div>
-            <div class="w-full bg-app-bg h-2.5 rounded-full overflow-hidden border border-app-border">
-              <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full transition-all duration-1000" :style="{ width: `${completionPercentage}%` }"></div>
+            <div class="w-full bg-app-secondary h-4 border-2 border-app-border p-0.5 overflow-hidden">
+              <div class="bg-app-text h-full transition-all duration-1000 origin-left" :style="{ width: `${completionPercentage}%` }"></div>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-              <div class="text-center p-3 rounded-xl bg-app-bg border border-app-border">
-                <div class="text-[10px] text-app-text-muted uppercase font-black mb-1">Terminado</div>
-                <div class="font-black text-lg text-app-text">{{ completedTasksCount }}</div>
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <div class="text-center p-3 bg-app-secondary border-2 border-app-border">
+                <div class="text-[8px] text-app-text-secondary uppercase font-black mb-1">TERMINADO</div>
+                <div class="font-black text-lg text-app-text tracking-widest">{{ completedTasksCount }}</div>
               </div>
-              <div class="text-center p-3 rounded-xl bg-app-bg border border-app-border">
-                <div class="text-[10px] text-app-text-muted uppercase font-black mb-1">en proceso</div>
-                <div class="font-black text-lg text-rose-500">{{ inProgressTasksCount }}</div>
+              <div class="text-center p-3 bg-app-secondary border-2 border-app-border">
+                <div class="text-[8px] text-app-text-secondary uppercase font-black mb-1">PROCESO</div>
+                <div class="font-black text-lg text-app-text tracking-widest">{{ inProgressTasksCount }}</div>
               </div>
             </div>
           </div>
 
           <!-- Documents Box -->
-          <div class="bg-app-surface border border-app-border p-6 rounded-2xl shadow-sm transition-colors">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-black text-app-text-muted uppercase tracking-wider">Lista de documentos</h3>
-              <button @click="showAddDocModal = true" class="text-purple-600 dark:text-purple-400 text-xs font-black uppercase hover:underline">+ Agregar&nbsp;</button>
+          <div class="pixel-card p-6">
+            <div class="flex items-center justify-between mb-4 border-b-2 border-app-border pb-4">
+              <h3 class="text-[10px] font-black text-app-text-secondary uppercase tracking-[0.2em]">> DOCUMENTOS_ADJUNTOS</h3>
+              <button @click="showAddDocModal = true" class="text-app-text text-[10px] font-black uppercase hover:bg-app-text hover:text-app-bg px-2 border-2 border-app-border transition-all">[+ AGREGAR]</button>
             </div>
             <div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
               <div 
                 v-for="doc in docStore.documents" 
                 :key="doc.id"
-                class="flex items-center space-x-3 group cursor-pointer bg-app-bg p-3 rounded-xl border border-app-border hover:border-purple-500/30 transition-all"
+                class="flex items-center space-x-3 group cursor-pointer bg-app-bg p-3 border-2 border-app-border hover:border-app-text transition-all"
                 @click="handleDocumentAction(doc)"
               >
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                     :class="doc.tipo === 'MD' ? 'bg-purple-600/10 text-purple-600 dark:text-purple-400' : (doc.tipo === 'LINK' ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400' : 'bg-red-600/10 text-red-600 dark:text-red-400')">
-                  <svg v-if="doc.tipo === 'MD'" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-width="2"/></svg>
-                  <svg v-else-if="doc.tipo === 'LINK'" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2"/></svg>
-                  <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-width="2"/></svg>
+                <div class="w-10 h-10 flex items-center justify-center shrink-0 bg-app-secondary border-2 border-app-border text-app-text">
+                  <span v-if="doc.tipo === 'MD'" class="text-xl font-black">MD</span>
+                  <span v-else-if="doc.tipo === 'LINK'" class="text-xl font-black">LN</span>
+                  <span v-else class="text-xl font-black">FL</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-black truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors text-app-text">
+                  <p class="text-sm font-black truncate group-hover:text-app-text transition-colors text-app-text">
                      {{ doc.titulo }}{{ doc.tipo === 'MD' && !doc.titulo.toLowerCase().endsWith('.md') ? '.md' : '' }}
                   </p>
-                  <p class="text-[10px] text-app-text-muted uppercase font-black">{{ doc.tipo }}</p>
+                  <p class="text-[10px] text-app-text-secondary uppercase font-black">{{ doc.tipo }}</p>
                 </div>
                 <button 
                   @click.stop="handleDeleteDoc(doc.id)"
                   class="p-2 text-app-text-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                 >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2.5"/></svg>
+                  <span class="text-red-500 font-black">[X]</span>
                 </button>
               </div>
 
               <!-- Placeholder empty -->
-              <div v-if="docStore.documents.length === 0" class="py-8 flex flex-col items-center justify-center border-2 border-dashed border-app-border rounded-xl">
-                 <p class="text-app-text-muted text-sm font-medium">No hay documentos.</p>
+              <div v-if="docStore.documents.length === 0" class="py-8 flex flex-col items-center justify-center border-2 border-dashed border-app-border">
+                 <p class="text-app-text-muted text-sm font-medium uppercase tracking-widest">NO_HAY_DOCUMENTOS.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Unified Tasks Section -->
-      <section class="bg-app-surface border border-app-border p-8 rounded-3xl min-h-[500px] flex flex-col transition-colors shadow-xl">
-          <h3 class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div class="flex items-center space-x-4">
-              <span class="text-xl font-black text-app-text">Gestión de Actividades</span>
+      <!-- Tasks / Kanban Section -->
+      <section class="pt-8">
+        <div class="flex items-center justify-between mb-8 border-b-4 border-app-border pb-4">
+           <div class="flex items-center space-x-4">
+              <h2 class="text-2xl font-black text-app-text uppercase tracking-widest">> TABLERO_DE_CONTROL</h2>
+              <span class="text-[10px] bg-app-text text-app-bg px-2 font-black tracking-[0.2em] uppercase">{{ taskStore.tasks.length }} TAREAS_TOTAL</span>
+           </div>
+           <div class="flex space-x-3">
               <button 
-                  @click="openTaskModal()"
-                  :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
-                  class="px-4 py-2 bg-purple-600/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
-                >
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                  <span>Tarea</span>
+                @click="openTaskModal()"
+                :disabled="projectStore.currentProject.estado !== 'ACTIVO'"
+                class="px-6 py-2 bg-app-text border-2 border-app-text text-app-bg font-black uppercase text-xs tracking-widest hover:bg-app-secondary hover:text-app-text transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                [+] NUEVA_TAREA
               </button>
-            </div>
-            
-            <!-- Tab Navigation -->
-            <div class="flex p-1 bg-app-bg rounded-2xl border border-app-border self-start md:self-auto shadow-inner">
+            <div class="flex p-1 bg-app-bg border border-app-border self-start md:self-auto shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.2)]">
                <button 
                 v-for="tab in ['kanban', 'list', 'gantt']" 
                 :key="tab"
                 @click="activeTab = tab"
-                class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
-                :class="activeTab === tab ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-app-text-muted hover:text-app-text'"
+                class="px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                :class="activeTab === tab ? 'bg-purple-600 text-white shadow-[4px_4px_0px_0px_rgba(139,92,246,0.2)]' : 'text-app-text-muted hover:text-app-text'"
                >
                  {{ tab }}
                </button>
             </div>
-          </h3>
+          </div>
+        </div>
           
           <div class="flex-1">
             <KanbanBoard 
@@ -209,8 +204,8 @@
 
     <!-- Enhanced Task/Subtask Modal -->
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-app-bg/80 backdrop-blur-md" @click="showModal = false"></div>
-      <div class="bg-app-surface border border-app-border rounded-[2.5rem] p-10 w-full max-w-xl relative z-10 shadow-2xl animate-pop-in">
+      <div class="absolute inset-0 bg-app-bg/95" @click="showModal = false"></div>
+      <div class="bg-app-secondary border-4 border-app-border p-10 w-full max-w-xl relative z-10 shadow-[10px_10px_0px_0px_rgba(0,255,65,0.2)]">
         <h3 class="text-3xl font-black mb-1 text-app-text">
           <template v-if="isEditing">Editar {{ isSubtask ? 'Subtarea' : 'Tarea Principal' }}</template>
           <template v-else>Nueva {{ isSubtask ? 'Subtarea' : 'Tarea Principal' }}</template>
@@ -223,12 +218,12 @@
         <form @submit.prevent="handleSubmit" class="space-y-6 text-app-text">
           <div>
             <label class="block text-xs font-black text-app-text-muted uppercase tracking-widest mb-2">Título de la {{ isSubtask ? 'subtarea' : 'tarea' }}</label>
-            <input v-model="newTask.nombre" required class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-4 text-app-text focus:border-purple-500 outline-none transition-all" :placeholder="isSubtask ? 'Nombre de la subtarea' : 'Nombre de la tarea principal'">
+            <input v-model="newTask.nombre" required class="w-full bg-app-bg border border-app-border px-6 py-4 text-app-text focus:border-purple-500 outline-none transition-all" :placeholder="isSubtask ? 'Nombre de la subtarea' : 'Nombre de la tarea principal'">
           </div>
 
           <div v-if="!isSubtask">
              <label class="block text-xs font-black text-app-text-muted uppercase tracking-widest mb-2">Detalles / Descripción</label>
-             <textarea v-model="newTask.descripcion" rows="3" class="w-full bg-app-bg border border-app-border rounded-2xl px-6 py-4 text-app-text focus:border-purple-500 outline-none transition-all" placeholder="Explica brevemente de qué trata esta actividad..."></textarea>
+             <textarea v-model="newTask.descripcion" rows="3" class="w-full bg-app-bg border border-app-border px-6 py-4 text-app-text focus:border-purple-500 outline-none transition-all" placeholder="Explica brevemente de qué trata esta actividad..."></textarea>
           </div>
 
           <div v-if="!isSubtask">
@@ -239,7 +234,7 @@
                <span 
                 v-for="userId in newTask.asignados" 
                 :key="'sel-'+userId"
-                class="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 text-xs font-bold rounded-xl flex items-center gap-2"
+                class="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-2"
                >
                  {{ usersStore.users.find(u => u.id === userId)?.nombre }}
                  <button type="button" @click="toggleUser(userId)" class="hover:text-red-400 font-black">&times;</button>
@@ -252,9 +247,9 @@
                  v-model="userSearch" 
                  type="text" 
                  placeholder="Buscar por nombre..." 
-                 class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none transition-all text-sm"
+                 class="w-full bg-white/5 border border-white/10 px-4 py-3 text-white focus:border-purple-500 outline-none transition-all text-sm"
                >
-               <svg class="w-4 h-4 text-slate-500 absolute right-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+               <span class="w-4 h-4 text-slate-500 absolute right-4 top-3.5">[?]</span>
             </div>
 
             <!-- Filtered Users List -->

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <h2 class="text-3xl font-black mb-8 text-app-text">Resumen General</h2>
+    <h2 class="text-3xl font-black mb-8 text-app-text tracking-widest uppercase">_ DASHBOARD</h2>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      <div v-for="stat in stats" :key="stat.label" class="bg-app-surface border border-app-border p-8 rounded-3xl hover:shadow-lg transition-all group">
-        <p class="text-app-text-muted text-sm font-bold uppercase tracking-widest mb-2">{{ stat.label }}</p>
-        <div class="flex items-end justify-between">
-          <p class="text-4xl font-black tracking-tighter text-app-text">{{ stat.value }}</p>
-          <div :class="`p-3 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400 group-hover:scale-110 transition-transform`">
-            <component :is="stat.icon" class="w-6 h-6" />
+      <div v-for="stat in stats" :key="stat.label" class="pixel-card group">
+        <p class="text-app-text-secondary text-xs font-bold uppercase tracking-[0.2em] mb-4">{{ stat.label }}</p>
+        <div class="flex items-center justify-between">
+          <p class="text-4xl font-black text-app-text">{{ stat.value }}</p>
+          <div class="text-app-text opacity-50 text-xl font-bold">
+            [STAT]
           </div>
         </div>
       </div>
@@ -16,54 +16,54 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Project Progress Breakdown -->
-      <div class="bg-app-surface border border-app-border p-8 rounded-3xl">
-        <h3 class="text-xl font-black mb-6 text-app-text">Progreso por Proyecto</h3>
+      <div class="pixel-card">
+        <h3 class="text-xl font-black mb-6 text-app-text uppercase tracking-widest">> PROGRESO_PROYECTOS</h3>
         <div class="space-y-6">
-          <div v-if="!projectStore.stats.proyectosDetalle?.length" class="text-app-text-muted font-medium py-4">
-            No hay proyectos registrados aún.
+          <div v-if="!projectStore.stats.proyectosDetalle?.length" class="text-app-text-secondary font-medium py-4">
+            [!] SIN DATOS DISPONIBLES
           </div>
           <div 
             v-for="proj in projectStore.stats.proyectosDetalle" 
             :key="proj.id"
-            class="group cursor-pointer"
+            class="group cursor-pointer border-b-2 border-transparent hover:border-app-border pb-2 transition-all"
             @click="$router.push(`/projects/${proj.id}`)"
           >
             <div class="flex justify-between items-end mb-2">
-              <span class="font-bold text-app-text group-hover:text-blue-500 transition-colors">{{ proj.nombre }}</span>
-              <span class="text-xs font-black text-app-text-muted">{{ proj.progreso }}%</span>
+              <span class="font-bold text-app-text uppercase tracking-wider">{{ proj.nombre }}</span>
+              <span class="text-xs font-black text-app-text">{{ proj.progreso }}%</span>
             </div>
-            <div class="h-2 w-full bg-app-bg rounded-full overflow-hidden border border-app-border">
+            <div class="h-4 w-full bg-app-secondary border-2 border-app-border relative overflow-hidden">
               <div 
-                class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-1000"
+                class="h-full bg-app-text opacity-80"
                 :style="{ width: proj.progreso + '%' }"
               ></div>
             </div>
             <div class="flex justify-between mt-1.5">
-               <span class="text-[9px] font-black uppercase tracking-tighter text-app-text-muted">{{ proj.estado }}</span>
-               <span class="text-[9px] font-black uppercase tracking-tighter text-app-text-muted">{{ proj.tareasFinalizadas }}/{{ proj.totalTareas }} Tareas</span>
+               <span class="text-[10px] font-black uppercase tracking-widest text-app-text-secondary">{{ proj.estado }}</span>
+               <span class="text-[10px] font-black uppercase tracking-widest text-app-text-secondary">{{ proj.tareasFinalizadas }}/{{ proj.totalTareas }} TAREAS</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Quick Actions -->
-      <div class="bg-app-surface border border-app-border p-8 rounded-3xl flex flex-col justify-between">
+      <div class="pixel-card flex flex-col justify-between">
         <div>
-           <h3 class="text-xl font-black mb-6 text-app-text">Acciones Rápidas</h3>
+           <h3 class="text-xl font-black mb-6 text-app-text uppercase tracking-widest">> ACCIONES_RÁPIDAS</h3>
            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-             <router-link to="/projects" class="p-6 rounded-2xl bg-purple-600/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-center hover:bg-purple-600/20 transition-all flex flex-col items-center group">
-               <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">📂</span>
-               + Nuevo Proyecto
+             <router-link to="/projects" class="p-6 border-2 border-app-border text-app-text font-bold text-center hover:bg-app-text hover:text-app-bg transition-all flex flex-col items-center group">
+               <span class="text-2xl mb-2">[+]</span>
+               NUEVO PROYECTO
              </router-link>
-             <router-link to="/tickets" class="p-6 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-center hover:bg-blue-600/20 transition-all flex flex-col items-center group">
-               <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">🎟️</span>
-               + Abrir Ticket
+             <router-link to="/tickets" class="p-6 border-2 border-app-border text-app-text font-bold text-center hover:bg-app-text hover:text-app-bg transition-all flex flex-col items-center group">
+               <span class="text-2xl mb-2">[!]</span>
+               ABRIR TICKET
              </router-link>
            </div>
         </div>
         
-        <div class="mt-8 pt-8 border-t border-app-border italic text-app-text-muted text-xs">
-           "La gestión de proyectos es el arte de convertir una visión en realidad, tarea por tarea."
+        <div class="mt-8 pt-8 border-t-2 border-app-border italic text-app-text-secondary text-xs uppercase tracking-widest">
+           "SISTEMA OPERATIVO PRISMA V1.0.0 - LISTO PARA OPERAR"
         </div>
       </div>
     </div>

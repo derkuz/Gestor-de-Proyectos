@@ -1,17 +1,17 @@
 <template>
-  <div class="h-screen bg-app-bg text-app-text flex flex-col overflow-hidden transition-colors">
+  <div class="h-screen bg-app-bg text-app-text flex flex-col overflow-hidden transition-all">
     <!-- Header -->
-    <header class="h-16 border-b border-app-border px-8 flex items-center justify-between backdrop-blur-xl bg-app-surface/50 sticky top-0 z-50">
+    <header class="h-16 border-b-2 border-app-border px-8 flex items-center justify-between bg-app-secondary sticky top-0 z-50">
       <div class="flex items-center space-x-6">
-        <button @click="goBack" class="p-2 hover:bg-app-bg rounded-xl transition-all text-app-text-muted hover:text-app-text border border-transparent hover:border-app-border">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button @click="goBack" class="p-2 border-2 border-app-border bg-app-secondary text-app-text hover:bg-app-text hover:text-app-secondary transition-all">
+          <span class="font-black"><- VOLVER</span>
         </button>
         <div>
-          <h2 class="text-[10px] font-black uppercase tracking-widest text-app-text-muted mb-0.5">Editando Documento</h2>
+          <h2 class="text-[10px] font-black uppercase tracking-widest text-app-text-secondary mb-0.5">> EDITANDO_DOCUMENTO</h2>
           <input 
             v-model="docTitle" 
-            class="bg-transparent border-none p-0 text-xl font-black focus:ring-0 w-80 text-app-text placeholder-app-text-muted/30"
-            placeholder="Título del documento..."
+            class="bg-transparent border-none p-0 text-xl font-black focus:ring-0 w-80 text-app-text placeholder-app-text-secondary/30 uppercase tracking-widest"
+            placeholder="TÍTULO_DEL_DOCUMENTO..."
           >
         </div>
       </div>
@@ -19,26 +19,26 @@
       <div class="flex items-center space-x-3">
         <button 
           @click="showMermaidHelper = !showMermaidHelper"
-          class="p-2.5 rounded-xl text-app-text-muted hover:text-app-text transition-all border border-app-border bg-app-bg"
-          title="Ayuda de Mermaid"
+          class="px-4 py-2 border-2 border-app-border bg-app-secondary text-app-text font-black text-xs uppercase tracking-widest hover:bg-app-text hover:text-app-secondary transition-all"
+          title="AYUDA"
         >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          [AYUDA]
         </button>
 
         <button 
           @click="showPreview = !showPreview" 
-          class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
-          :class="showPreview ? 'bg-blue-600/10 border-blue-600/20 text-blue-600 dark:text-blue-400' : 'border-app-border text-app-text-muted hover:text-app-text'"
+          class="px-4 py-2 border-2 border-app-border transition-all text-xs font-black uppercase tracking-widest"
+          :class="showPreview ? 'bg-app-text text-app-bg' : 'bg-app-secondary text-app-text hover:bg-app-text hover:text-app-secondary'"
         >
-          {{ showPreview ? 'Cerrar Vista Previa' : 'Vista Previa' }}
+          {{ showPreview ? '[ CERRAR_VISTA ]' : '[ VISTA_PREVIA ]' }}
         </button>
         
         <button 
           @click="handleSave"
           :disabled="saving"
-          class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+          class="px-6 py-2 bg-app-text border-2 border-app-text text-app-bg font-black uppercase tracking-widest text-xs hover:bg-app-secondary hover:text-app-text transition-all disabled:opacity-50"
         >
-          {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
+          {{ saving ? 'GUARDANDO...' : '[ GUARDAR ]' }}
         </button>
       </div>
     </header>
@@ -55,117 +55,113 @@
     </div>
 
     <!-- Toolbar -->
-    <div class="h-12 border-b border-app-border bg-app-surface px-6 flex items-center space-x-1 overflow-visible shrink-0 relative z-[60]">
+    <div class="h-12 border-b-4 border-app-border bg-app-bg px-6 flex items-center space-x-1 overflow-visible shrink-0 relative z-[60]">
       <template v-for="(btn, idx) in toolbarButtons" :key="idx">
         <div v-if="btn.type === 'separator'" class="w-px h-6 bg-app-border mx-2"></div>
         
         <!-- Template Select -->
-        <div v-else-if="btn.type === 'template-select'" class="relative">
-           <button 
-             @click="showTemplates = !showTemplates"
-             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-blue-500 bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all flex items-center space-x-2"
-           >
-              <span>Plantillas</span>
-              <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': showTemplates }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-           </button>
-           
-           <div v-if="showTemplates" class="absolute left-0 mt-2 w-64 bg-app-surface border border-app-border rounded-2xl shadow-2xl z-[100] p-2 space-y-1 animate-pop-in">
-              <div class="absolute inset-0 bg-app-surface/50 backdrop-blur-xl rounded-2xl -z-10"></div>
-              <button 
-                v-for="tmp in templates" 
-                :key="tmp.id"
-                @click="handleApplyTemplate(tmp)"
-                class="w-full text-left px-4 py-3 rounded-xl hover:bg-app-bg transition-all flex flex-col group/item"
-              >
-                 <span class="text-xs font-black text-app-text group-hover/item:text-blue-400 transition-colors">{{ tmp.name }}</span>
-                 <span class="text-[10px] text-app-text-muted mt-0.5">{{ tmp.desc }}</span>
-              </button>
-           </div>
+         <div v-else-if="btn.type === 'template-select'" class="relative">
+            <button 
+              @click="showTemplates = !showTemplates"
+              class="px-4 py-1.5 border-2 border-app-border bg-app-bg text-app-text text-[10px] font-black uppercase tracking-widest hover:bg-app-text hover:text-app-bg transition-all flex items-center space-x-2"
+            >
+               <span>[ PLANTILLAS ]</span>
+               <span class="text-[8px] transition-transform" :class="{ 'rotate-180': showTemplates }">V</span>
+            </button>
+                      <div v-if="showTemplates" class="absolute left-0 mt-2 w-64 bg-app-secondary border-2 border-app-border p-2 space-y-1 z-[100] shadow-[4px_4px_0px_0px_rgba(0,255,65,0.1)]">
+               <button 
+                 v-for="tmp in templates" 
+                 :key="tmp.id"
+                 @click="handleApplyTemplate(tmp)"
+                 class="w-full text-left px-4 py-2 border-2 border-transparent hover:border-app-border hover:bg-app-text/5 transition-all flex flex-col group/item"
+               >
+                  <span class="text-xs font-black text-app-text tracking-widest uppercase">{{ tmp.name }}</span>
+                  <span class="text-[9px] text-app-text-secondary mt-0.5 uppercase tracking-tighter">{{ tmp.desc }}</span>
+               </button>
+            </div>
         </div>
 
-        <button 
-          v-else
-          @click="insertMarkdown(btn.action)"
-          class="p-2 rounded-lg text-app-text-muted hover:text-app-text hover:bg-app-bg transition-all"
-          :title="btn.title"
-        >
-          <component :is="btn.icon" class="w-5 h-5" />
-        </button>
+         <button 
+           v-else
+           @click="insertMarkdown(btn.action)"
+           class="p-2 border-2 border-transparent hover:border-app-border hover:bg-app-text/5 text-app-text-secondary hover:text-app-text transition-all"
+           :title="btn.title"
+         >
+           <component :is="btn.icon" class="w-4 h-4" />
+         </button>
       </template>
     </div>
 
     <!-- Editor Area -->
     <main class="flex-1 flex overflow-hidden relative">
       <!-- Textarea (Left/Full) -->
-      <div 
-        class="flex-1 h-full p-0 transition-all duration-300 relative group"
-        :class="showPreview ? 'w-1/2 border-r border-app-border' : 'w-full'"
-      >
-        <textarea 
-          ref="editorRef"
-          v-model="docContent"
-          class="w-full h-full bg-app-bg border-none focus:ring-0 text-app-text font-mono text-base resize-none outline-none leading-relaxed p-10 custom-scrollbar"
-          placeholder="Escribe aquí en formato Markdown..."
-        ></textarea>
-        
-        <div class="absolute bottom-6 right-8 text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          Markdown Editor
-        </div>
+       <div 
+         class="flex-1 h-full p-0 transition-all duration-0 relative group"
+         :class="showPreview ? 'w-1/2 border-r-2 border-app-border' : 'w-full'"
+       >
+         <textarea 
+           ref="editorRef"
+           v-model="docContent"
+           class="w-full h-full bg-app-bg border-none focus:ring-0 text-app-text font-mono text-base resize-none outline-none leading-relaxed p-10 custom-scrollbar uppercase tracking-widest whitespace-pre-wrap"
+           placeholder="ESCRIBE_AQUÍ..."
+         ></textarea>
+                <div class="absolute bottom-6 right-8 text-[10px] font-black text-app-text-secondary uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+           _ EDITOR_MARKDOWN
+         </div>
       </div>
 
       <!-- Preview Area (Right) -->
-      <div 
-        v-if="showPreview"
-        class="w-1/2 h-full p-12 bg-app-bg/30 overflow-y-auto animate-fade-in custom-scrollbar"
-      >
-        <div class="prose dark:prose-invert prose-blue max-w-none prose-sm md:prose-base" v-html="previewHtml"></div>
-      </div>
+       <div 
+         v-if="showPreview"
+         class="w-1/2 h-full p-12 bg-app-secondary overflow-y-auto custom-scrollbar"
+       >
+         <div class="prose prose-retro max-w-none" v-html="previewHtml"></div>
+       </div>
 
       <!-- Mermaid Side Panel -->
-      <transition name="slide-panel">
-        <div v-if="showMermaidHelper" class="absolute right-0 top-0 bottom-0 w-80 bg-app-surface border-l border-app-border shadow-2xl z-40 flex flex-col">
-          <div class="p-6 border-b border-app-border flex justify-between items-center bg-app-bg/50">
-            <h3 class="text-xs font-black uppercase tracking-widest text-app-text">Ayuda de Mermaid</h3>
-            <button @click="showMermaidHelper = false" class="text-app-text-muted hover:text-app-text">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
-            <!-- Flowchart Section -->
-            <section>
-              <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3">Diagrama de Flujo</h4>
-              <p class="text-[11px] text-app-text-muted mb-4 leading-relaxed font-medium">Usa bloques de código con la etiqueta <code class="bg-app-bg px-1 rounded text-app-text">mermaid</code>.</p>
-              
-              <div class="bg-app-bg rounded-xl border border-app-border p-4 relative group cursor-pointer" @click="insertMarkdown('flowchart')">
-                <pre class="text-[10px] font-mono text-app-text-muted leading-tight">
-graph TD
-    A[Inicio] --> B{¿Procesar?}
-    B -- Sí --> C[Tarea]
-    B -- No --> D[Fin]
-    C --> D</pre>
-                <div class="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all rounded-xl">
-                  <span class="text-[9px] font-black uppercase tracking-widest text-blue-600">Click para insertar</span>
-                </div>
-              </div>
-            </section>
+       <transition name="slide-panel">
+         <div v-if="showMermaidHelper" class="absolute right-0 top-0 bottom-0 w-80 bg-app-secondary border-l-2 border-app-border shadow-[10px_10px_0px_0px_rgba(0,255,65,0.05)] z-40 flex flex-col">
+           <div class="p-6 border-b-2 border-app-border flex justify-between items-center">
+             <h3 class="text-xs font-black uppercase tracking-widest text-app-text">>> AYUDA_MERMAID</h3>
+             <button @click="showMermaidHelper = false" class="text-app-text hover:bg-app-text hover:text-app-secondary border-2 border-app-border px-2 py-0.5 transition-colors">
+               [X]
+             </button>
+           </div>
+           <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+             <!-- Flowchart Section -->
+             <section>
+               <h4 class="text-[10px] font-black text-app-text-secondary uppercase tracking-widest mb-3">> DIAGRAMA_DE_FLUJO</h4>
+               <p class="text-[11px] text-app-text-secondary mb-4 uppercase tracking-widest">> BLOQUES_CÓDIGO_MERMAID.</p>
+               
+               <div class="pixel-card bg-app-bg p-4 relative group cursor-pointer" @click="insertMarkdown('flowchart')">
+                 <pre class="text-[10px] font-mono text-app-text-secondary leading-tight uppercase">
+ graph TD
+     A[Inicio] --> B{¿Procesar?}
+     B -- Sí --> C[Tarea]
+     B -- No --> D[Fin]
+     C --> D</pre>
+                 <div class="absolute inset-0 bg-app-text/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                   <span class="text-[9px] font-black uppercase tracking-widest text-app-text">[ INSERTAR ]</span>
+                 </div>
+               </div>
+             </section>
 
-            <!-- Mermaid Intro -->
-            <section class="bg-blue-600/5 p-4 rounded-xl border border-blue-500/10">
-              <h4 class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Tipos de Nodos</h4>
-              <ul class="text-[11px] text-app-text-muted space-y-2 font-medium">
-                <li><code class="text-blue-500">[Rect]</code> - Nodo rectangular</li>
-                <li><code class="text-blue-500">(Round)</code> - Nodo redondeado</li>
-                <li><code class="text-blue-500">{Diamond}</code> - Nodo de decisión</li>
-                <li><code class="text-blue-500">((Circle))</code> - Nodo circular</li>
-              </ul>
-            </section>
-            
-            <section class="pt-4">
-              <p class="text-[10px] text-app-text-muted font-bold italic">Selecciona un tipo de diagrama para copiar el ejemplo básico al editor.</p>
-            </section>
-          </div>
-        </div>
-      </transition>
+             <!-- Mermaid Intro -->
+             <section class="pixel-card border-app-text/20 bg-app-text/5 p-4">
+               <h4 class="text-[10px] font-black text-app-text uppercase tracking-widest mb-2">> TIPOS_DE_NODOS</h4>
+               <ul class="text-[11px] text-app-text-secondary space-y-2 font-medium uppercase tracking-[0.1em]">
+                 <li>[RECT] - NODO RECTANGULAR</li>
+                 <li>(ROUND) - NODO REDONDEADO</li>
+                 <li>{DIAMOND} - NODO DECISIÓN</li>
+                 <li>((CIRCLE)) - NODO CIRCULAR</li>
+               </ul>
+             </section>
+                        <section class="pt-4">
+               <p class="text-[10px] text-app-text-secondary font-bold uppercase tracking-widest">> SELECCIONA_TIPO_PARA_COPIAR.</p>
+             </section>
+           </div>
+         </div>
+       </transition>
     </main>
   </div>
 </template>
@@ -190,21 +186,13 @@ const showTemplates = ref(false)
 const saving = ref(false)
 const editorRef = ref(null)
 
-// Initialize Mermaid
-mermaid.initialize({
-    startOnLoad: false,
-    theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'default',
-    securityLevel: 'loose',
-    fontFamily: 'Inter'
-})
-
 // Custom renderer for marked to handle mermaid blocks
 const renderer = new marked.Renderer()
 const originalCode = renderer.code.bind(renderer)
 renderer.code = (token) => {
     const { text, lang } = token
     if (lang === 'mermaid') {
-        return `<div class="mermaid-container my-8 flex justify-center bg-app-surface p-6 rounded-2xl border border-app-border">
+        return `<div class="mermaid-container my-8 flex justify-center bg-app-secondary p-6 border-2 border-app-border uppercase">
                   <pre class="mermaid">${text}</pre>
                 </div>`
     }
@@ -772,7 +760,7 @@ sequenceDiagram
 
 .slide-panel-enter-active,
 .slide-panel-leave-active {
-  transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 0.2s steps(4);
 }
 
 .slide-panel-enter-from,

@@ -8,8 +8,7 @@
 <style>
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'VT323', monospace;
+  image-rendering: pixelated;
 }
 </style>
